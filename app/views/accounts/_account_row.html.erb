@@ -1,0 +1,29 @@
+<tr class="transition-colors hover:bg-zinc-50/80">
+  <td class="px-4 py-3">
+    <%= link_to account.name, account, class: "font-medium text-zinc-900 no-underline hover:text-accent" %>
+  </td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 sm:table-cell">
+    <% if account.plan %>
+      <%= link_to account.plan.name, plan_path(account.plan), class: "text-zinc-600 no-underline hover:text-accent" %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="px-4 py-3">
+    <% if account.active? %>
+      <span class="inline-flex rounded-md bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-800">Ativa</span>
+    <% else %>
+      <span class="inline-flex rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Inativa</span>
+    <% end %>
+  </td>
+  <td class="px-4 py-3 text-right">
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= link_to "Ver", account, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= link_to "Editar", edit_account_path(account), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= button_to "Excluir", account, method: :delete,
+            form: { class: "inline" },
+            data: { turbo_confirm: "Excluir esta conta?" },
+            class: "app-btn-danger cursor-pointer px-3 py-1.5 text-xs" %>
+    </div>
+  </td>
+</tr>

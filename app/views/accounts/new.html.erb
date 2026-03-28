@@ -1,0 +1,17 @@
+<% content_for :title, "Nova conta · Docfy" %>
+
+<div class="mx-auto max-w-xl space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent">Contas</p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Nova conta</h1>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600">Associe um nome, um plano e o status da conta.</p>
+  </header>
+
+  <div class="app-card p-6 sm:p-8">
+    <%= render "form", account: @account %>
+  </div>
+
+  <p>
+    <%= link_to "← Voltar às contas", accounts_path, class: "text-sm font-medium text-zinc-600 no-underline transition-colors hover:text-zinc-900" %>
+  </p>
+</div>

@@ -1,0 +1,26 @@
+<% content_for :title, "#{@account.name} · Docfy" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Contas</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= @account.name %></h1>
+      <p class="mt-1 text-sm text-zinc-500">Detalhes da conta</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Editar", edit_account_path(@account), class: "app-btn-primary" %>
+      <%= link_to "Voltar", accounts_path, class: "app-btn-secondary" %>
+    </div>
+  </header>
+
+  <%= render @account %>
+
+  <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
+    <p class="text-sm font-medium text-zinc-800">Zona de risco</p>
+    <p class="mt-1 text-sm text-zinc-600">Excluir remove permanentemente esta conta.</p>
+    <%= button_to "Excluir conta", @account, method: :delete,
+          form: { class: "mt-4 inline" },
+          data: { turbo_confirm: "Excluir esta conta? Esta ação não pode ser desfeita." },
+          class: "app-btn-danger cursor-pointer" %>
+  </div>
+</div>
