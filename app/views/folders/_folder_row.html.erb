@@ -1,0 +1,22 @@
+<tr class="transition-colors hover:bg-zinc-50/80">
+  <td class="px-4 py-3">
+    <%= link_to folder.name, folder, class: "font-medium text-zinc-900 no-underline hover:text-accent" %>
+  </td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 sm:table-cell">
+    <% if folder.account %>
+      <%= link_to folder.account.name, account_path(folder.account), class: "text-zinc-600 no-underline hover:text-accent" %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="px-4 py-3 text-right">
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= link_to "Ver", folder, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= link_to "Editar", edit_folder_path(folder), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= button_to "Excluir", folder, method: :delete,
+            form: { class: "inline" },
+            data: { turbo_confirm: "Excluir esta pasta?" },
+            class: "app-btn-danger cursor-pointer px-3 py-1.5 text-xs" %>
+    </div>
+  </td>
+</tr>

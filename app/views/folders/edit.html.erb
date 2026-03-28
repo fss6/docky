@@ -1,0 +1,19 @@
+<% content_for :title, "Editar pasta · Docfy" %>
+
+<div class="mx-auto max-w-xl space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent">Pastas</p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Editar pasta</h1>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600">Atualize o nome ou a conta desta pasta.</p>
+  </header>
+
+  <div class="app-card p-6 sm:p-8">
+    <%= render "form", folder: @folder %>
+  </div>
+
+  <p class="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+    <%= link_to "Ver detalhes", folder_path(@folder), class: "font-medium text-accent no-underline hover:text-teal-700" %>
+    <span class="text-zinc-300" aria-hidden="true">|</span>
+    <%= link_to "← Voltar às pastas", folders_path, class: "font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
+  </p>
+</div>
