@@ -11,6 +11,7 @@
       { key: :dashboard, label: "Painel", path: root_path, icon: :home },
       { key: :collections, label: "Coleções", path: plans_path, icon: :layers },
       { key: :accounts, label: "Contas", path: accounts_path, icon: :building },
+      { key: :users, label: "Usuários", path: users_path, icon: :users },
       { key: :assets, label: "Ativos", path: "#", icon: :document },
       { key: :insights, label: "Insights IA", path: "#", icon: :sparkles },
       { key: :settings, label: "Configurações", path: "#", icon: :cog }
@@ -18,7 +19,8 @@
     <% nav.each do |item| %>
       <% active = (item[:key] == :dashboard && current_page?(root_path)) ||
                    (item[:key] == :collections && request.path.start_with?("/plans")) ||
-                   (item[:key] == :accounts && request.path.start_with?("/accounts")) %>
+                   (item[:key] == :accounts && request.path.start_with?("/accounts")) ||
+                   (item[:key] == :users && request.path.start_with?("/users")) %>
       <%= link_to item[:path], class: [
             "group flex items-center justify-center gap-3 rounded-md px-2 py-2.5 text-zinc-400 transition-colors no-underline xl:justify-start",
             (active ? "bg-zinc-800/80 text-white" : "hover:bg-zinc-800/60 hover:text-zinc-200")

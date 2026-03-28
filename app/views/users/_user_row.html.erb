@@ -1,0 +1,31 @@
+<tr class="transition-colors hover:bg-zinc-50/80">
+  <td class="px-4 py-3">
+    <%= link_to user.name, user, class: "font-medium text-zinc-900 no-underline hover:text-accent" %>
+  </td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 md:table-cell"><%= user.email %></td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 sm:table-cell"><%= user.role %></td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 lg:table-cell">
+    <% if user.account %>
+      <%= link_to user.account.name, account_path(user.account), class: "text-zinc-600 no-underline hover:text-accent" %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="px-4 py-3">
+    <% if user.active? %>
+      <span class="inline-flex rounded-md bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-800">Ativo</span>
+    <% else %>
+      <span class="inline-flex rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Inativo</span>
+    <% end %>
+  </td>
+  <td class="px-4 py-3 text-right">
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= link_to "Ver", user, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= link_to "Editar", edit_user_path(user), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= button_to "Excluir", user, method: :delete,
+            form: { class: "inline" },
+            data: { turbo_confirm: "Excluir este usuário?" },
+            class: "app-btn-danger cursor-pointer px-3 py-1.5 text-xs" %>
+    </div>
+  </td>
+</tr>

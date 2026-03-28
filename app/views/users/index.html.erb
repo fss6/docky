@@ -1,0 +1,42 @@
+<% content_for :title, "Usuários · Docfy" %>
+
+<div class="space-y-8">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Acesso</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Usuários</h1>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
+        Gerencie pessoas vinculadas às contas, funções e status de acesso.
+      </p>
+    </div>
+    <%= link_to "Novo usuário", new_user_path, class: "app-btn-primary w-full shrink-0 sm:w-auto" %>
+  </header>
+
+  <% if @users.any? %>
+    <div class="app-card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <th class="px-4 py-3 font-semibold">Nome</th>
+              <th class="hidden px-4 py-3 font-semibold md:table-cell">E-mail</th>
+              <th class="hidden px-4 py-3 font-semibold sm:table-cell">Função</th>
+              <th class="hidden px-4 py-3 font-semibold lg:table-cell">Conta</th>
+              <th class="px-4 py-3 font-semibold">Status</th>
+              <th class="px-4 py-3 text-right font-semibold">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            <%= render partial: "users/user_row", collection: @users, as: :user %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="app-card px-6 py-16 text-center">
+      <p class="text-sm font-medium text-zinc-900">Nenhum usuário cadastrado</p>
+      <p class="mt-1 text-sm text-zinc-500">Crie o primeiro usuário para começar.</p>
+      <%= link_to "Novo usuário", new_user_path, class: "app-btn-primary mt-6 inline-flex" %>
+    </div>
+  <% end %>
+</div>
