@@ -1,0 +1,26 @@
+<% content_for :title, "#{@group.name} · Docfy" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Grupos</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= @group.name %></h1>
+      <p class="mt-1 text-sm text-zinc-500">Detalhes do grupo</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Editar", edit_group_path(@group), class: "app-btn-primary" %>
+      <%= link_to "Voltar", groups_path, class: "app-btn-secondary" %>
+    </div>
+  </header>
+
+  <%= render @group %>
+
+  <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
+    <p class="text-sm font-medium text-zinc-800">Zona de risco</p>
+    <p class="mt-1 text-sm text-zinc-600">Excluir remove permanentemente este grupo.</p>
+    <%= button_to "Excluir grupo", @group, method: :delete,
+          form: { class: "mt-4 inline" },
+          data: { turbo_confirm: "Excluir este grupo? Esta ação não pode ser desfeita." },
+          class: "app-btn-danger cursor-pointer" %>
+  </div>
+</div>

@@ -13,6 +13,7 @@
       { key: :accounts, label: "Contas", path: accounts_path, icon: :building },
       { key: :users, label: "Usuários", path: users_path, icon: :users },
       { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
+      { key: :groups, label: "Grupos", path: groups_path, icon: :group },
       { key: :subscriptions, label: "Assinaturas", path: subscriptions_path, icon: :credit_card },
       { key: :assets, label: "Ativos", path: "#", icon: :document },
       { key: :insights, label: "Insights IA", path: "#", icon: :sparkles },
@@ -24,6 +25,7 @@
                    (item[:key] == :accounts && request.path.start_with?("/accounts")) ||
                    (item[:key] == :users && request.path.start_with?("/users")) ||
                    (item[:key] == :folders && request.path.start_with?("/folders")) ||
+                   (item[:key] == :groups && request.path.start_with?("/groups")) ||
                    (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) %>
       <%= link_to item[:path], class: [
             "group flex items-center justify-center gap-3 rounded-md px-2 py-2.5 text-zinc-400 transition-colors no-underline xl:justify-start",

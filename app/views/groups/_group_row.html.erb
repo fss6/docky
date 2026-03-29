@@ -1,0 +1,22 @@
+<tr class="transition-colors hover:bg-zinc-50/80">
+  <td class="px-4 py-3">
+    <%= link_to group.name, group, class: "font-medium text-zinc-900 no-underline hover:text-accent" %>
+  </td>
+  <td class="hidden px-4 py-3 text-sm text-zinc-600 sm:table-cell">
+    <% if group.account %>
+      <%= link_to group.account.name, account_path(group.account), class: "text-zinc-600 no-underline hover:text-accent" %>
+    <% else %>
+      —
+    <% end %>
+  </td>
+  <td class="px-4 py-3 text-right">
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      <%= link_to "Ver", group, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= link_to "Editar", edit_group_path(group), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <%= button_to "Excluir", group, method: :delete,
+            form: { class: "inline" },
+            data: { turbo_confirm: "Excluir este grupo?" },
+            class: "app-btn-danger cursor-pointer px-3 py-1.5 text-xs" %>
+    </div>
+  </td>
+</tr>

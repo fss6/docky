@@ -1,0 +1,32 @@
+<%= form_with(model: group, class: "space-y-6") do |form| %>
+  <% if group.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert">
+      <% err_n = group.errors.count %>
+      <p class="font-medium"><%= err_n %> <%= err_n == 1 ? "erro impediu" : "erros impediram" %> salvar este grupo:</p>
+      <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
+        <% group.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-5">
+    <div>
+      <%= form.label :account_id, "Conta", class: "app-label" %>
+      <%= form.collection_select :account_id, Account.order(:name), :id, :name,
+            { prompt: "Selecione uma conta" },
+            class: "app-input" %>
+    </div>
+
+    <div>
+      <%= form.label :name, "Nome", class: "app-label" %>
+      <%= form.text_field :name, class: "app-input", autocomplete: "off", placeholder: "Nome do grupo" %>
+    </div>
+  </div>
+
+  <div class="flex flex-col-reverse gap-3 border-t border-zinc-100 pt-6 sm:flex-row sm:justify-end">
+    <%= link_to "Cancelar", groups_path, class: "app-btn-secondary text-center sm:text-left" %>
+    <%= form.submit group.persisted? ? "Atualizar grupo" : "Criar grupo", class: "app-btn-primary cursor-pointer border-0" %>
+  </div>
+<% end %>
