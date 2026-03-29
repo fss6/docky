@@ -84,3 +84,5 @@
 - user_id
 - belongs_to Group, User
 ```
+
+> This Readme using [GitHub syntax](https://docs.github.com/pt/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
