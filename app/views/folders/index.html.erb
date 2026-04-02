@@ -13,20 +13,9 @@
   </header>
 
   <% if @folders.any? %>
-    <div class="app-card overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-zinc-200 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-              <th class="px-4 py-3 font-semibold">Nome</th>
-              <th class="hidden px-4 py-3 font-semibold sm:table-cell">Conta</th>
-              <th class="px-4 py-3 text-right font-semibold">Ações</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-100">
-            <%= render partial: "folders/folder_row", collection: @folders, as: :folder %>
-          </tbody>
-        </table>
+    <div class="px-1 py-2 sm:px-2">
+      <div class="grid grid-cols-1 gap-8 bg-red-100 md:grid-cols-2 xl:grid-cols-3">
+      <%= render partial: "folders/folder_card", collection: @folders, as: :folder %>
       </div>
     </div>
   <% else %>

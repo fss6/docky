@@ -3,7 +3,11 @@ class FoldersController < ApplicationController
 
   # GET /folders or /folders.json
   def index
-    @folders = Folder.includes(:account).order(:name)
+    @folders = Folder.includes(:account)
+                     .left_joins(:documents)
+                     .select("folders.*, COUNT(documents.id) AS documents_count")
+                     .group("folders.id")
+                     .order(:name)
   end
 
   # GET /folders/1 or /folders/1.json
