@@ -16,6 +16,8 @@ class DocumentsController < ApplicationController
 
     respond_to do |format|
       if @document.save
+        DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
+
         format.html { redirect_to after_upload_path, notice: "Arquivo enviado com sucesso." }
         format.json { render :show, status: :created, location: @document }
       else
