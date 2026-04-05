@@ -51,18 +51,22 @@
       </p>
     </div>
   </div>
-  <% if document.tags.any? %>
-    <div class="border-t border-zinc-100 px-5 py-4 sm:px-6 sm:py-5">
+  <% chunks = document.embedding_records.ordered_for_display %>
+  <% has_text = document.content.present? || document.summary.present? || chunks.any? %>
+  <div class="border-t border-zinc-100">
+    <div class="px-5 py-4 sm:px-6 sm:py-5">
       <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Etiquetas</p>
       <div class="mt-2 flex flex-wrap gap-2">
-        <% document.tags.each do |tag| %>
-          <span class="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700"><%= tag %></span>
+        <% if document.tags.any? %>
+          <% document.tags.each do |tag| %>
+            <span class="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700"><%= tag %></span>
+          <% end %>
+        <% else %>
+          <span class="text-sm text-zinc-500">—</span>
         <% end %>
       </div>
     </div>
-  <% end %>
-  <% chunks = document.embedding_records.ordered_for_display %>
-  <% if document.content.present? || document.summary.present? || chunks.any? %>
+    <% if has_text %>
     <div class="grid divide-y divide-zinc-100 border-t border-zinc-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
       <% if document.content.present? %>
         <div class="px-5 py-4 sm:px-6 sm:py-5">
@@ -89,5 +93,6 @@
         </div>
       <% end %>
     </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
