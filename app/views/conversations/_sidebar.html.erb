@@ -15,7 +15,7 @@
     <% if chat_user_id %>
       <%= button_to account_conversations_path(account),
             method: :post,
-            params: { conversation: { user_id: chat_user_id, title: "Nova conversa" } },
+            params: { conversation: { user_id: chat_user_id, title: Conversation::DEFAULT_TITLE } },
             class: "flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" do %>
         <%= heroicon "plus", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-white", "aria-hidden": "true" } %>
         Nova conversa
@@ -40,7 +40,7 @@
               ].join(" ") do %>
           <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "mt-0.5 h-4 w-4 shrink-0 text-zinc-500 group-hover:text-zinc-400 #{active ? '!text-teal-300' : ''}", "aria-hidden": "true" } %>
           <span class="min-w-0 flex-1">
-            <span class="line-clamp-2 font-medium leading-snug"><%= conv.title.presence || "Conversa ##{conv.id}" %></span>
+            <%= render "conversations/sidebar_title_span", conversation: conv, variant: :desktop %>
             <span class="mt-1 block text-[11px] font-normal <%= active ? "text-teal-200/90" : "text-zinc-500 group-hover:text-zinc-400" %>">
               <%= conv.updated_at.strftime("%d/%m/%Y") %>
             </span>
@@ -69,7 +69,7 @@
                 "block rounded-lg px-2 py-2 text-sm no-underline",
                 active ? "bg-teal-900/90 text-white" : "text-zinc-300 hover:bg-zinc-700/50"
               ].join(" ") do %>
-          <span class="line-clamp-2 font-medium"><%= conv.title.presence || "Conversa ##{conv.id}" %></span>
+          <%= render "conversations/sidebar_title_span", conversation: conv, variant: :mobile %>
           <span class="mt-0.5 block text-[11px] opacity-80"><%= conv.updated_at.strftime("%d/%m/%Y") %></span>
         <% end %>
       <% end %>

@@ -13,6 +13,34 @@ class RagQueryJob < ApplicationJob
     user_message = conversation.messages.where(role: "user").where("id < ?", ai_message.id).order(:id).last
     return if user_message.blank?
 
+    if Rag::GreetingMessage.only?(user_message.content)
+      unless indexed?(conversation, user_message)
+        finish_with_text(
+          ai_message,
+          conversation,
+          "Olá! Sou o assistente Docfy desta conta — estou aqui para ajudar você a entender os documentos que enviar: " \
+          "pode perguntar o que quiser sobre o texto, pedir resumos, localizar cláusulas ou dados; respondo com base no que estiver indexado e cito arquivo e página quando fizer sentido.\n\n" \
+          "Ainda não há arquivos processados. Depois do upload e do processamento, envie sua primeira pergunta e seguimos."
+        )
+        return
+      end
+
+      stream_greeting_reply(ai_message, conversation, user_message)
+      return
+    end
+
+    case Rag::QueryIntent.kind(user_message.content)
+    when :meta_identity
+      finish_with_text(ai_message, conversation, Rag::QueryIntent::Responses.meta_identity)
+      return
+    when :meta_capabilities
+      finish_with_text(ai_message, conversation, Rag::QueryIntent::Responses.meta_capabilities)
+      return
+    when :out_of_scope
+      finish_with_text(ai_message, conversation, Rag::QueryIntent::Responses.out_of_scope)
+      return
+    end
+
     unless indexed?(conversation, user_message)
       finish_with_text(ai_message, conversation, "Nenhum documento indexado. Faça upload e aguarde o processamento.")
       return
@@ -40,8 +68,11 @@ class RagQueryJob < ApplicationJob
     end
 
     if records.blank?
-      hint = focus_id.present? ? "neste documento." : "nos documentos da conta."
-      finish_with_text(ai_message, conversation, "Não encontrei informação relevante #{hint}")
+      finish_with_text(
+        ai_message,
+        conversation,
+        Rag::QueryIntent::Responses.no_relevant_chunks(focus_document: focus_id.present?)
+      )
       return
     end
 
@@ -50,6 +81,16 @@ class RagQueryJob < ApplicationJob
       "--- Trecho #{i + 1} (#{info['file']} · p. #{info['page'] || '?'}) ---\n#{r.content}"
     end.join("\n\n")
 
+    stream_llm_reply(ai_message, conversation, user_message, context, records)
+  end
+
+  private
+
+  def stream_greeting_reply(ai_message, conversation, user_message)
+    stream_llm_reply(ai_message, conversation, user_message, "", nil)
+  end
+
+  def stream_llm_reply(ai_message, conversation, user_message, context, records)
     history = LlmConversationHistory.for_conversation(conversation, before_message_id: user_message.id)
 
     begin
@@ -74,9 +115,14 @@ class RagQueryJob < ApplicationJob
       return
     end
 
-    sources = records.map(&:source_info).uniq do |s|
-      [s["file"], s["page"], s["chunk_id"]]
-    end
+    sources =
+      if records.present?
+        records.map(&:source_info).uniq do |s|
+          [s["file"], s["page"], s["chunk_id"]]
+        end
+      else
+        []
+      end
     ai_message.reload
     ai_message.update!(sources: sources, streaming: false)
 
@@ -87,8 +133,6 @@ class RagQueryJob < ApplicationJob
       locals: { message: ai_message.reload }
     )
   end
-
-  private
 
   def indexed?(conversation, user_message)
     scope = EmbeddingRecord.where(account_id: conversation.account_id).where.not(embedding: nil)

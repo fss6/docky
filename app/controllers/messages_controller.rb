@@ -24,6 +24,8 @@ class MessagesController < ApplicationController
 
     RagQueryJob.perform_later(@ai_message.id)
 
+    ConversationTitleJob.perform_later(@conversation.id, @user_message.id) if @conversation.default_title?
+
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to account_conversation_path(@account, @conversation), status: :see_other }

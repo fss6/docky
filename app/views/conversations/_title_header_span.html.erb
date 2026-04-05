@@ -1,0 +1,4 @@
+<%# locals: (conversation:) %>
+<span id="<%= dom_id(conversation, :title_header) %>" class="font-medium text-zinc-700">
+  <%= conversation.title.presence || "Conversa" %>
+</span>

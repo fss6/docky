@@ -15,7 +15,7 @@ class ChatController < ApplicationController
     end
 
     if params[:focus_document_id].present?
-      conversation = account.conversations.create!(user: user, title: "Nova conversa")
+      conversation = account.conversations.create!(user: user, title: Conversation::DEFAULT_TITLE)
       redirect_to account_conversation_path(
         account,
         conversation,
