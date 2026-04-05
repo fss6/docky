@@ -1,2 +1,11 @@
 module ApplicationHelper
+  # Atalho estável: /chat → ChatController → lista de conversas (primeira conta).
+  def nav_chat_path
+    chat_path
+  end
+
+  # Lista + thread do módulo chat: layout full-height no main (scroll só dentro do módulo).
+  def chat_module_page?
+    controller_name == "conversations" && %w[index show].include?(action_name)
+  end
 end

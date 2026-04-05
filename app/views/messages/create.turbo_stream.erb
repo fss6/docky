@@ -1,0 +1,10 @@
+<%= turbo_stream.append "messages", partial: "messages/message", locals: { message: @user_message } %>
+<%= turbo_stream.append "messages", partial: "messages/thinking", locals: { message: @ai_message } %>
+<%= turbo_stream.replace "chat-form" do %>
+  <div id="chat-form">
+    <%= render "messages/chat_form",
+          account: @account,
+          conversation: @conversation,
+          focus_document_id: nil %>
+  </div>
+<% end %>

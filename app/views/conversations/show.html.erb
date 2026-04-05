@@ -1,0 +1,57 @@
+<% content_for :title, "Conversa · Docfy" %>
+
+<%= turbo_stream_from "conversation_#{@conversation.id}" %>
+
+<div class="chat-module flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-[var(--shadow-float)] lg:flex-row">
+  <%= render "conversations/sidebar",
+        account: @account,
+        conversation: @conversation,
+        sidebar_conversations: @sidebar_conversations %>
+
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-zinc-50/90 to-white" data-controller="chat">
+    <%# Cabeçalho produto (estilo Chista: marca + subtítulo + meta da thread) %>
+    <header class="shrink-0 border-b border-zinc-200/90 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h2 class="text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">Docfy</h2>
+          <p class="mt-0.5 max-w-2xl text-sm leading-relaxed text-zinc-600">
+            Faça perguntas sobre os documentos da conta e obtenha respostas com citações às fontes.
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
+            <span class="font-medium text-zinc-700"><%= @conversation.title.presence || "Conversa" %></span>
+            <span class="text-zinc-300" aria-hidden="true">·</span>
+            <span><%= @document_count %> <%= @document_count == 1 ? "arquivo indexado" : "arquivos indexados" %></span>
+            <% if @focus_document&.file&.attached? %>
+              <span class="text-zinc-300" aria-hidden="true">·</span>
+              <span class="text-zinc-600">Foco: <%= @focus_document.file.filename %></span>
+            <% end %>
+          </div>
+        </div>
+        <div
+          class="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-teal-200/90 bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-900 sm:ml-2 sm:self-center"
+          title="Contexto RAG: toda a conta, exceto quando há foco num documento."
+        >
+          <span class="h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          RAG ativo
+        </div>
+      </div>
+    </header>
+
+    <div class="flex min-h-0 flex-1 flex-col px-4 pb-5 pt-3 sm:px-6 lg:px-8 lg:pb-6">
+      <div
+        id="messages"
+        data-chat-target="messages"
+        class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain rounded-xl bg-zinc-100/60 p-4 sm:p-5 [scrollbar-gutter:stable]"
+      >
+        <%= render partial: "messages/message", collection: @messages, as: :message %>
+      </div>
+
+      <div id="chat-form" class="mt-4 shrink-0 border-t border-zinc-200/80 pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+        <%= render "messages/chat_form",
+              account: @account,
+              conversation: @conversation,
+              focus_document_id: @focus_document_id %>
+      </div>
+    </div>
+  </div>
+</div>

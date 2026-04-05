@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<html lang="pt-BR" class="<%= chat_module_page? ? "h-dvh max-h-dvh overflow-hidden" : "h-full" %>">
   <head>
     <title><%= content_for(:title) || "Docfy" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24,18 +24,21 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-dvh bg-zinc-100 font-sans text-zinc-900 antialiased">
-    <div class="flex min-h-dvh w-full items-stretch">
+  <% chat_shell = chat_module_page? %>
+  <body class="bg-zinc-100 font-sans text-zinc-900 antialiased <%= chat_shell ? "h-dvh overflow-hidden" : "min-h-dvh" %>">
+    <div class="flex w-full items-stretch <%= chat_shell ? "h-full min-h-0" : "min-h-dvh" %>">
       <%= render "layouts/nav_sidebar" %>
 
-      <div class="flex min-h-dvh min-w-0 flex-1 flex-col">
+      <div class="flex min-w-0 flex-1 flex-col <%= chat_shell ? "h-full min-h-0 overflow-hidden" : "min-h-dvh" %>">
         <%= render "layouts/top_bar" %>
 
-        <div class="flex min-h-0 flex-1 items-stretch">
-          <main class="min-w-0 flex-1 overflow-y-auto">
-            <div class="mx-auto flex min-h-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-              <%= render "shared/flash" %>
-              <div class="flex-1">
+        <div class="flex min-h-0 flex-1 items-stretch overflow-hidden">
+          <main class="min-w-0 flex-1 <%= chat_shell ? "flex min-h-0 flex-col overflow-hidden" : "overflow-y-auto" %>">
+            <div class="flex w-full <%= chat_shell ? "max-w-none flex-1 min-h-0 flex-col px-4 py-4 sm:px-5 lg:px-8 lg:py-5" : "mx-auto min-h-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-8" %>">
+              <div class="<%= chat_shell ? "shrink-0" : "" %>">
+                <%= render "shared/flash" %>
+              </div>
+              <div class="<%= chat_shell ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "flex-1" %>">
                 <%= yield %>
               </div>
             </div>

@@ -1,0 +1,14 @@
+<%# locals: message %>
+<div id="<%= dom_id(message) %>" class="flex flex-col items-start gap-1">
+  <div class="min-w-0 max-w-[min(100%,40rem)]">
+    <div
+      id="<%= dom_id(message, :content) %>"
+      class="flex min-h-[3rem] items-center gap-1.5 rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-zinc-200/80"
+      aria-busy="true"
+    >
+      <span class="thinking-dot inline-block h-2 w-2 rounded-full bg-zinc-400"></span>
+      <span class="thinking-dot animation-delay-200 inline-block h-2 w-2 rounded-full bg-zinc-400"></span>
+      <span class="thinking-dot animation-delay-400 inline-block h-2 w-2 rounded-full bg-zinc-400"></span>
+    </div>
+  </div>
+</div>

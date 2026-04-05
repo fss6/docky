@@ -1,0 +1,58 @@
+<% content_for :title, "Conversas · Docfy" %>
+<% account_doc_total = @account.documents.count %>
+
+<div class="chat-module flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-[var(--shadow-float)] lg:flex-row">
+  <%= render "conversations/sidebar",
+        account: @account,
+        conversation: nil,
+        sidebar_conversations: @sidebar_conversations %>
+
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-zinc-50/90 to-white">
+    <header class="border-b border-zinc-200/90 bg-white/90 px-4 py-5 backdrop-blur-sm sm:px-6 lg:px-8">
+      <h2 class="text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">Docfy</h2>
+      <p class="mt-0.5 max-w-2xl text-sm leading-relaxed text-zinc-600">
+        Todas as conversas desta conta. Abra uma na lista à esquerda ou inicie uma nova.
+      </p>
+      <p class="mt-3 text-xs text-zinc-500">
+        Conta <span class="font-medium text-zinc-700"><%= @account.name.presence || "Conta ##{@account.id}" %></span>
+        · <%= account_doc_total %> <%= account_doc_total == 1 ? "arquivo" : "arquivos" %> no RAG
+      </p>
+    </header>
+
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
+      <% if @conversations.any? %>
+        <ul class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[var(--shadow-card)]">
+          <% @conversations.each do |conversation| %>
+            <li>
+              <%= link_to account_conversation_path(@account, conversation),
+                    class: "block px-4 py-4 transition-colors hover:bg-zinc-50 sm:px-5" do %>
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                  <p class="font-medium text-zinc-900">
+                    <%= conversation.title.presence || "Conversa ##{conversation.id}" %>
+                  </p>
+                  <p class="text-xs text-zinc-500">
+                    <%= conversation.updated_at.strftime("%d/%m/%Y %H:%M") %>
+                  </p>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">
+                  <%= conversation.user&.name.presence || conversation.user&.email.presence || "Usuário ##{conversation.user_id}" %>
+                </p>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="app-card border-dashed border-zinc-200/80 p-8 text-center">
+          <p class="text-sm text-zinc-600">Nenhuma conversa ainda.</p>
+          <p class="mt-2 text-sm text-zinc-500">
+            Use <span class="font-medium text-zinc-800">Nova conversa</span> no painel à esquerda para começar.
+          </p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <%= link_to "Pastas", folders_path, class: "app-btn-secondary" %>
+            <%= link_to "Contas", accounts_path, class: "app-btn-ghost border border-zinc-200" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<aside class="hidden w-14 shrink-0 flex-col self-stretch border-r border-zinc-800/80 bg-zinc-950 lg:flex xl:w-52" aria-label="Navegação principal">
+<aside class="hidden min-h-0 w-14 shrink-0 flex-col self-stretch border-r border-zinc-800/80 bg-zinc-950 lg:flex xl:w-52" aria-label="Navegação principal">
   <div class="flex h-14 items-center justify-center border-b border-zinc-800/80 xl:justify-start xl:px-4">
     <%= link_to root_path, class: "flex items-center gap-2 text-white no-underline" do %>
       <span class="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-sm font-semibold text-white shadow-sm">D</span>
@@ -13,6 +13,7 @@
       { key: :accounts, label: "Contas", path: accounts_path, icon: :building },
       { key: :users, label: "Usuários", path: users_path, icon: :users },
       { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
+      { key: :chat, label: "Chat", path: nav_chat_path, icon: :chat },
       { key: :groups, label: "Grupos", path: groups_path, icon: :group },
       { key: :subscriptions, label: "Assinaturas", path: subscriptions_path, icon: :credit_card },
       { key: :insights, label: "Insights IA", path: "#", icon: :sparkles },
@@ -21,9 +22,10 @@
     <% nav.each do |item| %>
       <% active = (item[:key] == :dashboard && current_page?(root_path)) ||
                    (item[:key] == :collections && request.path.start_with?("/plans")) ||
-                   (item[:key] == :accounts && request.path.start_with?("/accounts")) ||
+                   (item[:key] == :accounts && request.path.start_with?("/accounts") && !request.path.match?(%r{\A/accounts/\d+/conversations})) ||
                    (item[:key] == :users && request.path.start_with?("/users")) ||
                    (item[:key] == :folders && request.path.start_with?("/folders")) ||
+                   (item[:key] == :chat && (request.path == "/chat" || request.path.match?(%r{\A/accounts/\d+/conversations}))) ||
                    (item[:key] == :groups && request.path.start_with?("/groups")) ||
                    (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) %>
       <%= link_to item[:path], class: [

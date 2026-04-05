@@ -1,0 +1,78 @@
+<%# locals: (account:, sidebar_conversations:, conversation: nil) %>
+<% current_id = conversation&.id %>
+<aside
+  class="flex min-h-0 w-full shrink-0 flex-col border-b border-zinc-700/60 bg-zinc-800 text-zinc-100 lg:max-h-full lg:w-[min(100%,19rem)] lg:border-b-0 lg:border-r lg:border-zinc-700/60"
+  aria-label="Conversas"
+>
+  <%# Bloco Conversas + Nova conversa (como referência Chista / ChatGPT) %>
+  <div class="border-b border-zinc-700/50 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
+    <div class="mb-3 flex items-center gap-2 text-zinc-100">
+      <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-5 w-5 shrink-0 text-accent", "aria-hidden": "true" } %>
+      <span class="text-sm font-semibold tracking-tight">Conversas</span>
+    </div>
+
+    <% chat_user_id = conversation&.user_id || account.users.order(:id).first&.id %>
+    <% if chat_user_id %>
+      <%= button_to account_conversations_path(account),
+            method: :post,
+            params: { conversation: { user_id: chat_user_id, title: "Nova conversa" } },
+            class: "flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-accent px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" do %>
+        <%= heroicon "plus", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-white", "aria-hidden": "true" } %>
+        Nova conversa
+      <% end %>
+    <% end %>
+
+    <%= link_to account_conversations_path(account),
+          class: "mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-center text-xs font-medium text-zinc-400 no-underline transition-colors hover:bg-zinc-700/40 hover:text-zinc-200" do %>
+      <%= heroicon "queue-list", variant: :outline, options: { class: "h-3.5 w-3.5 shrink-0 opacity-80", "aria-hidden": "true" } %>
+      Ver todas
+    <% end %>
+  </div>
+
+  <div class="hidden min-h-0 flex-1 flex-col overflow-hidden px-3 pb-4 pt-2 sm:px-4 lg:flex">
+    <nav class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain pr-2 [scrollbar-gutter:stable]" aria-label="Lista de conversas">
+      <% sidebar_conversations.each do |conv| %>
+        <% active = current_id.present? && conv.id == current_id %>
+        <%= link_to account_conversation_path(account, conv),
+              class: [
+                "group flex items-start gap-2 rounded-lg px-3 py-2.5 text-left text-sm no-underline transition-colors",
+                active ? "bg-teal-900/90 text-white shadow-[inset_0_0_0_1px_rgb(20_184_166/0.45)]" : "text-zinc-300 hover:bg-zinc-700/55 hover:text-white"
+              ].join(" ") do %>
+          <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "mt-0.5 h-4 w-4 shrink-0 text-zinc-500 group-hover:text-zinc-400 #{active ? '!text-teal-300' : ''}", "aria-hidden": "true" } %>
+          <span class="min-w-0 flex-1">
+            <span class="line-clamp-2 font-medium leading-snug"><%= conv.title.presence || "Conversa ##{conv.id}" %></span>
+            <span class="mt-1 block text-[11px] font-normal <%= active ? "text-teal-200/90" : "text-zinc-500 group-hover:text-zinc-400" %>">
+              <%= conv.updated_at.strftime("%d/%m/%Y") %>
+            </span>
+          </span>
+        <% end %>
+      <% end %>
+      <% if sidebar_conversations.empty? %>
+        <p class="px-2 py-6 text-center text-xs leading-relaxed text-zinc-500">Nenhuma conversa ainda. Use Nova conversa acima.</p>
+      <% end %>
+    </nav>
+  </div>
+
+  <details class="border-t border-zinc-700/50 p-2 lg:hidden">
+    <summary class="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm font-medium text-zinc-200 [&::-webkit-details-marker]:hidden">
+      <span class="flex items-center gap-2">
+        <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-4 w-4 text-accent", "aria-hidden": "true" } %>
+        Conversas
+      </span>
+      <%= heroicon "chevron-down", variant: :outline, options: { class: "h-4 w-4 text-zinc-500", "aria-hidden": "true" } %>
+    </summary>
+    <div class="mt-1 max-h-64 space-y-0.5 overflow-y-auto border-t border-zinc-700/40 pt-2">
+      <% sidebar_conversations.each do |conv| %>
+        <% active = current_id.present? && conv.id == current_id %>
+        <%= link_to account_conversation_path(account, conv),
+              class: [
+                "block rounded-lg px-2 py-2 text-sm no-underline",
+                active ? "bg-teal-900/90 text-white" : "text-zinc-300 hover:bg-zinc-700/50"
+              ].join(" ") do %>
+          <span class="line-clamp-2 font-medium"><%= conv.title.presence || "Conversa ##{conv.id}" %></span>
+          <span class="mt-0.5 block text-[11px] opacity-80"><%= conv.updated_at.strftime("%d/%m/%Y") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </details>
+</aside>

@@ -28,6 +28,11 @@ class EmbeddingRecord < ApplicationRecord
     metadata&.fetch("chunk_index", nil)
   end
 
+  def source_info
+    fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
+    { "file" => fname, "page" => page_number, "chunk_id" => id }
+  end
+
   private
 
   def document_id_matches_document_recordable

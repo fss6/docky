@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "chat", to: "chat#index", as: :chat
+
   resources :folders do
     resources :documents, shallow: true, only: %i[index create show destroy]
   end
@@ -7,7 +9,11 @@ Rails.application.routes.draw do
   end
   resources :subscriptions
   resources :users
-  resources :accounts
+  resources :accounts do
+    resources :conversations, only: %i[index show create] do
+      resources :messages, only: [:create]
+    end
+  end
   resources :plans
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -1,0 +1,27 @@
+<%# locals: (account:, conversation:, focus_document_id: nil) %>
+<%= form_with url: account_conversation_messages_path(account, conversation),
+              data: { chat_target: "form" },
+              class: "flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end" do |f| %>
+  <% if focus_document_id.present? %>
+    <%= hidden_field_tag "message[focus_document_id]", focus_document_id %>
+  <% end %>
+  <label class="sr-only" for="chat-input">Mensagem</label>
+  <textarea
+    id="chat-input"
+    name="message[content]"
+    rows="2"
+    data-chat-target="input"
+    data-action="keydown->chat#keydown input->chat#resize"
+    placeholder="<%= focus_document_id.present? ? "Digite sua pergunta sobre este documento…" : "Digite sua mensagem aqui…" %>"
+    class="min-h-[3rem] min-w-0 flex-1 resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[13px] leading-normal text-zinc-900 shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-zinc-400 focus:border-accent focus:ring-2 focus:ring-accent/20"
+  ></textarea>
+  <button
+    type="button"
+    data-action="chat#submit"
+    class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:min-w-[7.5rem] sm:self-stretch"
+    aria-label="Enviar mensagem"
+  >
+    Enviar
+    <%= heroicon "paper-airplane", variant: :mini, options: { class: "h-4 w-4 shrink-0 text-white", "aria-hidden": "true" } %>
+  </button>
+<% end %>

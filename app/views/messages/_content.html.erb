@@ -1,0 +1,7 @@
+<%# locals: message %>
+<div
+  id="<%= dom_id(message, :content) %>"
+  class="rounded-2xl rounded-bl-md bg-white px-4 py-3 text-[13px] leading-relaxed text-zinc-800 shadow-sm ring-1 ring-zinc-200/80 whitespace-pre-wrap"
+>
+  <%= message.content.presence || "" %>
+</div>
