@@ -22,10 +22,11 @@ class RagQueryJob < ApplicationJob
     document_ids = focus_id.present? ? [focus_id] : nil
 
     records = nil
+    retrieval_question = Rag::RetrievalQuery.build(conversation: conversation, user_message: user_message)
     begin
       records = Rag::Retrieve.call(
         account_id: conversation.account_id,
-        question: user_message.content,
+        question: retrieval_question,
         document_ids: document_ids,
         limit: 5
       )
@@ -49,10 +50,7 @@ class RagQueryJob < ApplicationJob
       "--- Trecho #{i + 1} (#{info['file']} · p. #{info['page'] || '?'}) ---\n#{r.content}"
     end.join("\n\n")
 
-    history = conversation.messages
-      .where("id < ?", user_message.id)
-      .order(:id)
-      .map { |m| { role: m.role, content: m.content.to_s } }
+    history = LlmConversationHistory.for_conversation(conversation, before_message_id: user_message.id)
 
     begin
       LlmService.stream(context: context, history: history, user_content: user_message.content) do |token|
