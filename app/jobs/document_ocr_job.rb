@@ -49,6 +49,8 @@ class DocumentOcrJob < ApplicationJob
 
       document.update!(status: :processed, metadata: meta)
     end
+
+    DocumentEmbeddingRecordsJob.perform_later(document.id)
   rescue ::MistralOcr::ExtractContent::Error => e
     mark_failed(document, e.message)
   rescue StandardError => e

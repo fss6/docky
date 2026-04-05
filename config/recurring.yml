@@ -9,7 +9,19 @@
 #     priority: 2
 #     schedule: at 5am every day
 
+# Tarefas periódicas do Solid Queue (ex.: bin/jobs ou plugin solid_queue no Puma com SOLID_QUEUE_IN_PUMA).
+# Em Docker com apenas Sidekiq, use: bin/rails embedding:sweep no cron a cada 10–15 min.
+
 production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+
+  pending_embedding_records_sweep:
+    class: PendingEmbeddingRecordsSweepJob
+    schedule: every 10 minutes
+
+development:
+  pending_embedding_records_sweep:
+    class: PendingEmbeddingRecordsSweepJob
+    schedule: every 10 minutes

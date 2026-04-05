@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class EmbeddingRecord < ApplicationRecord
+  has_neighbors :embedding
+
   belongs_to :account
   belongs_to :document, optional: true
   belongs_to :recordable, polymorphic: true
@@ -10,6 +12,10 @@ class EmbeddingRecord < ApplicationRecord
       Arel.sql("(metadata->>'page')::integer NULLS LAST"),
       Arel.sql("(metadata->>'chunk_index')::integer NULLS LAST")
     )
+  }
+
+  scope :pending_embedding, lambda {
+    where(embedding: nil).where.not(content: nil).where.not(content: "")
   }
 
   validate :document_id_matches_document_recordable
