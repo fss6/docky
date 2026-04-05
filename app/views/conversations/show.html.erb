@@ -46,7 +46,7 @@
         data-chat-target="messages"
         class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain rounded-xl bg-zinc-100/60 p-4 sm:p-5 [scrollbar-gutter:stable]"
       >
-        <%= render partial: "messages/message", collection: @messages, as: :message %>
+        <%= render partial: "messages/message", collection: @messages, as: :message, locals: { account: @account } %>
       </div>
 
       <div id="chat-form" class="mt-4 shrink-0 border-t border-zinc-200/80 pt-4 pb-[max(0.25rem,env(safe-area-inset-bottom))]">

@@ -115,22 +115,20 @@ class RagQueryJob < ApplicationJob
       return
     end
 
+    ai_message.reload
     sources =
       if records.present?
-        records.map(&:source_info).uniq do |s|
-          [s["file"], s["page"], s["chunk_id"]]
-        end
+        Rag::AnswerSources.source_infos_for_answer(records: records, answer_text: ai_message.content)
       else
         []
       end
-    ai_message.reload
     ai_message.update!(sources: sources, streaming: false)
 
     Turbo::StreamsChannel.broadcast_replace_to(
       "conversation_#{conversation.id}",
       target: dom_id(ai_message),
       partial: "messages/message",
-      locals: { message: ai_message.reload }
+      locals: { message: ai_message.reload, account: conversation.account }
     )
   end
 
@@ -147,7 +145,7 @@ class RagQueryJob < ApplicationJob
       "conversation_#{conversation.id}",
       target: dom_id(ai_message),
       partial: "messages/message",
-      locals: { message: ai_message.reload }
+      locals: { message: ai_message.reload, account: conversation.account }
     )
   end
 end

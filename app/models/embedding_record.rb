@@ -30,7 +30,9 @@ class EmbeddingRecord < ApplicationRecord
 
   def source_info
     fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
-    { "file" => fname, "page" => page_number, "chunk_id" => id }
+    info = { "file" => fname, "page" => page_number, "chunk_id" => id }
+    info["document_id"] = document_id if document_id.present?
+    info
   end
 
   private
