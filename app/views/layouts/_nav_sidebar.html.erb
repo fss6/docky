@@ -9,11 +9,11 @@
   <nav class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
     <% nav = [
       { key: :dashboard, label: "Painel", path: root_path, icon: :home },
-      { key: :plans, label: "Planos", path: plans_path, icon: :plans },
-      { key: :accounts, label: "Contas", path: accounts_path, icon: :building },
-      { key: :users, label: "Usuários", path: users_path, icon: :users },
-      { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
       { key: :chat, label: "Chat", path: nav_chat_path, icon: :chat },
+      { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
+      { key: :users, label: "Usuários", path: users_path, icon: :users },
+      { key: :plans, label: "Planos", path: plans_path, icon: :plans },
+      { key: :accounts, label: "Contas", path: accounts_path, icon: :building }, 
       { key: :groups, label: "Grupos", path: groups_path, icon: :group },
       { key: :subscriptions, label: "Assinaturas", path: subscriptions_path, icon: :credit_card },
       { key: :settings, label: "Configurações", path: "#", icon: :cog }
@@ -27,6 +27,22 @@
                    (item[:key] == :chat && (request.path == "/chat" || request.path.match?(%r{\A/accounts/\d+/conversations}))) ||
                    (item[:key] == :groups && request.path.start_with?("/groups")) ||
                    (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) %>
+      
+      <% allowed = case item[:key]
+        when :dashboard then true
+        when :plans then policy(Plan).index?
+        when :accounts then policy(Account).index?
+        when :users then policy(User).index? 
+        when :subscriptions then policy(Subscription).index?
+        when :groups then policy(Group).index?
+        when :chat then policy(Conversation).index?
+        when :folders then policy(Folder).index?
+        when :settings then true
+        else false
+      end %>
+
+      <% next unless allowed %>
+
       <%= link_to item[:path], class: [
             "group flex items-center justify-center gap-3 rounded-md px-2 py-2.5 text-zinc-400 transition-colors no-underline xl:justify-start",
             (active ? "bg-zinc-800/80 text-white" : "hover:bg-zinc-800/60 hover:text-zinc-200")

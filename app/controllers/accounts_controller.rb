@@ -1,6 +1,6 @@
 class AccountsController < ApplicationController
   before_action :set_account, only: %i[ show edit update destroy ]
-
+  before_action :authorize_policy
   # GET /accounts or /accounts.json
   def index
     @accounts = Account.includes(:plan).order(:name)
@@ -58,6 +58,10 @@ class AccountsController < ApplicationController
   end
 
   private
+    def authorize_policy
+      authorize Subscription
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_account
       @account = Account.includes(:plan).find(params.expect(:id))

@@ -1,9 +1,10 @@
 class SubscriptionsController < ApplicationController
   before_action :set_subscription, only: %i[ show edit update destroy ]
+  before_action :authorize_policy
 
   # GET /subscriptions or /subscriptions.json
   def index
-    @subscriptions = Subscription.includes(:account, :plan).order(created_at: :desc)
+    @subscriptions = policy_scope(Subscription).includes(:account, :plan).order(created_at: :desc)
   end
 
   # GET /subscriptions/1 or /subscriptions/1.json
@@ -58,6 +59,10 @@ class SubscriptionsController < ApplicationController
   end
 
   private
+    def authorize_policy
+      authorize Subscription
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_subscription
       @subscription = Subscription.includes(:account, :plan).find(params.expect(:id))

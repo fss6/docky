@@ -1,9 +1,10 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[ show edit update destroy ]
+  before_action :authorize_policy
 
   # GET /users or /users.json
   def index
-    @users = User.includes(:account).order(:name)
+    @users = policy_scope(User).includes(:account).order(:name)
   end
 
   # GET /users/1 or /users/1.json
@@ -58,6 +59,10 @@ class UsersController < ApplicationController
   end
 
   private
+    def authorize_policy
+      authorize User
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = User.includes(:account).find(params.expect(:id))

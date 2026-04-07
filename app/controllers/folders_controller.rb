@@ -1,5 +1,6 @@
 class FoldersController < ApplicationController
   before_action :set_folder, only: %i[show edit update destroy]
+  before_action :authorize_policy
 
   # GET /folders or /folders.json
   def index
@@ -63,6 +64,10 @@ class FoldersController < ApplicationController
   end
 
   private
+    def authorize_policy
+      authorize Folder
+    end
+    
     # Use callbacks to share common setup or constraints between actions.
     def set_folder
       @folder = Folder.includes(:account).find(params.expect(:id))

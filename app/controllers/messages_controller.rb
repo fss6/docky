@@ -2,6 +2,7 @@
 
 class MessagesController < ApplicationController
   before_action :set_account_and_conversation
+  before_action :authorize_policy
 
   def create
     content = message_params[:content].to_s.strip
@@ -33,6 +34,10 @@ class MessagesController < ApplicationController
   end
 
   private
+
+  def authorize_policy
+    authorize Message
+  end
 
   def set_account_and_conversation
     @account = Account.find(params.expect(:account_id))

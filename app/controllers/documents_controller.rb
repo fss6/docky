@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
   before_action :set_folder, only: %i[index create]
   before_action :set_document, only: %i[show destroy]
+  before_action :authorize_policy
 
   def index
     @documents = @folder.documents.includes(:account, :user, :folder, :embedding_records).with_attached_file.order(created_at: :desc)
@@ -40,6 +41,10 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def authorize_policy
+    authorize Document
+  end
 
   def set_folder
     @folder = Folder.find(params.expect(:folder_id))

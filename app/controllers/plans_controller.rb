@@ -1,8 +1,10 @@
 class PlansController < ApplicationController
   before_action :set_plan, only: %i[ show edit update destroy ]
+  before_action :authorize_policy
 
   # GET /plans or /plans.json
   def index
+    authorize Plan
     @plans = Plan.all
   end
 
@@ -58,6 +60,10 @@ class PlansController < ApplicationController
   end
 
   private
+    def authorize_policy
+      authorize Plan
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_plan
       @plan = Plan.find(params.expect(:id))

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ChatController < ApplicationController
+  before_action :authorize_policy
+
   def index
     account = current_tenant
     unless account
@@ -25,5 +27,11 @@ class ChatController < ApplicationController
     end
 
     redirect_to account_conversations_path(account)
+  end
+
+  private
+
+  def authorize_policy
+    authorize Conversation
   end
 end

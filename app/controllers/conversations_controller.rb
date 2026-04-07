@@ -2,6 +2,7 @@
 
 class ConversationsController < ApplicationController
   before_action :set_account
+  before_action :authorize_policy
 
   def index
     @conversations = @account.conversations.includes(:user).order(updated_at: :desc)
@@ -45,6 +46,10 @@ class ConversationsController < ApplicationController
   end
 
   private
+
+  def authorize_policy
+    authorize Conversation
+  end
 
   def set_account
     @account = Account.find(params.expect(:account_id))
