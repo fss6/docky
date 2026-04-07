@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :set_folder, only: %i[index create]
-  before_action :set_document, only: %i[show destroy add_tag replace_tag remove_tag]
+  before_action :set_document, only: %i[show destroy move add_tag replace_tag remove_tag]
   before_action :authorize_policy
 
   def index
@@ -64,6 +64,14 @@ class DocumentsController < ApplicationController
       format.html { redirect_to folder_documents_path(folder), notice: "Documento excluído com sucesso.", status: :see_other }
       format.json { head :no_content }
     end
+  end
+
+  def move
+    destination_folder = Folder.find(params.expect(:folder_id))
+    @document.update!(folder: destination_folder)
+
+    redirect_back fallback_location: folders_path(folder_id: destination_folder.id),
+                  notice: "Arquivo movido com sucesso."
   end
 
   def add_tag

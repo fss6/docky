@@ -37,6 +37,15 @@
   </td>
   <td class="px-4 py-3 text-right">
     <div class="flex flex-wrap items-center justify-end gap-2">
+      <% if local_assigns[:folder_move_options].present? %>
+        <%= form_with url: move_document_path(document), method: :patch, class: "inline-flex items-center gap-2" do |form| %>
+          <%= form.select :folder_id,
+                options_for_select(local_assigns[:folder_move_options], document.folder_id),
+                {},
+                class: "app-input !py-1.5 !text-xs !w-40" %>
+          <%= form.submit "Mover", class: "app-btn-secondary px-3 py-1.5 text-xs border-0 cursor-pointer" %>
+        <% end %>
+      <% end %>
       <%= link_to "Ver", document, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
       <%= button_to "Excluir", document, method: :delete,
             form: { class: "inline" },

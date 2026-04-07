@@ -21,6 +21,10 @@ class DocumentPolicy < ApplicationPolicy
     update?
   end
 
+  def move?
+    update?
+  end
+
   def replace_tag?
     update?
   end

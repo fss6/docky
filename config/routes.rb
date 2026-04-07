@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   end
   resources :documents, only: [] do
     member do
+      patch :move
       patch :add_tag
       patch :replace_tag
       delete :remove_tag

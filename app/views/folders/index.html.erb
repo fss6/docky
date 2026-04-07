@@ -13,10 +13,66 @@
   </header>
 
   <% if @folders.any? %>
-    <div class="px-1 py-2 sm:px-2">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <%= render partial: "folders/folder_card", collection: @folders, as: :folder %>
-      </div>
+    <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <aside class="app-card p-3 xl:col-span-3">
+        <p class="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Pastas</p>
+        <nav class="space-y-1">
+          <% @folders.each do |folder| %>
+            <% active = @selected_folder&.id == folder.id %>
+            <%= link_to folders_path(folder_id: folder.id), class: [
+                  "flex items-center justify-between rounded-md px-3 py-2 text-sm no-underline transition-colors",
+                  (active ? "bg-zinc-900 text-white" : "text-zinc-700 hover:bg-zinc-100")
+                ].join(" ") do %>
+              <span class="font-medium"><%= folder.name %></span>
+              <span class="<%= active ? 'text-zinc-300' : 'text-zinc-500' %> text-xs">
+                <%= folder.try(:documents_count).to_i %>
+              </span>
+            <% end %>
+          <% end %>
+        </nav>
+      </aside>
+
+      <section class="app-card overflow-hidden xl:col-span-9">
+        <header class="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Arquivos da pasta</p>
+            <h2 class="text-lg font-semibold text-zinc-900"><%= @selected_folder&.name || "Sem pasta selecionada" %></h2>
+          </div>
+          <% if @selected_folder %>
+            <%= link_to "Ver pasta", folder_path(@selected_folder), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+          <% end %>
+        </header>
+
+        <% if @documents.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-zinc-200 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  <th class="px-4 py-3 font-semibold">Arquivo</th>
+                  <th class="hidden px-4 py-3 font-semibold sm:table-cell">Usuário</th>
+                  <th class="px-4 py-3 font-semibold">Status</th>
+                  <th class="hidden px-4 py-3 font-semibold lg:table-cell">Atualizado</th>
+                  <th class="px-4 py-3 text-right font-semibold">Ações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-100">
+                <%= render partial: "documents/document_row",
+                      collection: @documents,
+                      as: :document,
+                      locals: {
+                        in_folder: true,
+                        folder_move_options: @folders.map { |folder| [folder.name, folder.id] }
+                      } %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-sm font-medium text-zinc-900">Nenhum documento nesta pasta</p>
+            <p class="mt-1 text-sm text-zinc-500">Use a tela da pasta para enviar arquivos ou mova documentos para cá.</p>
+          </div>
+        <% end %>
+      </section>
     </div>
   <% else %>
     <div class="app-card px-6 py-16 text-center">
