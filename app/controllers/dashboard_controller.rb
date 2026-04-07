@@ -4,6 +4,7 @@ class DashboardController < ApplicationController
   def index
     documents = Document.all
     ordered_documents = documents.order(created_at: :desc)
+    @documents_last_30_days = documents_last_30_days_series(documents)
 
     @total_documents = documents.count
     @total_folders = Folder.count
@@ -43,5 +44,20 @@ class DashboardController < ApplicationController
     end.compact.uniq { |entry| entry[:name].downcase }.first(10)
 
     [total_tags, recent_tags]
+  end
+
+  def documents_last_30_days_series(documents)
+    range = 29.days.ago.to_date..Date.current
+    grouped = documents
+      .where(created_at: range.begin.beginning_of_day..range.end.end_of_day)
+      .group("DATE(created_at)")
+      .count
+
+    range.map do |date|
+      {
+        date: date.strftime("%d/%m"),
+        total: grouped[date] || 0
+      }
+    end
   end
 end
