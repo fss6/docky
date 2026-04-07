@@ -3,20 +3,38 @@
 <div class="space-y-6">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Pastas</p>
+      <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-1.5">
+          <li><%= link_to "Pastas", folders_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li><%= link_to @document.folder.name, folder_path(@document.folder), class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-zinc-700">Documento</li>
+        </ol>
+      </nav>
       <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
         <%= document_file_label(@document) %>
       </h1>
-      <p class="mt-1 text-sm text-zinc-500">
-        Em <%= link_to @document.folder.name, folder_path(@document.folder), class: "text-accent no-underline hover:text-teal-700" %>
-      </p>
-    </div>
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "Conversar com foco neste documento",
-            chat_path(focus_document_id: @document.id),
-            class: "app-btn-primary no-underline" %>
-      <%= link_to "Documentos da pasta", folder_documents_path(@document.folder), class: "app-btn-secondary" %>
-      <%= link_to "Pasta", folder_path(@document.folder), class: "app-btn-ghost border border-zinc-200" %>
+      <p class="mt-1 text-sm text-zinc-500">Em <%= @document.folder.name %></p>
+      <div class="mt-2 flex flex-wrap items-center gap-3 text-sm">
+        <%= link_to folder_path(@document.folder),
+              class: "inline-flex items-center gap-1.5 font-medium text-accent no-underline hover:text-teal-700" do %>
+          <%= heroicon "folder", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
+          <span>Abrir pasta</span>
+        <% end %>
+        <span class="text-zinc-300">|</span>
+        <%= link_to folder_documents_path(@document.folder),
+              class: "inline-flex items-center gap-1.5 font-medium text-accent no-underline hover:text-teal-700" do %>
+          <%= heroicon "document-text", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
+          <span>Ver documentos da pasta</span>
+        <% end %>
+        <span class="text-zinc-300">|</span>
+        <%= link_to chat_path(focus_document_id: @document.id),
+              class: "inline-flex items-center gap-1.5 font-medium text-accent no-underline hover:text-teal-700" do %>
+          <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
+          <span>Conversar com foco</span>
+        <% end %>
+      </div>
     </div>
   </header>
 

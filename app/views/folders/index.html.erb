@@ -44,7 +44,11 @@
             <h2 class="text-lg font-semibold text-zinc-900"><%= @selected_folder&.name || "Sem pasta selecionada" %></h2>
           </div>
           <% if @selected_folder %>
-            <%= link_to "Ver pasta", folder_path(@selected_folder), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+            <%= link_to folder_path(@selected_folder),
+                  class: "app-btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs no-underline" do %>
+              <%= heroicon "folder", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
+              <span>Detalhes da pasta</span>
+            <% end %>
           <% end %>
         </header>
 

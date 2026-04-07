@@ -12,13 +12,12 @@
         sidebar_conversations: @sidebar_conversations %>
 
   <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-zinc-50/90 to-white" data-controller="chat">
-    <%# Cabeçalho produto (estilo Chista: marca + subtítulo + meta da thread) %>
     <header class="shrink-0 border-b border-zinc-200/90 bg-white/90 px-4 py-4 backdrop-blur-sm sm:px-6 lg:px-8">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div class="min-w-0">
-          <h2 class="text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">Docfy</h2>
+          <h2 class="text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">Assistente de IA</h2>
           <p class="mt-0.5 max-w-2xl text-sm leading-relaxed text-zinc-600">
-            Faça perguntas sobre os documentos da conta e obtenha respostas com citações às fontes.
+            Faça perguntas sobre os documentos e obtenha respostas inteligentes com citações às fontes.
           </p>
           <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
             <%= render "conversations/title_header_span", conversation: @conversation %>
@@ -29,13 +28,6 @@
               <span class="text-zinc-600">Foco: <%= @focus_document.file.filename %></span>
             <% end %>
           </div>
-        </div>
-        <div
-          class="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-teal-200/90 bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-900 sm:ml-2 sm:self-center"
-          title="Contexto RAG: toda a conta, exceto quando há foco num documento."
-        >
-          <span class="h-2 w-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
-          RAG ativo
         </div>
       </div>
     </header>

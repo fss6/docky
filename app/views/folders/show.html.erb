@@ -3,76 +3,80 @@
 <div class="space-y-8">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Pastas</p>
+      <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-1.5">
+          <li><%= link_to "Pastas", folders_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-zinc-700"><%= @folder.name %></li>
+        </ol>
+      </nav>
       <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= @folder.name %></h1>
       <p class="mt-1 text-sm text-zinc-500">Conta <%= @folder.account&.name || "—" %> · envio rápido de arquivos abaixo</p>
     </div>
     <div class="flex flex-wrap gap-2">
       <%= link_to "Editar pasta", edit_folder_path(@folder), class: "app-btn-secondary" %>
-      <%= link_to "Todas as pastas", folders_path, class: "app-btn-ghost border border-zinc-200" %>
     </div>
   </header>
 
-  <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
-    <div>
-      <%= render @folder %>
-    </div>
-    <div class="lg:sticky lg:top-20">
-      <%= render "documents/upload", folder: @folder, upload_context: "folder" %>
-    </div>
-  </div>
+  <div class="grid gap-6 xl:grid-cols-12 xl:items-start">
+    <div class="space-y-6 xl:col-span-7">
+      <section class="app-card overflow-hidden" aria-labelledby="folder-docs-heading">
+        <div class="flex flex-col gap-3 border-b border-zinc-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <h2 id="folder-docs-heading" class="text-sm font-semibold text-zinc-900">Arquivos recentes</h2>
+          <%= link_to "Ver todos", folder_documents_path(@folder), class: "text-sm font-medium text-accent no-underline hover:text-teal-700" %>
+        </div>
+        <% if @recent_documents.any? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  <th class="px-5 py-3 font-semibold sm:px-6">Arquivo</th>
+                  <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">Enviado</th>
+                  <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
+                  <th class="px-5 py-3 text-right font-semibold sm:px-6"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-100">
+                <% @recent_documents.each do |doc| %>
+                  <tr class="transition-colors hover:bg-zinc-50/60">
+                    <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
+                      <%= link_to document_file_label(doc), doc, class: "text-zinc-900 no-underline hover:text-accent" %>
+                    </td>
+                    <td class="hidden px-5 py-3 tabular-nums text-zinc-600 sm:table-cell sm:px-6">
+                      <%= l(doc.created_at, format: :short) %>
+                    </td>
+                    <td class="px-5 py-3 sm:px-6">
+                      <span class="inline-flex rounded-md px-2 py-0.5 text-xs font-medium <%= document_status_badge_classes(doc.status) %>">
+                        <%= document_status_label(doc.status) %>
+                      </span>
+                    </td>
+                    <td class="px-5 py-3 text-right sm:px-6">
+                      <%= link_to "Abrir", doc, class: "text-xs font-medium text-accent no-underline hover:text-teal-700" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="px-5 py-12 text-center sm:px-6">
+            <p class="text-sm text-zinc-600">Nenhum arquivo ainda. Use o painel ao lado para enviar.</p>
+          </div>
+        <% end %>
+      </section>
 
-  <section class="app-card overflow-hidden" aria-labelledby="folder-docs-heading">
-    <div class="flex flex-col gap-3 border-b border-zinc-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-      <h2 id="folder-docs-heading" class="text-sm font-semibold text-zinc-900">Arquivos recentes</h2>
-      <%= link_to "Ver todos", folder_documents_path(@folder), class: "text-sm font-medium text-accent no-underline hover:text-teal-700" %>
+      <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
+        <p class="text-sm font-medium text-zinc-800">Zona de risco</p>
+        <p class="mt-1 text-sm text-zinc-600">Excluir remove permanentemente esta pasta e os documentos vinculados.</p>
+        <%= button_to "Excluir pasta", @folder, method: :delete,
+              form: { class: "mt-4 inline" },
+              data: { turbo_confirm: "Excluir esta pasta? Esta ação não pode ser desfeita." },
+              class: "app-btn-danger cursor-pointer" %>
+      </div>
     </div>
-    <% if @recent_documents.any? %>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-              <th class="px-5 py-3 font-semibold sm:px-6">Arquivo</th>
-              <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">Enviado</th>
-              <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
-              <th class="px-5 py-3 text-right font-semibold sm:px-6"></th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-100">
-            <% @recent_documents.each do |doc| %>
-              <tr class="transition-colors hover:bg-zinc-50/60">
-                <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
-                  <%= link_to document_file_label(doc), doc, class: "text-zinc-900 no-underline hover:text-accent" %>
-                </td>
-                <td class="hidden px-5 py-3 tabular-nums text-zinc-600 sm:table-cell sm:px-6">
-                  <%= l(doc.created_at, format: :short) %>
-                </td>
-                <td class="px-5 py-3 sm:px-6">
-                  <span class="inline-flex rounded-md px-2 py-0.5 text-xs font-medium <%= document_status_badge_classes(doc.status) %>">
-                    <%= document_status_label(doc.status) %>
-                  </span>
-                </td>
-                <td class="px-5 py-3 text-right sm:px-6">
-                  <%= link_to "Abrir", doc, class: "text-xs font-medium text-accent no-underline hover:text-teal-700" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% else %>
-      <div class="px-5 py-12 text-center sm:px-6">
-        <p class="text-sm text-zinc-600">Nenhum arquivo ainda. Use o painel ao lado para enviar.</p>
-      </div>
-    <% end %>
-  </section>
 
-  <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
-    <p class="text-sm font-medium text-zinc-800">Zona de risco</p>
-    <p class="mt-1 text-sm text-zinc-600">Excluir remove permanentemente esta pasta e os documentos vinculados.</p>
-    <%= button_to "Excluir pasta", @folder, method: :delete,
-          form: { class: "mt-4 inline" },
-          data: { turbo_confirm: "Excluir esta pasta? Esta ação não pode ser desfeita." },
-          class: "app-btn-danger cursor-pointer" %>
+    <aside class="xl:col-span-5 xl:sticky xl:top-20">
+      <%= render "documents/upload", folder: @folder, upload_context: "folder", compact: true %>
+    </aside>
   </div>
 </div>
