@@ -14,22 +14,34 @@
 
   <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
     <article class="app-card p-5">
-      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tags unicas</p>
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tags unicas</p>
+        <%= heroicon "tag", variant: :outline, options: { class: "h-4 w-4 text-zinc-400", "aria-hidden": "true" } %>
+      </div>
       <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900"><%= @total_tags %></p>
     </article>
 
     <article class="app-card p-5">
-      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Arquivos</p>
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Arquivos</p>
+        <%= heroicon "document-text", variant: :outline, options: { class: "h-4 w-4 text-zinc-400", "aria-hidden": "true" } %>
+      </div>
       <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900"><%= @total_documents %></p>
     </article>
 
     <article class="app-card p-5">
-      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Usuarios</p>
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Usuarios</p>
+        <%= heroicon "users", variant: :outline, options: { class: "h-4 w-4 text-zinc-400", "aria-hidden": "true" } %>
+      </div>
       <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900"><%= @total_users %></p>
     </article>
 
     <article class="app-card p-5">
-      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pastas</p>
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pastas</p>
+        <%= heroicon "folder", variant: :outline, options: { class: "h-4 w-4 text-zinc-400", "aria-hidden": "true" } %>
+      </div>
       <p class="mt-2 text-3xl font-semibold tracking-tight text-zinc-900"><%= @total_folders %></p>
     </article>
   </section>
