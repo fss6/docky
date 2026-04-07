@@ -5,7 +5,7 @@
     <p class="text-xs font-semibold uppercase tracking-wide text-accent">Documentos</p>
     <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Busca por termo</h1>
     <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
-      Encontre arquivos por palavras presentes no conteúdo, resumo ou tags.
+      Encontre arquivos por termos relevantes.
     </p>
   </header>
 
@@ -16,7 +16,7 @@
         <%= form.text_field :q,
               value: @query,
               class: "app-input",
-              placeholder: "Ex: corregedoria, escala, contrato...",
+              placeholder: "Ex: Contrato, licitação, proposta...",
               autocomplete: "off" %>
       </div>
       <%= form.submit "Buscar", class: "app-btn-primary border-0 cursor-pointer" %>

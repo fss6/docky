@@ -25,6 +25,7 @@ class DocumentsController < ApplicationController
       .uniq
 
     @documents = Document.includes(:user, :folder).with_attached_file.order(created_at: :desc)
+
     if @selected_tags.any?
       @selected_tags.each do |tag|
         @documents = @documents.where(
@@ -32,6 +33,8 @@ class DocumentsController < ApplicationController
           tag
         )
       end
+    else
+      @documents = @documents.none
     end
     @documents = @documents.limit(50)
   end
