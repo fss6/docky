@@ -65,11 +65,17 @@ class DocumentsController < ApplicationController
       if @document.save
         DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
 
-        format.html { redirect_to after_upload_path, notice: "Arquivo enviado com sucesso." }
+        format.html do
+          redirect_back fallback_location: after_upload_path,
+                        notice: "Arquivo enviado com sucesso.",
+                        status: :see_other
+        end
         format.json { render :show, status: :created, location: @document }
       else
         format.html do
-          redirect_to after_upload_path, alert: @document.errors.full_messages.to_sentence
+          redirect_back fallback_location: after_upload_path,
+                        alert: @document.errors.full_messages.to_sentence,
+                        status: :see_other
         end
         format.json { render json: @document.errors, status: :unprocessable_entity }
       end
