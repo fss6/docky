@@ -10,13 +10,14 @@
     <% nav = [
       { key: :dashboard, label: "Painel", path: dashboard_path, icon: :home },
       { key: :chat, label: "Chat", path: nav_chat_path, icon: :chat },
+      { key: :documents_tags_search, label: "Busca por tags", path: documents_tags_search_path, icon: :search },
       { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
       { key: :users, label: "Usuários", path: users_path, icon: :users },
       { key: :plans, label: "Planos", path: plans_path, icon: :plans },
       { key: :accounts, label: "Contas", path: accounts_path, icon: :building }, 
       { key: :groups, label: "Grupos", path: groups_path, icon: :group },
       { key: :subscriptions, label: "Assinaturas", path: subscriptions_path, icon: :credit_card },
-      { key: :settings, label: "Configurações", path: "#", icon: :cog }
+      { key: :settings, label: "Configurações", path: settings_path, icon: :cog }
     ] %>
     <% nav.each do |item| %>
       <% active = (item[:key] == :dashboard && (current_page?(root_path) || request.path.start_with?("/dashboard"))) ||
@@ -24,6 +25,8 @@
                    (item[:key] == :accounts && request.path.start_with?("/accounts") && !request.path.match?(%r{\A/accounts/\d+/conversations})) ||
                    (item[:key] == :users && request.path.start_with?("/users")) ||
                    (item[:key] == :folders && request.path.start_with?("/folders")) ||
+                   (item[:key] == :documents_tags_search && request.path.start_with?("/documents/tags")) ||
+                   (item[:key] == :settings && request.path.start_with?("/settings")) ||
                    (item[:key] == :chat && (request.path == "/chat" || request.path.match?(%r{\A/accounts/\d+/conversations}))) ||
                    (item[:key] == :groups && request.path.start_with?("/groups")) ||
                    (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) %>
@@ -37,7 +40,8 @@
         when :groups then policy(Group).index?
         when :chat then policy(Conversation).index?
         when :folders then policy(Folder).index?
-        when :settings then true
+        when :documents_tags_search then policy(Document).index?
+        when :settings then policy(Setting).show?
         else false
       end %>
 

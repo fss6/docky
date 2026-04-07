@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_06_173548) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -142,6 +142,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_173548) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "settings", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "generate_tags_automatically", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_settings_on_account_id", unique: true
+  end
+
   create_table "subscriptions", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "plan_id", null: false
@@ -196,6 +204,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_173548) do
   add_foreign_key "group_memberships", "users"
   add_foreign_key "groups", "accounts"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "settings", "accounts"
   add_foreign_key "subscriptions", "accounts"
   add_foreign_key "subscriptions", "plans"
   add_foreign_key "users", "accounts"

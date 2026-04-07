@@ -52,7 +52,7 @@ class ConversationsController < ApplicationController
   end
 
   def set_account
-    @account = Account.find(params.expect(:account_id))
+    @account = current_tenant
   end
 
   def conversation_params

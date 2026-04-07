@@ -40,7 +40,7 @@ class MessagesController < ApplicationController
   end
 
   def set_account_and_conversation
-    @account = Account.find(params.expect(:account_id))
+    @account = current_tenant
     @conversation = @account.conversations.find(params.expect(:conversation_id))
   end
 

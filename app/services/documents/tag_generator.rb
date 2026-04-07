@@ -5,7 +5,7 @@ module Documents
   class TagGenerator
     SYSTEM_PROMPT = <<~TEXT.squish.freeze
       Você extrai etiquetas (tags) para documentos.
-      Responda APENAS com um objeto JSON com a chave "tags": array de strings (entre 4 e 10 itens).
+      Responda APENAS com um objeto JSON com a chave "tags": array de strings (entre 1 e 5 itens).
       Cada tag deve ser curta (1 a 4 palavras), em português do Brasil, descrevendo tema, tipo de documento ou entidades relevantes.
       Sem hashtags, sem duplicatas, sem texto fora do JSON.
     TEXT

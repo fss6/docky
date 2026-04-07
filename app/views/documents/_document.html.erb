@@ -5,8 +5,11 @@
       <p class="mt-1 text-base font-medium text-zinc-900"><%= document_file_label(document) %></p>
       <% if document.file.attached? %>
         <p class="mt-2">
-          <%= link_to "Baixar", rails_blob_path(document.file, disposition: "attachment"),
-                class: "text-sm font-medium text-accent no-underline hover:text-teal-700" %>
+          <%= link_to rails_blob_path(document.file, disposition: "attachment"),
+                class: "inline-flex items-center gap-1.5 text-sm font-medium text-accent no-underline hover:text-teal-700" do %>
+            <%= heroicon "arrow-down-tray", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
+            <span>Baixar</span>
+          <% end %>
         </p>
       <% end %>
     </div>
@@ -56,14 +59,55 @@
   <div class="border-t border-zinc-100">
     <div class="px-5 py-4 sm:px-6 sm:py-5">
       <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Etiquetas</p>
-      <div class="mt-2 flex flex-wrap gap-2">
+      <div class="mt-2 space-y-3">
         <% if document.tags.any? %>
-          <% document.tags.each do |tag| %>
-            <span class="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700"><%= tag %></span>
-          <% end %>
+          <div class="flex flex-wrap gap-2">
+            <% document.tags.each do |tag| %>
+              <div class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700">
+                <span><%= tag %></span>
+                <%= button_to "x",
+                      remove_tag_document_path(document, tag: tag),
+                      method: :delete,
+                      class: "rounded-full px-1 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800",
+                      form: { class: "inline" } %>
+              </div>
+            <% end %>
+          </div>
         <% else %>
           <span class="text-sm text-zinc-500">—</span>
         <% end %>
+
+        <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <section class="rounded-lg border border-zinc-200 bg-zinc-50/70 px-4 py-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Adicionar tag</p>
+            <%= form_with url: add_tag_document_path(document), method: :patch, class: "mt-3 flex flex-col gap-2 sm:flex-row sm:items-end" do |form| %>
+              <div class="w-full">
+                <%= form.label :tag, "Nova tag", class: "app-label" %>
+                <%= form.text_field :tag, class: "app-input", placeholder: "Ex: nota fiscal, contrato, etc.", autocomplete: "off" %>
+              </div>
+              <%= form.submit "Adicionar", class: "app-btn-secondary cursor-pointer border-0" %>
+            <% end %>
+          </section>
+
+          <% if document.tags.any? %>
+            <section class="rounded-lg border border-zinc-200 bg-zinc-50/70 px-4 py-4">
+              <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Editar tag</p>
+              <%= form_with url: replace_tag_document_path(document), method: :patch, class: "mt-3 space-y-2" do |form| %>
+                <div>
+                  <%= form.label :old_tag, "Tag atual", class: "app-label" %>
+                  <%= form.select :old_tag, options_for_select(document.tags), {}, class: "app-input" %>
+                </div>
+                <div>
+                  <%= form.label :new_tag, "Novo valor", class: "app-label" %>
+                  <%= form.text_field :new_tag, class: "app-input", placeholder: "Novo texto da tag", autocomplete: "off" %>
+                </div>
+                <div>
+                  <%= form.submit "Atualizar", class: "app-btn-secondary cursor-pointer border-0 w-full sm:w-auto" %>
+                </div>
+              <% end %>
+            </section>
+          <% end %>
+        </div>
       </div>
     </div>
     <% if has_text %>

@@ -8,6 +8,7 @@ class DocumentTaggingJob < ApplicationJob
   def perform(document_id)
     document = Document.find(document_id)
     return unless document.processed?
+    return unless document.account&.generate_tags_automatically?
 
     tags = Documents::TagGenerator.call(document)
     return if tags.nil?

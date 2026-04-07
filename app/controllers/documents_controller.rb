@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :set_folder, only: %i[index create]
-  before_action :set_document, only: %i[show destroy]
+  before_action :set_document, only: %i[show destroy add_tag replace_tag remove_tag]
   before_action :authorize_policy
 
   def index
@@ -8,6 +8,32 @@ class DocumentsController < ApplicationController
   end
 
   def show
+  end
+
+  def tags_search
+    @available_tags = Document.pluck(:tags)
+      .flatten
+      .compact
+      .map { |tag| tag.to_s.strip }
+      .reject(&:blank?)
+      .uniq
+      .sort
+
+    @selected_tags = Array(params[:tags])
+      .map { |tag| tag.to_s.strip }
+      .reject(&:blank?)
+      .uniq
+
+    @documents = Document.includes(:user, :folder).with_attached_file.order(created_at: :desc)
+    if @selected_tags.any?
+      @selected_tags.each do |tag|
+        @documents = @documents.where(
+          "EXISTS (SELECT 1 FROM jsonb_array_elements_text(documents.tags) AS t(value) WHERE LOWER(t.value) = LOWER(?))",
+          tag
+        )
+      end
+    end
+    @documents = @documents.limit(50)
   end
 
   def create
@@ -40,10 +66,41 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def add_tag
+    tags = Document.normalize_tags(@document.tags + [params[:tag]])
+    return redirect_back(fallback_location: document_path(@document), alert: "Informe uma tag válida.") if tags == @document.tags
+
+    @document.update!(tags: tags)
+
+    redirect_back fallback_location: document_path(@document), notice: "Tag adicionada com sucesso."
+  end
+
+  def replace_tag
+    old_tag = params[:old_tag].to_s
+    new_tag = params[:new_tag].to_s
+    return redirect_back(fallback_location: document_path(@document), alert: "Informe a tag atual.") if old_tag.blank?
+    return redirect_back(fallback_location: document_path(@document), alert: "Informe um novo valor para a tag.") if new_tag.blank?
+
+    updated = @document.tags.reject { |tag| tag.casecmp(old_tag).zero? }
+    updated << new_tag
+    @document.update!(tags: Document.normalize_tags(updated))
+
+    redirect_back fallback_location: document_path(@document), notice: "Tag atualizada com sucesso."
+  end
+
+  def remove_tag
+    tag_to_remove = params[:tag].to_s
+    tags = @document.tags.reject { |tag| tag.casecmp(tag_to_remove).zero? }
+    @document.update!(tags: tags)
+
+    redirect_back fallback_location: document_path(@document), notice: "Tag removida com sucesso."
+  end
+
   private
 
   def authorize_policy
-    authorize Document
+    record = @document || Document
+    authorize record
   end
 
   def set_folder

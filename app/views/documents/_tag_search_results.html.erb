@@ -1,0 +1,44 @@
+<section class="app-card p-5">
+  <header class="mb-4 flex items-center justify-between">
+    <h2 class="text-base font-semibold text-zinc-900">Resultados</h2>
+    <span class="text-xs text-zinc-500"><%= pluralize(documents.size, "arquivo", "arquivos") %></span>
+  </header>
+
+  <% if documents.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
+            <th class="px-2 py-2">Arquivo</th>
+            <th class="px-2 py-2">Pasta</th>
+            <th class="px-2 py-2">Usuario</th>
+            <th class="px-2 py-2">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% documents.each do |document| %>
+            <tr class="border-b border-zinc-100">
+              <td class="px-2 py-2">
+                <p class="font-medium text-zinc-900">
+                  <%= link_to(document.file.filename.to_s.presence || "Documento ##{document.id}", document_path(document), class: "no-underline text-zinc-900 hover:text-accent") %>
+                </p>
+                <% if document.tags.any? %>
+                  <div class="mt-1 flex flex-wrap gap-1.5">
+                    <% document.tags.each do |tag| %>
+                      <span class="inline-flex rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700"><%= tag %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </td>
+              <td class="px-2 py-2 text-zinc-600"><%= document.folder&.name || "-" %></td>
+              <td class="px-2 py-2 text-zinc-600"><%= document.user&.name || document.user&.email || "-" %></td>
+              <td class="px-2 py-2 text-zinc-500"><%= l(document.created_at, format: :short) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-sm text-zinc-500">Nenhum arquivo encontrado com as tags selecionadas.</p>
+  <% end %>
+</section>

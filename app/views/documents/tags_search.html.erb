@@ -1,0 +1,31 @@
+<% content_for :title, "Busca por tags · Docfy" %>
+
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent">Documentos</p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Busca por tags</h1>
+    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
+      Selecione uma ou mais tags para filtrar arquivos automaticamente.
+    </p>
+  </header>
+
+  <section class="app-card p-5">
+    <%= form_with url: documents_tags_search_path, method: :get do %>
+      <% if @available_tags.any? %>
+        <div class="flex flex-wrap gap-2">
+          <% @available_tags.each do |tag| %>
+            <% checked = @selected_tags.include?(tag) %>
+            <label class="<%= checked ? 'border-accent bg-accent/10 text-accent' : 'border-zinc-300 bg-white text-zinc-700' %> cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium transition-colors hover:border-accent/60">
+              <%= check_box_tag "tags[]", tag, checked, class: "sr-only", onchange: "this.form.requestSubmit()" %>
+              <span><%= tag %></span>
+            </label>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-zinc-500">Nenhuma tag cadastrada ainda.</p>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%= render "documents/tag_search_results", documents: @documents %>
+</div>

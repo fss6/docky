@@ -13,6 +13,22 @@ class DocumentPolicy < ApplicationPolicy
     user.role_member? || user.role_owner?
   end
 
+  def tags_search?
+    index?
+  end
+
+  def add_tag?
+    update?
+  end
+
+  def replace_tag?
+    update?
+  end
+
+  def remove_tag?
+    update?
+  end
+
   def create?
     user.role_member? || user.role_owner?
   end

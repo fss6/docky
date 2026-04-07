@@ -18,7 +18,7 @@ class RagQueryJob < ApplicationJob
         finish_with_text(
           ai_message,
           conversation,
-          "Olá! Sou o assistente Docfy desta conta — estou aqui para ajudar você a entender os documentos que enviar: " \
+          "Olá! Sou o assistente desta conta — estou aqui para ajudar você a entender os documentos que enviar: " \
           "pode perguntar o que quiser sobre o texto, pedir resumos, localizar cláusulas ou dados; respondo com base no que estiver indexado e cito arquivo e página quando fizer sentido.\n\n" \
           "Ainda não há arquivos processados. Depois do upload e do processamento, envie sua primeira pergunta e seguimos."
         )

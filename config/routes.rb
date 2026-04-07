@@ -3,10 +3,19 @@ Rails.application.routes.draw do
     sessions: 'users/sessions'
   }
   get "dashboard", to: "dashboard#index", as: :dashboard
+  get "documents/tags", to: "documents#tags_search", as: :documents_tags_search
   get "chat", to: "chat#index", as: :chat
+  resource :settings, only: %i[show update]
 
   resources :folders do
     resources :documents, shallow: true, only: %i[index create show destroy]
+  end
+  resources :documents, only: [] do
+    member do
+      patch :add_tag
+      patch :replace_tag
+      delete :remove_tag
+    end
   end
   resources :groups do
     resources :memberships, controller: "group_memberships", only: %i[create destroy]

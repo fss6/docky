@@ -24,6 +24,15 @@ class Document < ApplicationRecord
     v.is_a?(Array) ? v : []
   end
 
+  def self.normalize_tags(raw_tags, max: 20)
+    Array(raw_tags).filter_map do |tag|
+      normalized = tag.to_s.strip.squeeze(" ")
+      next if normalized.blank?
+
+      normalized.truncate(80, omission: "")
+    end.uniq { |t| t.downcase }.first(max)
+  end
+
   private
 
   def tags_are_strings
