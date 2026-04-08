@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Dokivo" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/brand/favicon.ico" sizes="any">
+    <link rel="icon" href="/brand/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/brand/logo_96x96.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-dvh bg-[#060E1C] font-[DM_Sans,sans-serif] text-white antialiased" style="font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;">
+    <%= yield %>
+  </body>
+</html>

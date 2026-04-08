@@ -2,6 +2,15 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     sessions: 'users/sessions'
   }
+  authenticated :user do
+    root "dashboard#index", as: :authenticated_root
+  end
+  unauthenticated do
+    root "landing#index"
+  end
+
+  get "landing", to: "landing#index", as: :landing
+  get "privacidade", to: "landing#privacy", as: :privacy
   get "dashboard", to: "dashboard#index", as: :dashboard
   get "documents/tags", to: "documents#tags_search", as: :documents_tags_search
   get "documents/search", to: "documents#term_search", as: :documents_term_search
@@ -40,5 +49,4 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  root "dashboard#index"
 end

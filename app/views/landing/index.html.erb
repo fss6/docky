@@ -1,0 +1,375 @@
+<% content_for :title, "Dokivo — Gestão inteligente de documentos" %>
+
+<% content_for :head do %>
+<style>
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+  .syne { font-family: 'Syne', sans-serif; }
+  .heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+  @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  @keyframes blink-cur { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .anim-pulse-dot { animation: pulse-dot 2s infinite; }
+  .anim-blink { animation: blink-cur 1s infinite; display:inline-block; width:2px; height:13px; background:#1A6FFF; margin-left:2px; vertical-align:middle; }
+  .anim-scroll-x { animation: scroll-x 22s linear infinite; width: max-content; }
+  .anim-fade-up { animation: fade-up 0.7s ease both; }
+  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; }
+  .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.4s; }
+  .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; }
+  .d8 { animation-delay: 0.8s; }
+  .feat-card { transition: all 0.25s; }
+  .feat-card:hover { background: rgba(26,111,255,0.06) !important; border-color: rgba(26,111,255,0.3) !important; transform: translateY(-3px); }
+  .mock-doc { transition: all 0.2s; }
+  .mock-doc:hover { background: rgba(26,111,255,0.08); border-color: rgba(26,111,255,0.3); }
+  .steps-row { position: relative; }
+  .steps-row::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(26,111,255,0.3), rgba(26,111,255,0.3), transparent);
+    z-index: 0;
+  }
+  @media (max-width: 768px) {
+    .steps-row::before { display: none; }
+    .float-tag { display: none !important; }
+  }
+  .price-featured { background: rgba(26,111,255,0.08) !important; border-color: #1A6FFF !important; transform: scale(1.02); }
+  @media (max-width: 900px) { .price-featured { transform: none; } }
+</style>
+<% end %>
+
+<%# ─── NAV ─── %>
+<nav class="sticky top-0 z-50 border-b" style="border-color:rgba(255,255,255,0.08);background:rgba(6,14,28,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
+  <div class="mx-auto flex max-w-[1160px] items-center justify-between px-8 py-4">
+    <a href="/" class="flex items-center gap-3 no-underline">
+      <%= image_tag "/brand/logo.svg", alt: "Dokivo", class: "h-[38px] w-[38px] shrink-0 rounded-[10px]" %>
+      <span class="logo-text">Dok<span>ivo</span></span>
+    </a>
+    <div class="flex items-center gap-2">
+      <a href="#funcionalidades" class="hidden rounded-lg border px-5 py-2 text-sm font-medium transition hover:text-white sm:block" style="border-color:rgba(255,255,255,0.08);color:#C8D8EE;" onmouseover="this.style.borderColor='rgba(26,111,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">Funcionalidades</a>
+      <a href="#precos" class="hidden rounded-lg border px-5 py-2 text-sm font-medium transition hover:text-white sm:block" style="border-color:rgba(255,255,255,0.08);color:#C8D8EE;" onmouseover="this.style.borderColor='rgba(26,111,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">Preços</a>
+      <%= link_to "Entrar", new_user_session_path, class: "rounded-lg border px-5 py-2 text-sm font-medium transition hover:text-white", style: "border-color:rgba(255,255,255,0.08);color:#C8D8EE;" %>
+      <%= link_to "Criar conta", new_user_registration_path, class: "rounded-lg bg-[#1A6FFF] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#4D8FFF]" %>
+    </div>
+  </div>
+</nav>
+
+<%# ─── HERO ─── %>
+<section class="relative overflow-hidden px-8 pb-20 pt-24">
+  <div class="pointer-events-none absolute left-1/2 top-[-200px] h-[600px] w-[600px] -translate-x-1/2 rounded-full" style="background:radial-gradient(circle,rgba(26,111,255,0.2) 0%,transparent 70%);filter:blur(80px);z-index:0;"></div>
+  <div class="pointer-events-none absolute right-[-100px] top-[60%] h-[400px] w-[400px] rounded-full" style="background:radial-gradient(circle,rgba(26,111,255,0.12) 0%,transparent 70%);filter:blur(80px);z-index:0;"></div>
+  <div class="pointer-events-none absolute left-[-80px] top-[30%] h-[300px] w-[300px] rounded-full" style="background:radial-gradient(circle,rgba(100,160,255,0.1) 0%,transparent 70%);filter:blur(80px);z-index:0;"></div>
+
+  <div class="relative z-10 mx-auto grid max-w-[1160px] items-center gap-16 lg:grid-cols-2">
+    <%# Copy side %>
+    <div>
+      <div class="anim-fade-up mb-7 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5" style="border-color:rgba(26,111,255,0.3);background:rgba(26,111,255,0.08);">
+        <span class="anim-pulse-dot h-1.5 w-1.5 rounded-full bg-[#1A6FFF]"></span>
+        <span class="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#A8C8FF]">Gestão inteligente de documentos</span>
+      </div>
+      <h1 class="heading anim-fade-up d1 mb-6 font-extrabold leading-[1.08] tracking-[-0.03em] text-white" style="font-size:clamp(36px,4.5vw,54px);">
+        Seus documentos.<br>
+        <em class="not-italic text-[#4D8FFF]">Perguntas respondidas</em><br>
+        em segundos.
+      </h1>
+      <p class="anim-fade-up d2 mb-10 max-w-[480px] text-[17px] font-light leading-[1.7] text-[#8CA0BC]">
+        O Dokivo transforma arquivos corporativos em conhecimento acessível. Faça upload, pergunte em linguagem natural e obtenha respostas precisas com rastreabilidade total.
+      </p>
+      <div class="anim-fade-up d3 flex flex-wrap items-center gap-3.5">
+        <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 rounded-[10px] bg-[#1A6FFF] px-7 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#4D8FFF] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(26,111,255,0.35)]" do %>
+          Começar grátis
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <% end %>
+        <%= link_to "Ver demonstração", new_user_session_path, class: "rounded-[10px] border px-7 py-3.5 text-[15px] font-medium text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white", style: "border-color:rgba(255,255,255,0.12);" %>
+      </div>
+      <div class="anim-fade-up d4 mt-10 flex items-center gap-2.5 text-[13px] text-[#8CA0BC]">
+        <div class="flex">
+          <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#060E1C] bg-[#1A6FFF] text-[11px] font-semibold" style="margin-right:-8px;">AB</div>
+          <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#060E1C] bg-[#0E4DAB] text-[11px] font-semibold" style="margin-right:-8px;">CF</div>
+          <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#060E1C] bg-[#3D85E0] text-[11px] font-semibold" style="margin-right:-8px;">MR</div>
+          <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#060E1C] bg-[#2060C0] text-[11px] font-semibold">TS</div>
+        </div>
+        <span>+200 empresas já usam o Dokivo</span>
+      </div>
+    </div>
+
+    <%# Mockup side %>
+    <div class="anim-fade-up d3 relative">
+      <div class="float-tag absolute -right-4 -top-4 z-20 flex items-center gap-2 rounded-[10px] border px-3.5 py-2.5 text-[13px] font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)]" style="background:rgba(17,34,64,0.95);border-color:rgba(26,111,255,0.3);" >
+        <div class="flex h-7 w-7 items-center justify-center rounded-[7px]" style="background:rgba(40,200,100,0.15);">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#28C864" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        Contrato aprovado
+      </div>
+
+      <div class="relative overflow-hidden rounded-[20px] border p-6 shadow-[0_40px_80px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)_inset]" style="background:rgba(17,34,64,0.9);border-color:rgba(255,255,255,0.08);backdrop-filter:blur(8px);">
+        <div class="absolute inset-x-0 top-0 h-px" style="background:linear-gradient(90deg,transparent,rgba(26,111,255,0.6),transparent);"></div>
+
+        <div class="mb-5 flex items-center justify-between">
+          <div class="flex gap-1.5">
+            <div class="h-2.5 w-2.5 rounded-full bg-[#FF5F57]"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-[#28CA41]"></div>
+          </div>
+          <div class="rounded-md border px-3 py-1 text-[12px] text-[#8CA0BC]" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);">dokivo.com.br</div>
+        </div>
+
+        <div class="mb-3.5 grid grid-cols-2 gap-2.5">
+          <div class="rounded-[10px] border p-3.5" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);">
+            <div class="text-[11px] uppercase tracking-[0.06em] text-[#8CA0BC]">Documentos</div>
+            <div class="syne mt-1.5 text-[26px] font-bold text-white">247</div>
+          </div>
+          <div class="rounded-[10px] border p-3.5" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);">
+            <div class="text-[11px] uppercase tracking-[0.06em] text-[#8CA0BC]">Consultados hoje</div>
+            <div class="syne mt-1.5 text-[26px] font-bold text-white">38</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <div class="mock-doc flex items-center gap-3 rounded-lg border p-2.5 px-3" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-sm" style="background:rgba(255,80,80,0.15);">📄</div>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-[13px] font-medium text-white">Contrato ACME Corp — 2025</div>
+              <div class="mt-0.5 text-[11px] text-[#8CA0BC]">PDF · 2,4 MB · há 2h</div>
+            </div>
+            <span class="shrink-0 rounded-[5px] px-2 py-0.5 text-[10px] font-semibold" style="background:rgba(255,180,0,0.15);color:#FFB400;">Pendente</span>
+          </div>
+          <div class="mock-doc flex items-center gap-3 rounded-lg border p-2.5 px-3" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-sm" style="background:rgba(40,200,100,0.15);">📋</div>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-[13px] font-medium text-white">Política de Privacidade v3</div>
+              <div class="mt-0.5 text-[11px] text-[#8CA0BC]">DOCX · 840 KB · ontem</div>
+            </div>
+            <span class="shrink-0 rounded-[5px] px-2 py-0.5 text-[10px] font-semibold" style="background:rgba(40,200,100,0.15);color:#28C864;">Aprovado</span>
+          </div>
+          <div class="mock-doc flex items-center gap-3 rounded-lg border p-2.5 px-3" style="background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[7px] text-sm" style="background:rgba(26,111,255,0.15);">📊</div>
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-[13px] font-medium text-white">Relatório Auditoria Q2</div>
+              <div class="mt-0.5 text-[11px] text-[#8CA0BC]">PDF · 5,1 MB · 3 dias</div>
+            </div>
+            <span class="shrink-0 rounded-[5px] px-2 py-0.5 text-[10px] font-semibold" style="background:rgba(26,111,255,0.15);color:#A8C8FF;">Em revisão</span>
+          </div>
+        </div>
+
+        <div class="mt-3.5 rounded-[10px] border p-3 px-3.5" style="background:rgba(26,111,255,0.08);border-color:rgba(26,111,255,0.3);">
+          <div class="mb-1.5 text-[12px] text-[#A8C8FF]">💬 "Qual o prazo de entrega no contrato ACME?"</div>
+          <div class="text-[13px] leading-[1.5] text-[#C8D8EE]">
+            Conforme a Cláusula 4.2, o prazo é de <strong class="text-[#A8C8FF]">30 dias corridos</strong> após a assinatura, com prorrogação de até 15 dias.<span class="anim-blink"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-tag absolute -bottom-4 -left-4 z-20 flex items-center gap-2 rounded-[10px] border px-3.5 py-2.5 text-[13px] font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)]" style="background:rgba(17,34,64,0.95);border-color:rgba(26,111,255,0.3);">
+        <div class="flex h-7 w-7 items-center justify-center rounded-[7px]" style="background:rgba(26,111,255,0.15);">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#4D8FFF" stroke-width="1.2"/><path d="M7 4.5v3l2 1.5" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        Resposta em &lt; 2s
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# ─── LOGOS STRIP ─── %>
+<div class="overflow-hidden border-y py-7" style="border-color:rgba(255,255,255,0.08);background:rgba(255,255,255,0.015);">
+  <div class="anim-scroll-x flex items-center gap-16">
+    <% ["Jurídico", "·", "Recursos Humanos", "·", "Contabilidade", "·", "Compliance", "·", "Engenharia", "·", "Contratos", "·", "Licitações", "·", "Auditoria", "·", "Imobiliário", "·", "Saúde", "·",
+        "Jurídico", "·", "Recursos Humanos", "·", "Contabilidade", "·", "Compliance", "·", "Engenharia", "·", "Contratos", "·", "Licitações", "·", "Auditoria", "·", "Imobiliário", "·", "Saúde", "·"].each do |item| %>
+      <span class="whitespace-nowrap text-[14px] font-semibold uppercase tracking-[0.06em]" style="color:rgba(255,255,255,0.2);"><%= item %></span>
+    <% end %>
+  </div>
+</div>
+
+<%# ─── PROBLEM / SOLUTION ─── %>
+<section class="py-24" id="funcionalidades">
+  <div class="mx-auto max-w-[1160px] px-8">
+    <div class="mb-4 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#A8C8FF]">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+      O cenário atual
+    </div>
+    <h2 class="heading mb-4 font-extrabold leading-[1.1] tracking-[-0.02em] text-white" style="font-size:clamp(28px,3.5vw,42px);">Documentos espalhados custam<br>tempo e dinheiro.</h2>
+    <p class="max-w-[540px] text-[17px] font-light leading-[1.7] text-[#8CA0BC]">Equipes modernas precisam de acesso rápido e inteligente ao conteúdo dos seus arquivos — não de buscas manuais intermináveis.</p>
+
+    <div class="mt-14 grid gap-5 lg:grid-cols-2">
+      <div class="rounded-[20px] border p-9" style="background:rgba(255,60,60,0.04);border-color:rgba(255,60,60,0.15);">
+        <div class="mb-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#FF6B6B]">⚠ O problema</div>
+        <h3 class="heading mb-3 text-[22px] font-bold leading-[1.25]">Arquivos dispersos, histórico perdido e retrabalho constante.</h3>
+        <p class="mb-5 font-light leading-[1.7] text-[#8CA0BC]">Quando documentos ficam espalhados entre e-mails, pastas e sistemas, sua equipe gasta horas procurando informação em vez de decidir.</p>
+        <div class="flex flex-col gap-2.5">
+          <% ["Contratos desatualizados circulando por e-mail", "Horas perdidas para encontrar uma cláusula", "Risco de decisões com informação desatualizada"].each do |item| %>
+            <div class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]">
+              <svg class="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="rgba(255,80,80,0.2)"/><path d="M5 5l4 4M9 5l-4 4" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <%= item %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="rounded-[20px] border p-9" style="background:rgba(26,111,255,0.06);border-color:rgba(26,111,255,0.2);">
+        <div class="mb-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#A8C8FF]">✦ A solução</div>
+        <h3 class="heading mb-3 text-[22px] font-bold leading-[1.25]">Um hub único que lê, entende e responde sobre seus documentos.</h3>
+        <p class="mb-5 font-light leading-[1.7] text-[#8CA0BC]">Com o Dokivo, basta fazer upload e perguntar em linguagem natural. A IA localiza, interpreta e entrega a informação exata que você precisa.</p>
+        <div class="flex flex-col gap-2.5">
+          <% ["Busca semântica em todos os seus arquivos", "Respostas com referência exata ao trecho fonte", "Controle de acesso e rastreabilidade completa"].each do |item| %>
+            <div class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]">
+              <svg class="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="rgba(26,111,255,0.2)"/><path d="M4 7l2 2 4-4" stroke="#A8C8FF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <%= item %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# ─── FEATURES ─── %>
+<section class="pb-24">
+  <div class="mx-auto max-w-[1160px] px-8">
+    <div class="mb-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#A8C8FF]">Funcionalidades</div>
+    <h2 class="heading mb-14 font-extrabold leading-[1.1] tracking-[-0.02em] text-white" style="font-size:clamp(28px,3.5vw,42px);">Tudo que sua equipe precisa<br>para dominar os documentos.</h2>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% [
+        ["Upload inteligente", "Suporte a PDF, Word, Excel e imagens. O sistema indexa automaticamente o conteúdo para consultas instantâneas.",
+          '<path d="M4 18V6l6-4h8v16H4z" stroke="#4D8FFF" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 6h6V2" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6M8 15h4" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/>'],
+        ["Chat com IA (RAG)", "Pergunte em português e receba respostas precisas baseadas no conteúdo real dos seus documentos, com citação da fonte.",
+          '<path d="M3 14.5c0-4.14 3.36-7.5 7.5-7.5S18 10.36 18 14.5" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="9" r="4" stroke="#4D8FFF" stroke-width="1.4"/>'],
+        ["Busca semântica", "Encontre informações mesmo sem saber a palavra exata. O sistema entende o contexto e retorna o trecho mais relevante.",
+          '<circle cx="11" cy="11" r="7" stroke="#4D8FFF" stroke-width="1.4"/><path d="M11 8v3l2 2" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'],
+        ["OCR automático", "Documentos escaneados e imagens são processados automaticamente com reconhecimento de texto de alta precisão.",
+          '<rect x="3" y="5" width="16" height="12" rx="2" stroke="#4D8FFF" stroke-width="1.4"/><path d="M7 9h8M7 13h5" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/>'],
+        ["Permissões granulares", "Controle quem acessa cada documento ou pasta. Defina regras por equipe, cargo ou projeto com total governança.",
+          '<path d="M4 6h14M4 11h14M4 16h8" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round"/>'],
+        ["Auditoria completa", "Rastreie quem acessou, consultou ou alterou cada documento. Log imutável para conformidade e compliance.",
+          '<path d="M11 3L3 8v6c0 3 3.5 5.5 8 6.5C16.5 19.5 20 17 20 14V8L11 3z" stroke="#4D8FFF" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11l2 2 4-4" stroke="#4D8FFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>']
+      ].each do |feat| %>
+        <div class="feat-card cursor-default rounded-[16px] border p-7" style="background:rgba(255,255,255,0.025);border-color:rgba(255,255,255,0.08);">
+          <div class="mb-[18px] flex h-11 w-11 items-center justify-center rounded-[12px]" style="background:rgba(26,111,255,0.12);">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><%= feat[2].html_safe %></svg>
+          </div>
+          <h4 class="mb-2 text-[16px] font-semibold text-white"><%= feat[0] %></h4>
+          <p class="text-[14px] font-light leading-[1.65] text-[#8CA0BC]"><%= feat[1] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<%# ─── HOW IT WORKS ─── %>
+<section class="border-y py-24" style="background:#0C1A2E;border-color:rgba(255,255,255,0.08);" id="como-funciona">
+  <div class="mx-auto max-w-[1160px] px-8">
+    <div class="mb-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#A8C8FF]">Como funciona</div>
+    <h2 class="heading mb-14 font-extrabold leading-[1.1] tracking-[-0.02em] text-white" style="font-size:clamp(28px,3.5vw,42px);">De zero ao primeiro insight<br>em menos de 5 minutos.</h2>
+
+    <div class="steps-row grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <% [
+        ["1", "Crie sua conta", "Cadastro em segundos. Sem cartão de crédito para começar."],
+        ["2", "Faça upload", "Envie PDFs, contratos e documentos. A indexação é automática."],
+        ["3", "Pergunte", "Digite sua pergunta em português. A IA localiza a resposta na fonte."],
+        ["4", "Decida mais rápido", "Respostas com rastreabilidade. Sua equipe ganha velocidade e precisão."]
+      ].each do |step| %>
+        <div class="relative z-10 rounded-[16px] border px-5 py-7 text-center" style="background:#112240;border-color:rgba(255,255,255,0.08);">
+          <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#1A6FFF]" style="box-shadow:0 0 0 8px rgba(26,111,255,0.12);">
+            <span class="syne text-[20px] font-extrabold text-white"><%= step[0] %></span>
+          </div>
+          <h4 class="mb-2 text-[16px] font-semibold text-white"><%= step[1] %></h4>
+          <p class="text-[13px] font-light leading-[1.6] text-[#8CA0BC]"><%= step[2] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<%# ─── PRICING ─── %>
+<section class="py-24" id="precos">
+  <div class="mx-auto max-w-[1160px] px-8">
+    <div class="mb-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#A8C8FF]">Planos</div>
+    <h2 class="heading mb-4 font-extrabold leading-[1.1] tracking-[-0.02em] text-white" style="font-size:clamp(28px,3.5vw,42px);">Simples, transparente<br>e sem surpresas.</h2>
+    <p class="mb-14 max-w-[540px] text-[17px] font-light leading-[1.7] text-[#8CA0BC]">Todos os planos incluem suporte em português e dados hospedados no Brasil.</p>
+
+    <div class="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <%# Starter %>
+      <div class="flex h-full flex-col rounded-[20px] border p-8" style="background:rgba(255,255,255,0.025);border-color:rgba(255,255,255,0.08);">
+        <div class="mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8CA0BC]">Starter</div>
+        <div class="syne mb-1 text-[42px] font-extrabold leading-none"><sup class="text-[18px] font-bold align-super">R$</sup>149</div>
+        <div class="mb-6 text-[13px] text-[#8CA0BC]">/ mês · até 3 usuários</div>
+        <div class="mb-6 h-px" style="background:rgba(255,255,255,0.08);"></div>
+        <ul class="mb-7 flex flex-col gap-3">
+          <% ["5 GB de documentos indexados", "Chat com IA ilimitado", "OCR automático", "Suporte por e-mail"].each do |f| %>
+            <li class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]"><span class="text-[#A8C8FF]">✓</span><%= f %></li>
+          <% end %>
+        </ul>
+        <%= link_to "Começar grátis", new_user_registration_path, class: "mt-auto block rounded-lg border py-3 text-center text-[14px] font-semibold text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white", style: "border-color:rgba(255,255,255,0.08);" %>
+      </div>
+
+      <%# Pro — featured %>
+      <div class="price-featured relative flex h-full flex-col rounded-[20px] border p-8">
+        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#1A6FFF] px-4 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-white">Mais popular</div>
+        <div class="mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8CA0BC]">Pro</div>
+        <div class="syne mb-1 text-[42px] font-extrabold leading-none"><sup class="text-[18px] font-bold align-super">R$</sup>449</div>
+        <div class="mb-6 text-[13px] text-[#8CA0BC]">/ mês · até 15 usuários</div>
+        <div class="mb-6 h-px" style="background:rgba(255,255,255,0.08);"></div>
+        <ul class="mb-7 flex flex-col gap-3">
+          <% ["25 GB de documentos indexados", "Chat com IA ilimitado", "OCR + busca semântica avançada", "Permissões por equipe", "Auditoria completa", "Suporte prioritário"].each do |f| %>
+            <li class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]"><span class="text-[#A8C8FF]">✓</span><%= f %></li>
+          <% end %>
+        </ul>
+        <%= link_to "Assinar Pro", new_user_registration_path, class: "mt-auto block rounded-lg bg-[#1A6FFF] py-3 text-center text-[14px] font-semibold text-white transition hover:bg-[#4D8FFF]" %>
+      </div>
+
+      <%# Enterprise %>
+      <div class="flex h-full flex-col rounded-[20px] border p-8" style="background:rgba(255,255,255,0.025);border-color:rgba(255,255,255,0.08);">
+        <div class="mb-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8CA0BC]">Enterprise</div>
+        <div class="syne mb-1 text-[32px] font-extrabold leading-none">Sob consulta</div>
+        <div class="mb-6 text-[13px] text-[#8CA0BC]">volumes e usuários customizados</div>
+        <div class="mb-6 h-px" style="background:rgba(255,255,255,0.08);"></div>
+        <ul class="mb-7 flex flex-col gap-3">
+          <% ["GB ilimitado de documentos", "Usuários ilimitados", "SSO e integração via API", "SLA garantido", "Onboarding dedicado", "Gerente de conta"].each do |f| %>
+            <li class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]"><span class="text-[#A8C8FF]">✓</span><%= f %></li>
+          <% end %>
+        </ul>
+        <a href="mailto:contato@dokivo.com.br" class="mt-auto block rounded-lg border py-3 text-center text-[14px] font-semibold text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white" style="border-color:rgba(255,255,255,0.08);">Falar com vendas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# ─── CTA FINAL ─── %>
+<section class="relative overflow-hidden py-24 text-center">
+  <div class="pointer-events-none absolute left-1/2 top-1/2 h-[400px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full" style="background:radial-gradient(ellipse,rgba(26,111,255,0.18) 0%,transparent 70%);"></div>
+  <div class="relative z-10 mx-auto max-w-[1160px] px-8">
+    <h2 class="heading mb-4 font-extrabold leading-tight tracking-[-0.02em] text-white" style="font-size:clamp(30px,4vw,48px);">Pronto para transformar<br>como sua equipe usa documentos?</h2>
+    <p class="mx-auto mb-10 max-w-[520px] text-[17px] font-light leading-[1.7] text-[#8CA0BC]">Crie sua conta grátis e veja o Dokivo em ação. Setup em menos de 5 minutos, sem necessidade de cartão.</p>
+    <div class="flex flex-wrap items-center justify-center gap-3.5">
+      <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 rounded-[10px] bg-[#1A6FFF] px-7 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#4D8FFF] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(26,111,255,0.35)]" do %>
+        Criar conta grátis
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <% end %>
+      <a href="mailto:contato@dokivo.com.br" class="rounded-[10px] border px-7 py-3.5 text-[15px] font-medium text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white" style="border-color:rgba(255,255,255,0.12);">Falar com um especialista</a>
+    </div>
+  </div>
+</section>
+
+<%# ─── FOOTER ─── %>
+<footer class="border-t py-10" style="background:#0C1A2E;border-color:rgba(255,255,255,0.08);">
+  <div class="mx-auto flex max-w-[1160px] flex-wrap items-center justify-between gap-4 px-8">
+    <div class="flex items-center gap-3">
+      <span class="text-[13px] font-medium text-[#C8D8EE]">CNPJ 62.603.073/0001-25</span>
+    </div>
+    <p class="text-[13px] text-[#8CA0BC]">© 2025 Dokivo. Todos os direitos reservados.</p>
+    <div class="flex gap-6">
+      <%= link_to "Privacidade", privacy_path, class: "text-[13px] text-[#8CA0BC] transition hover:text-white" %>
+      <a href="#" class="text-[13px] text-[#8CA0BC] transition hover:text-white">Termos</a>
+      <a href="mailto:contato@dokivo.com.br" class="text-[13px] text-[#8CA0BC] transition hover:text-white">Contato</a>
+    </div>
+  </div>
+</footer>
