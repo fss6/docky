@@ -86,7 +86,7 @@
       <div class="anim-fade-up d3 flex flex-wrap items-center gap-3.5">
         <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 rounded-[10px] bg-[#1A6FFF] px-7 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#4D8FFF] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(26,111,255,0.35)]" do %>
           Começar grátis
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <%= heroicon "arrow-right", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
         <% end %>
         <a href="#como-funciona" class="rounded-[10px] border px-7 py-3.5 text-[15px] font-medium text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white" style="border-color:rgba(255,255,255,0.12);">Ver como funciona</a>
       </div>
@@ -105,7 +105,7 @@
     <div class="anim-fade-up d3 relative">
       <div class="float-tag absolute -right-4 -top-4 z-20 flex items-center gap-2 rounded-[10px] border px-3.5 py-2.5 text-[13px] font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)]" style="background:rgba(17,34,64,0.95);border-color:rgba(26,111,255,0.3);" >
         <div class="flex h-7 w-7 items-center justify-center rounded-[7px]" style="background:rgba(40,200,100,0.15);">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#28C864" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <%= heroicon "check", variant: :outline, options: { class: "h-3.5 w-3.5 text-[#28C864]", "aria-hidden": "true" } %>
         </div>
         Contrato aprovado
       </div>
@@ -170,7 +170,7 @@
 
       <div class="float-tag absolute -bottom-4 -left-4 z-20 flex items-center gap-2 rounded-[10px] border px-3.5 py-2.5 text-[13px] font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)]" style="background:rgba(17,34,64,0.95);border-color:rgba(26,111,255,0.3);">
         <div class="flex h-7 w-7 items-center justify-center rounded-[7px]" style="background:rgba(26,111,255,0.15);">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#4D8FFF" stroke-width="1.2"/><path d="M7 4.5v3l2 1.5" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <%= heroicon "clock", variant: :outline, options: { class: "h-3.5 w-3.5 text-[#4D8FFF]", "aria-hidden": "true" } %>
         </div>
         Resposta em &lt; 2s
       </div>
@@ -196,7 +196,7 @@
         <div class="flex flex-col gap-2.5">
           <% ["Contratos desatualizados circulando por e-mail", "Horas perdidas para encontrar uma cláusula", "Risco de decisões com informação desatualizada"].each do |item| %>
             <div class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]">
-              <svg class="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="rgba(255,80,80,0.2)"/><path d="M5 5l4 4M9 5l-4 4" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <%= heroicon "x-circle", variant: :outline, options: { class: "mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF6B6B]", "aria-hidden": "true" } %>
               <%= item %>
             </div>
           <% end %>
@@ -210,7 +210,7 @@
         <div class="flex flex-col gap-2.5">
           <% ["Busca semântica em todos os seus arquivos", "Respostas com referência exata ao trecho fonte", "Controle de acesso e rastreabilidade completa"].each do |item| %>
             <div class="flex items-start gap-2.5 text-[14px] text-[#C8D8EE]">
-              <svg class="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="rgba(26,111,255,0.2)"/><path d="M4 7l2 2 4-4" stroke="#A8C8FF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <%= heroicon "check-circle", variant: :outline, options: { class: "mt-0.5 h-3.5 w-3.5 shrink-0 text-[#A8C8FF]", "aria-hidden": "true" } %>
               <%= item %>
             </div>
           <% end %>
@@ -270,7 +270,7 @@
         <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
           <div class="flex-1">
             <div class="mb-[18px] flex h-11 w-11 items-center justify-center rounded-[12px]" style="background:rgba(26,111,255,0.18);">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 14.5c0-4.14 3.36-7.5 7.5-7.5S18 10.36 18 14.5" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="9" r="4" stroke="#4D8FFF" stroke-width="1.4"/></svg>
+              <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-[22px] w-[22px] text-[#4D8FFF]", "aria-hidden": "true" } %>
             </div>
             <div class="mb-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#A8C8FF]">Funcionalidade principal</div>
             <h4 class="mb-2 text-[18px] font-semibold text-white">Chat com IA (RAG)</h4>
@@ -285,18 +285,14 @@
       </div>
 
       <% [
-        ["Upload inteligente", "PDF, Word, Excel e imagens. Indexação automática após o envio.",
-          '<path d="M4 18V6l6-4h8v16H4z" stroke="#4D8FFF" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 6h6V2" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12h6M8 15h4" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/>'],
-        ["Busca semântica", "Encontre informações mesmo sem saber a palavra exata. O contexto guia o resultado.",
-          '<circle cx="11" cy="11" r="7" stroke="#4D8FFF" stroke-width="1.4"/><path d="M11 8v3l2 2" stroke="#4D8FFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'],
-        ["OCR automático", "Documentos escaneados e imagens reconhecidos automaticamente com alta precisão.",
-          '<rect x="3" y="5" width="16" height="12" rx="2" stroke="#4D8FFF" stroke-width="1.4"/><path d="M7 9h8M7 13h5" stroke="#4D8FFF" stroke-width="1.2" stroke-linecap="round"/>'],
-        ["Auditoria completa", "Log imutável de acessos e alterações para conformidade e compliance.",
-          '<path d="M11 3L3 8v6c0 3 3.5 5.5 8 6.5C16.5 19.5 20 17 20 14V8L11 3z" stroke="#4D8FFF" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11l2 2 4-4" stroke="#4D8FFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>']
+        ["Upload inteligente", "PDF, Word, Excel e imagens. Indexação automática após o envio.", "document-text"],
+        ["Busca semântica", "Encontre informações mesmo sem saber a palavra exata. O contexto guia o resultado.", "magnifying-glass"],
+        ["OCR automático", "Documentos escaneados e imagens reconhecidos automaticamente com alta precisão.", "camera"],
+        ["Auditoria completa", "Log imutável de acessos e alterações para conformidade e compliance.", "shield-check"]
       ].each do |feat| %>
         <div class="feat-card cursor-default rounded-[16px] border p-7" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.11);">
           <div class="mb-[18px] flex h-11 w-11 items-center justify-center rounded-[12px]" style="background:rgba(26,111,255,0.12);">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><%= feat[2].html_safe %></svg>
+            <%= heroicon feat[2], variant: :outline, options: { class: "h-[22px] w-[22px] text-[#4D8FFF]", "aria-hidden": "true" } %>
           </div>
           <h4 class="mb-2 text-[16px] font-semibold text-white"><%= feat[0] %></h4>
           <p class="text-[14px] font-light leading-[1.65] text-[#8CA0BC]"><%= feat[1] %></p>
@@ -410,7 +406,7 @@
         <details class="group py-1">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[15px] font-medium text-white transition hover:text-[#A8C8FF]">
             <%= question %>
-            <svg class="h-4 w-4 shrink-0 text-[#8CA0BC] transition-transform duration-200 group-open:rotate-180" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <%= heroicon "chevron-down", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-[#8CA0BC] transition-transform duration-200 group-open:rotate-180", "aria-hidden": "true" } %>
           </summary>
           <div class="pb-5 pr-8 text-[14px] font-light leading-[1.75] text-[#8CA0BC]">
             <%= answer %>
@@ -436,7 +432,7 @@
     <div class="flex flex-wrap items-center justify-center gap-3.5">
       <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 rounded-[10px] bg-[#1A6FFF] px-7 py-3.5 text-[15px] font-semibold text-white transition hover:bg-[#4D8FFF] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(26,111,255,0.35)]" do %>
         Criar conta grátis
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <%= heroicon "arrow-right", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
       <% end %>
       <a href="mailto:contato@dokivo.com.br" class="rounded-[10px] border px-7 py-3.5 text-[15px] font-medium text-[#C8D8EE] transition hover:border-[rgba(26,111,255,0.3)] hover:text-white" style="border-color:rgba(255,255,255,0.12);">Falar com um especialista</a>
     </div>
