@@ -41,6 +41,3 @@ networks:
   ipv6_net:
     driver: bridge
     enable_ipv6: true
-    ipam:
-      config:
-        - subnet: "fd00:dead:beef::/64"
