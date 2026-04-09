@@ -22,6 +22,21 @@
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script defer>
+      function renderWikiMarkdown() {
+        document.querySelectorAll("[data-markdown]").forEach(function(el) {
+          if (el.dataset.markdownRendered) return;
+          if (typeof marked === "undefined") return;
+          var raw = el.textContent || "";
+          el.innerHTML = marked.parse(raw);
+          el.dataset.markdownRendered = "1";
+        });
+      }
+      document.addEventListener("DOMContentLoaded", renderWikiMarkdown);
+      document.addEventListener("turbo:load", renderWikiMarkdown);
+      document.addEventListener("turbo:frame-load", renderWikiMarkdown);
+    </script>
   </head>
 
   <% chat_shell = chat_module_page? %>

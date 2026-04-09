@@ -10,6 +10,7 @@
     <% nav = [
       { key: :dashboard, label: "Painel", path: dashboard_path, icon: :home },
       { key: :conversations, label: "Conversas", path: nav_chat_path, icon: :conversations },
+      { key: :wiki, label: "Base de Conhecimento", path: wiki_path, icon: :book_open },
       { key: :documents_term_search, label: "Busca por termo", path: documents_term_search_path, icon: :search_document },
       { key: :documents_tags_search, label: "Busca por tags", path: documents_tags_search_path, icon: :search },
       { key: :folders, label: "Pastas", path: folders_path, icon: :folder },
@@ -31,7 +32,8 @@
                    (item[:key] == :settings && request.path.start_with?("/settings")) ||
                    (item[:key] == :conversations && request.path.match?(%r{\A/accounts/\d+/conversations})) ||
                    (item[:key] == :groups && request.path.start_with?("/groups")) ||
-                   (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) %>
+                   (item[:key] == :subscriptions && request.path.start_with?("/subscriptions")) ||
+                   (item[:key] == :wiki && request.path.start_with?("/wiki")) %>
       
       <% allowed = case item[:key]
         when :dashboard then policy(:dashboard).index?
@@ -45,6 +47,7 @@
         when :documents_term_search then policy(Document).index?
         when :documents_tags_search then policy(Document).index?
         when :settings then policy(Setting).show?
+        when :wiki then WikiPagePolicy.new(current_user, :wiki_page).index?
         else false
       end %>
 

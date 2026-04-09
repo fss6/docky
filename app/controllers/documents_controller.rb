@@ -84,6 +84,7 @@ class DocumentsController < ApplicationController
 
   def destroy
     folder = @document.folder
+    Wiki::CleanupDocumentService.new(account: @document.account, document_id: @document.id).call
     @document.destroy!
 
     respond_to do |format|

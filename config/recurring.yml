@@ -21,6 +21,10 @@ production:
     class: PendingEmbeddingRecordsSweepJob
     schedule: every 10 minutes
 
+  wiki_lint_all_accounts:
+    command: "Account.find_each { |a| WikiLintJob.perform_later(a.id) }"
+    schedule: every Monday at 7am
+
 development:
   pending_embedding_records_sweep:
     class: PendingEmbeddingRecordsSweepJob

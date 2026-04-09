@@ -5,6 +5,9 @@ class Account < ApplicationRecord
   has_many :documents, dependent: :destroy
   has_many :conversations, dependent: :destroy
   has_one :setting, dependent: :destroy
+  has_many :wiki_pages, dependent: :destroy
+  has_many :wiki_logs, dependent: :destroy
+  has_one :wiki_schema, dependent: :destroy
 
   after_create :create_default_setting!
 

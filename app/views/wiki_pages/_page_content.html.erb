@@ -1,0 +1,51 @@
+<div class="px-6 py-6 sm:px-8">
+  <header class="mb-6 border-b border-zinc-200 pb-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <% type_labels = { "index" => "Índice", "summary" => "Resumo", "entity" => "Entidade", "synthesis" => "Síntese" } %>
+        <span class="inline-flex items-center rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+          <%= type_labels[page.page_type] || page.page_type.capitalize %>
+        </span>
+        <h1 class="mt-2 text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl"><%= page.title %></h1>
+        <p class="mt-1 text-xs text-zinc-400 font-mono"><%= page.slug %></p>
+      </div>
+      <p class="shrink-0 text-xs text-zinc-400">
+        Atualizado <%= l(page.updated_at, format: :short) %>
+      </p>
+    </div>
+  </header>
+
+  <%# Conteúdo Markdown renderizado %>
+  <div class="prose prose-zinc max-w-none prose-headings:font-semibold prose-a:text-accent prose-code:text-sm">
+    <%= wiki_page_content_html(page.content) %>
+  </div>
+
+  <%# Links relacionados %>
+  <% links_out = page.outgoing_links.includes(:target_page) %>
+  <% links_in  = page.incoming_links.includes(:source_page) %>
+  <% if links_out.any? || links_in.any? %>
+    <section class="mt-8 border-t border-zinc-200 pt-5">
+      <h2 class="text-sm font-semibold text-zinc-700">Páginas relacionadas</h2>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <% links_out.each do |link| %>
+          <%= link_to wiki_page_path(slug: link.target_page.slug),
+                class: "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700 no-underline hover:border-accent hover:text-accent transition" do %>
+            <%= heroicon "arrow-right", variant: :outline, options: { class: "h-3 w-3", "aria-hidden": "true" } %>
+            <%= link.target_page.title %>
+            <% if link.link_type.present? %>
+              <span class="text-zinc-400">·</span>
+              <span class="text-zinc-400"><%= link.link_type %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% links_in.each do |link| %>
+          <%= link_to wiki_page_path(slug: link.source_page.slug),
+                class: "inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-700 no-underline hover:border-accent hover:text-accent transition" do %>
+            <%= heroicon "arrow-left", variant: :outline, options: { class: "h-3 w-3", "aria-hidden": "true" } %>
+            <%= link.source_page.title %>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

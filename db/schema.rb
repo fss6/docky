@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_100005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -22,7 +22,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_customer_id"
+    t.string "billing_status", default: "pending", null: false
     t.index ["plan_id"], name: "index_accounts_on_plan_id"
+    t.index ["stripe_customer_id"], name: "index_accounts_on_stripe_customer_id", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -59,7 +62,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "integration_connection_id"
+    t.string "channel", default: "web", null: false
+    t.string "external_sender_id"
     t.index ["account_id"], name: "index_conversations_on_account_id"
+    t.index ["integration_connection_id", "external_sender_id", "channel"], name: "index_conversations_on_whatsapp_thread", unique: true, where: "(((channel)::text = 'whatsapp'::text) AND (external_sender_id IS NOT NULL))"
+    t.index ["integration_connection_id"], name: "index_conversations_on_integration_connection_id"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
@@ -94,6 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.index ["account_id"], name: "index_embedding_records_on_account_id"
     t.index ["embedding"], name: "index_embedding_records_on_embedding", opclass: :vector_cosine_ops, using: :ivfflat
     t.index ["recordable_type", "recordable_id"], name: "index_embedding_records_on_recordable"
+    t.index ["recordable_type", "recordable_id"], name: "index_embedding_records_on_wiki_page_unique", unique: true, where: "((recordable_type)::text = 'WikiPage'::text)"
   end
 
   create_table "folders", force: :cascade do |t|
@@ -122,6 +131,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.index ["account_id"], name: "index_groups_on_account_id"
   end
 
+  create_table "integration_connections", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "provider", default: "whatsapp_cloud", null: false
+    t.string "phone_number_id", null: false
+    t.string "display_phone_number"
+    t.string "verify_token", null: false
+    t.text "access_token", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "phone_number_id"], name: "index_integration_connections_on_account_and_phone_number_id", unique: true
+    t.index ["account_id"], name: "index_integration_connections_on_account_id"
+    t.index ["phone_number_id"], name: "index_integration_connections_on_phone_number_id_unique", unique: true
+    t.index ["verify_token"], name: "index_integration_connections_on_verify_token", unique: true
+  end
+
+  create_table "integration_inbound_events", force: :cascade do |t|
+    t.bigint "integration_connection_id", null: false
+    t.string "provider_event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["integration_connection_id"], name: "index_integration_inbound_events_on_integration_connection_id"
+    t.index ["provider_event_id"], name: "index_integration_inbound_events_on_provider_event_id", unique: true
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role"
@@ -142,6 +176,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "processed_stripe_events", force: :cascade do |t|
+    t.string "event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_processed_stripe_events_on_event_id", unique: true
+  end
+
   create_table "settings", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.boolean "generate_tags_automatically", default: true, null: false
@@ -159,8 +200,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.datetime "canceled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_subscription_id"
+    t.string "stripe_price_id"
+    t.string "stripe_checkout_session_id"
     t.index ["account_id"], name: "index_subscriptions_on_account_id"
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
+    t.index ["stripe_checkout_session_id"], name: "index_subscriptions_on_stripe_checkout_session_id", unique: true
+    t.index ["stripe_subscription_id"], name: "index_subscriptions_on_stripe_subscription_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -190,10 +236,56 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "wiki_links", force: :cascade do |t|
+    t.bigint "source_page_id", null: false
+    t.bigint "target_page_id", null: false
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_page_id", "target_page_id"], name: "index_wiki_links_on_source_page_id_and_target_page_id", unique: true
+    t.index ["source_page_id"], name: "index_wiki_links_on_source_page_id"
+    t.index ["target_page_id"], name: "index_wiki_links_on_target_page_id"
+  end
+
+  create_table "wiki_logs", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "operation", null: false
+    t.integer "document_id"
+    t.integer "wiki_page_id"
+    t.text "details"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_wiki_logs_on_account_id_and_created_at"
+    t.index ["account_id"], name: "index_wiki_logs_on_account_id"
+  end
+
+  create_table "wiki_pages", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.text "content"
+    t.string "page_type", null: false
+    t.integer "source_document_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "slug"], name: "index_wiki_pages_on_account_id_and_slug", unique: true
+    t.index ["account_id"], name: "index_wiki_pages_on_account_id"
+    t.index ["page_type"], name: "index_wiki_pages_on_page_type"
+  end
+
+  create_table "wiki_schemas", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.text "instructions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_wiki_schemas_on_account_id"
+  end
+
   add_foreign_key "accounts", "plans"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "conversations", "accounts"
+  add_foreign_key "conversations", "integration_connections"
   add_foreign_key "conversations", "users"
   add_foreign_key "documents", "accounts"
   add_foreign_key "documents", "folders"
@@ -203,9 +295,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_07_150000) do
   add_foreign_key "group_memberships", "groups"
   add_foreign_key "group_memberships", "users"
   add_foreign_key "groups", "accounts"
+  add_foreign_key "integration_connections", "accounts"
+  add_foreign_key "integration_inbound_events", "integration_connections"
   add_foreign_key "messages", "conversations"
   add_foreign_key "settings", "accounts"
   add_foreign_key "subscriptions", "accounts"
   add_foreign_key "subscriptions", "plans"
   add_foreign_key "users", "accounts"
+  add_foreign_key "wiki_links", "wiki_pages", column: "source_page_id"
+  add_foreign_key "wiki_links", "wiki_pages", column: "target_page_id"
+  add_foreign_key "wiki_logs", "accounts"
+  add_foreign_key "wiki_pages", "accounts"
+  add_foreign_key "wiki_schemas", "accounts"
 end

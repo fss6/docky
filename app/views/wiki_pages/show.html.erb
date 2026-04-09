@@ -1,0 +1,20 @@
+<% content_for :title, "#{@wiki_page.title} · Wiki · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-1.5">
+          <li><%= link_to "Base de Conhecimento", wiki_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-zinc-700"><%= @wiki_page.title %></li>
+        </ol>
+      </nav>
+    </div>
+    <%= link_to "Ver todas as páginas", wiki_path, class: "app-btn-secondary w-full text-center sm:w-auto" %>
+  </header>
+
+  <div class="app-card overflow-hidden">
+    <%= render "wiki_pages/page_content", page: @wiki_page %>
+  </div>
+</div>

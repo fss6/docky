@@ -1,0 +1,70 @@
+<% content_for :title, "Log do Wiki · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Wiki</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Log de operações</h1>
+      <p class="mt-2 text-sm text-zinc-600">Histórico das últimas 50 operações do wiki (ingestão, consultas, lint).</p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "Base de Conhecimento", wiki_path, class: "app-btn-secondary w-full text-center sm:w-auto" %>
+      <%= link_to "Relatório de lint", wiki_lint_report_path, class: "app-btn-secondary w-full text-center sm:w-auto" %>
+    </div>
+  </header>
+
+  <div class="app-card overflow-hidden">
+    <% if @wiki_logs.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <th class="px-4 py-3">Operação</th>
+              <th class="hidden px-4 py-3 sm:table-cell">Detalhes</th>
+              <th class="px-4 py-3">Data</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            <% @wiki_logs.each do |log| %>
+              <% op_colors = { "ingest" => "bg-blue-50 text-blue-700", "query" => "bg-green-50 text-green-700", "lint" => "bg-amber-50 text-amber-700" } %>
+              <tr>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= op_colors[log.operation] || 'bg-zinc-100 text-zinc-700' %>">
+                    <%= log.operation %>
+                  </span>
+                  <% if log.document_id.present? %>
+                    <span class="ml-2 text-xs text-zinc-400">doc #<%= log.document_id %></span>
+                  <% end %>
+                </td>
+                <td class="hidden px-4 py-3 max-w-xs sm:table-cell">
+                  <% if log.details.present? %>
+                    <% parsed = (JSON.parse(log.details) rescue nil) %>
+                    <% if parsed.is_a?(Hash) %>
+                      <% if parsed["question"] %>
+                        <span class="text-zinc-600 truncate block"><%= parsed["question"].truncate(80) %></span>
+                      <% elsif parsed["description"] %>
+                        <span class="text-zinc-600 truncate block"><%= parsed["description"].truncate(80) %></span>
+                      <% else %>
+                        <span class="text-zinc-400 text-xs">—</span>
+                      <% end %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-zinc-400">—</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-3 text-xs text-zinc-500 whitespace-nowrap">
+                  <%= l(log.created_at, format: :short) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <p class="text-sm font-medium text-zinc-900">Nenhuma operação registrada</p>
+        <p class="mt-1 text-sm text-zinc-500">O log aparece aqui após processar documentos ou realizar consultas.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -51,6 +51,7 @@ class DocumentOcrJob < ApplicationJob
     end
 
     DocumentEmbeddingRecordsJob.perform_later(document.id)
+    WikiIngestJob.perform_later(document.id)
   rescue ::MistralOcr::ExtractContent::Error => e
     mark_failed(document, e.message)
   rescue StandardError => e

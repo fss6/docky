@@ -46,18 +46,19 @@ class RagQueryJob < ApplicationJob
       return
     end
 
-    focus_id = user_message.focus_document_id
+    focus_id     = user_message.focus_document_id
     document_ids = focus_id.present? ? [focus_id] : nil
 
-    records = nil
     retrieval_question = Rag::RetrievalQuery.build(conversation: conversation, user_message: user_message)
+    account = conversation.account
+
+    wiki_result = nil
     begin
-      records = Rag::Retrieve.call(
-        account_id: conversation.account_id,
-        question: retrieval_question,
-        document_ids: document_ids,
-        limit: 5
-      )
+      wiki_result = Wiki::QueryService.new(
+        retrieval_question,
+        account,
+        document_ids: document_ids
+      ).call
     rescue Openai::Embeddings::MissingApiKeyError
       finish_with_text(ai_message, conversation, "Configuração ausente: defina OPENAI_API_KEY.")
       return
@@ -67,7 +68,11 @@ class RagQueryJob < ApplicationJob
       return
     end
 
-    if records.blank?
+    wiki_chunks = wiki_result[:wiki_chunks]
+    doc_chunks  = wiki_result[:doc_chunks]
+    all_records = wiki_chunks + doc_chunks
+
+    if all_records.blank?
       finish_with_text(
         ai_message,
         conversation,
@@ -76,12 +81,8 @@ class RagQueryJob < ApplicationJob
       return
     end
 
-    context = records.map.with_index do |r, i|
-      info = r.source_info
-      "--- Trecho #{i + 1} (#{info['file']} · p. #{info['page'] || '?'}) ---\n#{r.content}"
-    end.join("\n\n")
-
-    stream_llm_reply(ai_message, conversation, user_message, context, records)
+    context = { wiki_chunks: wiki_chunks, doc_chunks: doc_chunks }
+    stream_llm_reply(ai_message, conversation, user_message, context, all_records)
   end
 
   private
@@ -133,10 +134,18 @@ class RagQueryJob < ApplicationJob
   end
 
   def indexed?(conversation, user_message)
-    scope = EmbeddingRecord.where(account_id: conversation.account_id).where.not(embedding: nil)
+    account_id = conversation.account_id
     fid = user_message.focus_document_id
-    scope = scope.where(document_id: fid) if fid.present?
-    scope.exists?
+
+    # Verifica documentos indexados (chunks)
+    doc_scope = EmbeddingRecord.where(account_id: account_id, recordable_type: "Document").where.not(embedding: nil)
+    doc_scope = doc_scope.where(document_id: fid) if fid.present?
+    return true if doc_scope.exists?
+
+    # Também considera wiki pages como conteúdo indexado (sem filtro por document_id)
+    return false if fid.present?
+
+    EmbeddingRecord.where(account_id: account_id, recordable_type: "WikiPage").where.not(embedding: nil).exists?
   end
 
   def finish_with_text(ai_message, conversation, text)

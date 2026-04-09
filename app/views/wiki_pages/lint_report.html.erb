@@ -1,0 +1,72 @@
+<% content_for :title, "Relatório de Lint · Wiki · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Wiki</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Relatório de Lint</h1>
+      <p class="mt-2 text-sm text-zinc-600">
+        Problemas de qualidade detectados na base de conhecimento.
+        <% if @last_lint_at %>
+          Última verificação: <span class="font-medium"><%= l(@last_lint_at, format: :short) %></span>.
+        <% end %>
+      </p>
+    </div>
+    <%= link_to "Base de Conhecimento", wiki_path, class: "app-btn-secondary w-full text-center sm:w-auto" %>
+  </header>
+
+  <% if @lint_issues.any? %>
+    <div class="space-y-3">
+      <% severity_styles = {
+        "high"   => { badge: "bg-red-50 text-red-700 border-red-100",   border: "border-red-200" },
+        "medium" => { badge: "bg-amber-50 text-amber-700 border-amber-100", border: "border-amber-200" },
+        "low"    => { badge: "bg-zinc-100 text-zinc-600 border-zinc-200",   border: "border-zinc-200" }
+      } %>
+      <% @lint_issues.sort_by { |i| %w[high medium low].index(i["severity"]) || 99 }.each do |issue| %>
+        <% styles = severity_styles[issue["severity"]] || severity_styles["low"] %>
+        <article class="app-card border <%= styles[:border] %> p-4 sm:p-5">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="rounded-full border px-2 py-0.5 text-xs font-medium <%= styles[:badge] %>">
+                <%= issue["severity"]&.upcase %>
+              </span>
+              <span class="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
+                <%= issue["type"] %>
+              </span>
+            </div>
+          </div>
+          <p class="mt-2 text-sm text-zinc-800"><%= issue["description"] %></p>
+          <% affected = Array(issue["affected_pages"]).compact %>
+          <% if affected.any? %>
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              <% affected.each do |slug| %>
+                <% page = current_account.wiki_pages.find_by(slug: slug) %>
+                <% if page %>
+                  <%= link_to wiki_page_path(slug: slug),
+                        class: "inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 no-underline hover:bg-accent/10 hover:text-accent transition" do %>
+                    <%= heroicon "document-text", variant: :outline, options: { class: "h-3 w-3", "aria-hidden": "true" } %>
+                    <%= page.title %>
+                  <% end %>
+                <% else %>
+                  <span class="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-500"><%= slug %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% elsif @last_lint_at %>
+    <div class="app-card px-6 py-12 text-center">
+      <%= heroicon "check-circle", variant: :outline, options: { class: "mx-auto h-10 w-10 text-green-400" } %>
+      <p class="mt-3 text-sm font-medium text-zinc-900">Nenhum problema encontrado</p>
+      <p class="mt-1 text-sm text-zinc-500">A base de conhecimento está consistente.</p>
+    </div>
+  <% else %>
+    <div class="app-card px-6 py-12 text-center">
+      <%= heroicon "clock", variant: :outline, options: { class: "mx-auto h-10 w-10 text-zinc-300" } %>
+      <p class="mt-3 text-sm font-medium text-zinc-900">Lint ainda não executado</p>
+      <p class="mt-1 text-sm text-zinc-500">O lint é executado automaticamente de forma periódica.</p>
+    </div>
+  <% end %>
+</div>
