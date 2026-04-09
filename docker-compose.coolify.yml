@@ -16,6 +16,7 @@ services:
       REDIS_URL: ${REDIS_URL}
     networks:
       - coolify
+      - ipv6_net
 
   worker:
     build:
@@ -31,8 +32,15 @@ services:
       - .env
     networks:
       - coolify
+      - ipv6_net
 
 networks:
   coolify:
     external: true
     name: coolify
+  ipv6_net:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "fd00:dead:beef::/64"
