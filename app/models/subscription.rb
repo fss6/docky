@@ -3,12 +3,14 @@ class Subscription < ApplicationRecord
   belongs_to :plan
 
   enum :status, {
+    pending: "pending",
     trialing: 'trialing',
     active: 'active',
     past_due: 'past_due',
     unpaid: 'unpaid',
     canceled: 'canceled',
-    expired: 'expired'
+    expired: 'expired',
+    incomplete: "incomplete"
   }
 
   def active?
@@ -16,7 +18,7 @@ class Subscription < ApplicationRecord
   end
 
   def blocked?
-    %w[unpaid expired].include?(status)
+    %w[pending unpaid expired past_due incomplete].include?(status)
   end
 
 end

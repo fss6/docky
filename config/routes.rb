@@ -1,7 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users, controllers: {
-    sessions: 'users/sessions'
+    sessions: 'users/sessions',
+    registrations: "users/registrations"
   }
+  devise_scope :user do
+    get "users/after_checkout", to: "users/registrations#after_checkout", as: :after_checkout_users_registrations
+  end
   authenticated :user do
     root "dashboard#index", as: :authenticated_root
   end
@@ -39,6 +43,10 @@ Rails.application.routes.draw do
     end
   end
   resources :plans
+  namespace :webhooks do
+    post :stripe, to: "stripe#create"
+  end
+  get "billing/pending", to: "billing#pending", as: :billing_pending
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

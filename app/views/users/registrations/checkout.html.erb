@@ -1,0 +1,23 @@
+<h2 class="mb-2 text-2xl font-semibold text-zinc-900">Finalizar assinatura</h2>
+<p class="mb-6 text-sm text-zinc-600">
+  Sua conta foi criada no plano <strong><%= @selected_plan&.name || "Pro" %></strong>. Finalize o pagamento para liberar o acesso.
+</p>
+
+<div
+  class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm"
+  data-controller="stripe-checkout"
+  data-stripe-checkout-publishable-key-value="<%= @stripe_publishable_key %>"
+  data-stripe-checkout-client-secret-value="<%= @checkout_client_secret %>"
+>
+  <div id="payment-element" class="mb-4"></div>
+  <button
+    type="button"
+    data-action="stripe-checkout#confirm"
+    class="w-full rounded-lg bg-[#1A6FFF] px-4 py-2.5 font-semibold text-white hover:bg-[#4D8FFF]"
+  >
+    Confirmar pagamento
+  </button>
+  <p data-stripe-checkout-target="error" class="mt-3 text-sm text-red-600"></p>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
