@@ -113,8 +113,13 @@ class BankStatementsController < ApplicationController
       scope = scope.where("occurred_on <= ?", params[:occurred_to])
     end
 
+    @total_entries = scope.where(transaction_type: "credit").sum(:amount).to_d
+    @total_exits = scope.where(transaction_type: "debit").sum(:amount).to_d
+    @final_balance = @total_entries + @total_exits
+
     @pagy, @bank_statements = pagy(scope, limit: 10)
-    @institution_filter_options = Institution.alphabetical.pluck(:name, :id)
+    institution_ids = current_client.bank_statements.select(:institution_id).distinct
+    @institution_filter_options = Institution.where(id: institution_ids).alphabetical.pluck(:name, :id)
     @transaction_type_filter_options = [
       [I18n.t("activerecord.enums.bank_statement.transaction_type.credit", default: "Crédito"), "credit"],
       [I18n.t("activerecord.enums.bank_statement.transaction_type.debit", default: "Débito"), "debit"]

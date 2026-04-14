@@ -1,6 +1,6 @@
 <% content_for :title, "Extratos · #{current_client.name} · Dokivo" %>
 
-<div class="space-y-4">
+<div class="space-y-4" data-controller="app-confirm-modal">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
@@ -22,6 +22,21 @@
   </header>
 
   <section class="min-w-0" aria-labelledby="launches-heading">
+    <div class="grid gap-3 sm:grid-cols-3">
+      <article class="app-card p-4">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Total entradas</p>
+        <p class="mt-1 text-xl font-semibold text-emerald-700"><%= bank_statement_amount_currency(@total_entries) %></p>
+      </article>
+      <article class="app-card p-4">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Total saídas</p>
+        <p class="mt-1 text-xl font-semibold text-red-600"><%= bank_statement_amount_currency(@total_exits) %></p>
+      </article>
+      <article class="app-card p-4">
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">Saldo final</p>
+        <p class="mt-1 text-xl font-semibold <%= @final_balance.negative? ? 'text-red-600' : 'text-emerald-700' %>"><%= bank_statement_amount_currency(@final_balance) %></p>
+      </article>
+    </div>
+
     <% active_filters_count = [params[:institution_id], params[:transaction_type], params[:occurred_from], params[:occurred_to]].count(&:present?) %>
     <details class="app-card mb-3 group" <%= "open" if active_filters_count.positive? %>>
       <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-left [&::-webkit-details-marker]:hidden">
@@ -82,7 +97,6 @@
                 <th class="px-4 py-3 font-semibold sm:px-5">Descrição</th>
                 <th class="px-4 py-3 font-semibold sm:px-5">Tipo</th>
                 <th class="px-4 py-3 text-right font-semibold sm:px-5">Valor</th>
-                <th class="hidden px-4 py-3 font-semibold lg:table-cell sm:px-5">Extrato</th>
                 <th class="px-4 py-3 text-right font-semibold sm:px-5">Ações</th>
               </tr>
             </thead>
@@ -101,37 +115,50 @@
                   <td class="whitespace-nowrap px-4 py-3 text-right font-medium tabular-nums sm:px-5 <%= bank_statement_amount_text_class(row) %>">
                     <%= bank_statement_amount_currency(row.amount) %>
                   </td>
-                  <td class="hidden px-4 py-3 lg:table-cell sm:px-5">
-                    <% imp = row.bank_statement_import %>
-                    <% if imp.file.attached? %>
-                      <%= link_to original_bank_statement_import_path(imp),
-                            class: "inline-flex text-accent hover:text-accent/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded",
-                            target: "_blank",
-                            rel: "noopener",
-                            title: "Abrir PDF original (import ##{imp.id})",
-                            aria: { label: "Abrir PDF original do import ##{imp.id}" } do %>
-                        <%= heroicon "document-text", variant: :outline, options: { class: "h-5 w-5 shrink-0", "aria-hidden": "true" } %>
-                      <% end %>
-                    <% else %>
-                      <%= link_to bank_statement_import_path(imp),
-                            class: "inline-flex text-zinc-400 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded",
-                            title: "Import ##{imp.id} (PDF indisponível)",
-                            aria: { label: "Ver importação ##{imp.id}, PDF indisponível" } do %>
-                        <%= heroicon "document-text", variant: :outline, options: { class: "h-5 w-5 shrink-0 opacity-70", "aria-hidden": "true" } %>
-                      <% end %>
-                    <% end %>
-                  </td>
                   <td class="whitespace-nowrap px-4 py-3 text-right sm:px-5">
-                    <div class="inline-flex items-center gap-3 text-xs font-medium">
+                    <div class="inline-flex items-center gap-2">
+                      <% imp = row.bank_statement_import %>
+                      <% if imp.file.attached? %>
+                        <%= link_to original_bank_statement_import_path(imp),
+                              class: "inline-flex text-zinc-500 hover:text-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 rounded",
+                              target: "_blank",
+                              rel: "noopener",
+                              title: "Abrir PDF original (import ##{imp.id})",
+                              aria: { label: "Abrir PDF original do import ##{imp.id}" } do %>
+                          <%= heroicon "document-text", variant: :outline, options: { class: "h-5 w-5 shrink-0", "aria-hidden": "true" } %>
+                        <% end %>
+                      <% else %>
+                        <%= link_to bank_statement_import_path(imp),
+                              class: "inline-flex text-zinc-400 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded",
+                              title: "Import ##{imp.id} (PDF indisponível)",
+                              aria: { label: "Ver importação ##{imp.id}, PDF indisponível" } do %>
+                          <%= heroicon "document-text", variant: :outline, options: { class: "h-5 w-5 shrink-0 opacity-70", "aria-hidden": "true" } %>
+                        <% end %>
+                      <% end %>
                       <% if policy(row).update? %>
-                        <%= link_to "Editar", edit_bank_statement_path(row), class: "text-accent no-underline hover:underline" %>
+                        <%= link_to edit_bank_statement_path(row),
+                              class: "inline-flex text-accent hover:text-accent/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 rounded",
+                              title: "Editar lançamento",
+                              aria: { label: "Editar lançamento ##{row.id}" } do %>
+                          <%= heroicon "pencil-square", variant: :outline, options: { class: "h-5 w-5 shrink-0", "aria-hidden": "true" } %>
+                        <% end %>
                       <% end %>
                       <% if policy(row).destroy? %>
-                        <%= button_to "Excluir",
-                              bank_statement_path(row),
-                              method: :delete,
-                              form: { data: { turbo_confirm: "Excluir este lançamento?" }, class: "inline" },
-                              class: "cursor-pointer border-0 bg-transparent p-0 text-red-600 hover:text-red-700" %>
+                        <%= button_tag type: "button",
+                              class: "inline-flex cursor-pointer border-0 bg-transparent p-0 text-red-600 hover:text-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 rounded",
+                              title: "Excluir lançamento",
+                              aria: { label: "Excluir lançamento ##{row.id}" },
+                              data: app_confirm_modal_open_data(
+                                url: bank_statement_path(row),
+                                item_label: row.description.to_s.truncate(42),
+                                heading: "Excluir lançamento",
+                                body_prefix: "Confirma a exclusão de ",
+                                body_suffix: "? Esta ação não pode ser desfeita.",
+                                confirm_text: "Excluir lançamento",
+                                confirm_variant: "danger"
+                              ) do %>
+                          <%= heroicon "trash", variant: :outline, options: { class: "h-5 w-5 shrink-0", "aria-hidden": "true" } %>
+                        <% end %>
                       <% end %>
                     </div>
                   </td>
@@ -152,4 +179,10 @@
       </div>
     <% end %>
   </section>
+
+  <%= render "shared/confirm_modal",
+        heading: "Excluir lançamento",
+        body_prefix: "Confirma a exclusão de ",
+        body_suffix: "? Esta ação não pode ser desfeita.",
+        confirm_text: "Excluir lançamento" %>
 </div>
