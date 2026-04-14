@@ -14,7 +14,7 @@
       </nav>
       <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Extratos e lançamentos</h1>
       <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
-        Importe PDFs (OCR Mistral + extração OpenAI). Os lançamentos ficam em <span class="font-medium text-zinc-700">abas por instituição</span>.
+        Importe PDFs. Os lançamentos ficam em <span class="font-medium text-zinc-700">abas por instituição</span>.
         <% if params[:import_id].present? %>
           <%= link_to "Ver todos os lançamentos", bank_statements_path, class: "font-medium text-accent no-underline hover:underline" %>
           (filtro: <%= link_to "import ##{params[:import_id]}", bank_statement_import_path(params[:import_id]), class: "font-medium text-accent no-underline hover:underline" %>).
@@ -41,14 +41,32 @@
                   </ul>
                 </div>
               <% end %>
-              <div>
-                <%= form.label :institution_id, "Instituição do extrato", class: "app-label" %>
-                <%= form.collection_select :institution_id,
-                      @institutions,
-                      :id,
-                      :name,
-                      { prompt: "Seleccione…" },
-                      class: "app-input", required: true %>
+              <div
+                class="relative"
+                data-controller="institution-autocomplete"
+                data-institution-autocomplete-institutions-value="<%= ERB::Util.html_escape(@institutions_json) %>">
+                <%= form.label :institution_id, "Instituição do extrato", class: "app-label", for: "bank_statement_import_institution_query" %>
+                <%= form.hidden_field :institution_id, required: true, data: { institution_autocomplete_target: "hidden" } %>
+                <input
+                  type="search"
+                  id="bank_statement_import_institution_query"
+                  class="app-input w-full"
+                  placeholder="Pesquisar ou selecionar…"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="institution-autocomplete-list"
+                  data-institution-autocomplete-target="query"
+                  data-action="focus->institution-autocomplete#open input->institution-autocomplete#search keydown->institution-autocomplete#keydown blur->institution-autocomplete#blur" />
+                <ul
+                  id="institution-autocomplete-list"
+                  class="hidden absolute z-30 mt-1 max-h-52 w-full overflow-y-auto rounded-md border border-zinc-200 bg-white py-1 shadow-lg"
+                  role="listbox"
+                  data-institution-autocomplete-target="list"
+                  data-action="mousedown->institution-autocomplete#pick">
+                </ul>
                 <p class="mt-1 text-xs text-zinc-500">
                   <%= link_to "Gerir instituições", institutions_path, class: "text-accent no-underline hover:underline" %>
                 </p>

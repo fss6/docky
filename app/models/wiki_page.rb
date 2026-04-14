@@ -4,6 +4,7 @@ class WikiPage < ApplicationRecord
   acts_as_tenant(:account)
 
   belongs_to :account
+  belongs_to :source_bank_statement_import, class_name: "BankStatementImport", optional: true, inverse_of: :wiki_pages
   has_many :embedding_records, as: :recordable, dependent: :destroy
   has_many :outgoing_links, class_name: "WikiLink", foreign_key: :source_page_id, dependent: :destroy
   has_many :incoming_links, class_name: "WikiLink", foreign_key: :target_page_id, dependent: :destroy

@@ -51,6 +51,7 @@ class BankStatementsController < ApplicationController
         .sort_by { |name, _| name.to_s.downcase }
     @bank_statement_import ||= current_client.bank_statement_imports.build
     @institutions = Institution.alphabetical
+    @institutions_json = @institutions.map { |i| { id: i.id, name: i.name } }.to_json
     @recent_imports = current_client.bank_statement_imports.includes(:bank_statements, :institution).order(created_at: :desc).limit(15)
   end
 end

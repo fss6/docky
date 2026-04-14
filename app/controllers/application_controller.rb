@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   set_current_tenant_through_filter
   before_action :find_current_tenant, unless: :devise_controller?
   before_action :assign_current_client_from_session, unless: :devise_controller?
+  before_action :set_nav_client_autocomplete_json, unless: :devise_controller?
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -44,12 +45,22 @@ class ApplicationController < ActionController::Base
     Current.client
   end
 
+  def set_nav_client_autocomplete_json
+    return unless current_user
+    return unless policy(Client).index?
+
+    @nav_clients_json = (
+      [{ id: "", name: "Todos os clientes" }] +
+      Client.order(:name).map { |c| { id: c.id, name: c.name } }
+    ).to_json
+  end
+
   # Para páginas que dependem do cliente activo na sessão (sem `client_id` na URL).
   def require_current_client!
     return if current_client
 
     skip_authorization
-    redirect_to clients_path, alert: "Seleccione um cliente para continuar."
+    redirect_to clients_path, alert: "Selecione um cliente para continuar."
   end
 
   def documents_in_current_client_scope

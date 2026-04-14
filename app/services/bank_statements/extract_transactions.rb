@@ -100,6 +100,9 @@ module BankStatements
           metadata: meta
         )
       end
+
+      BankStatementImportEmbeddingRecordsJob.perform_later(@import.id)
+      BankStatementWikiIngestJob.perform_later(@import.id)
     rescue ::MistralOcr::ExtractContent::Error, ::Openai::Completion::Error, Error => e
       mark_failed!(e.message, ocr_result: ocr_result)
     rescue JSON::ParserError => e
@@ -193,6 +196,8 @@ module BankStatements
         }.compact
       end
       @import.update(status: :failed, metadata: meta)
+      @import.wiki_pages.destroy_all
+      @import.embedding_records.destroy_all
     end
   end
 end

@@ -28,11 +28,37 @@ class EmbeddingRecord < ApplicationRecord
     metadata&.fetch("chunk_index", nil)
   end
 
+  def wiki_page?
+    recordable_type == "WikiPage"
+  end
+
+  def bank_statement_import?
+    recordable_type == "BankStatementImport"
+  end
+
   def source_info
-    fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
-    info = { "file" => fname, "page" => page_number, "chunk_id" => id }
-    info["document_id"] = document_id if document_id.present?
-    info
+    if wiki_page?
+      {
+        "wiki_slug"  => metadata&.dig("slug"),
+        "wiki_title" => metadata&.dig("title"),
+        "page_type"  => metadata&.dig("page_type")
+      }
+    elsif bank_statement_import?
+      fname = metadata&.dig("filename").presence || "Extrato bancário"
+      part = metadata&.dig("chunk_index")
+      part_label = part.nil? ? "?" : (part.to_i + 1).to_s
+      {
+        "file" => fname,
+        "page" => part_label,
+        "chunk_id" => id,
+        "bank_statement_import_id" => recordable_id
+      }
+    else
+      fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
+      info = { "file" => fname, "page" => page_number, "chunk_id" => id }
+      info["document_id"] = document_id if document_id.present?
+      info
+    end
   end
 
   private
@@ -43,27 +69,6 @@ class EmbeddingRecord < ApplicationRecord
     expected = recordable.id
     if document_id.present? && document_id != expected
       errors.add(:document_id, "deve ser o mesmo id do recordable (documento)")
-    end
-  end
-
-  public
-
-  def wiki_page?
-    recordable_type == "WikiPage"
-  end
-
-  def source_info
-    if wiki_page?
-      {
-        "wiki_slug"  => metadata&.dig("slug"),
-        "wiki_title" => metadata&.dig("title"),
-        "page_type"  => metadata&.dig("page_type")
-      }
-    else
-      fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
-      info = { "file" => fname, "page" => page_number, "chunk_id" => id }
-      info["document_id"] = document_id if document_id.present?
-      info
     end
   end
 end

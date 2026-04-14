@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_14_100002) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_14_120003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -327,9 +327,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_100002) do
     t.integer "source_document_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "source_bank_statement_import_id"
     t.index ["account_id", "slug"], name: "index_wiki_pages_on_account_id_and_slug", unique: true
     t.index ["account_id"], name: "index_wiki_pages_on_account_id"
     t.index ["page_type"], name: "index_wiki_pages_on_page_type"
+    t.index ["source_bank_statement_import_id"], name: "index_wiki_pages_on_source_bank_statement_import_id"
   end
 
   create_table "wiki_schemas", force: :cascade do |t|
@@ -375,5 +377,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_100002) do
   add_foreign_key "wiki_links", "wiki_pages", column: "target_page_id"
   add_foreign_key "wiki_logs", "accounts"
   add_foreign_key "wiki_pages", "accounts"
+  add_foreign_key "wiki_pages", "bank_statement_imports", column: "source_bank_statement_import_id"
   add_foreign_key "wiki_schemas", "accounts"
 end

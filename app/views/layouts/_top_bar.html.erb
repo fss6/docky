@@ -24,17 +24,54 @@
       </div>
     </details>
 
-    <% if current_user && policy(Client).index? %>
-      <%= form_with url: current_client_path, method: :patch, class: "flex min-w-0 max-w-full items-center gap-2 sm:gap-3" do %>
-        <%= label_tag :client_id, "Cliente ativo", class: "hidden shrink-0 text-xs font-medium text-zinc-500 sm:inline" %>
-        <%= select_tag :client_id,
-              options_for_select(
-                [["Todos os clientes", ""]] + Client.order(:name).map { |c| [c.name, c.id] },
-                current_client&.id
-              ),
-              class: "app-input min-w-0 max-w-[11rem] shrink truncate py-1.5 text-sm sm:max-w-[18rem]",
-              aria: { label: "Cliente ativo no sistema" },
-              onchange: "this.form.requestSubmit()" %>
+    <% if current_user && policy(Client).index? && @nav_clients_json.present? %>
+      <%= form_with url: current_client_path, method: :patch, class: "relative flex min-w-0 max-w-full items-center gap-2 sm:gap-3" do %>
+        <%= label_tag :client_id_query, "", class: "hidden shrink-0 text-xs font-medium text-zinc-500 sm:inline" %>
+        <div
+          class="relative min-w-0 max-w-[11rem] shrink sm:max-w-[18rem]"
+          data-controller="client-autocomplete"
+          data-client-autocomplete-clients-value="<%= ERB::Util.html_escape(@nav_clients_json) %>">
+          <%= hidden_field_tag :client_id, current_client&.id.to_s,
+                data: { client_autocomplete_target: "hidden" } %>
+          <div class="relative flex min-w-0 w-full rounded-md border border-zinc-200 bg-white shadow-sm transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20">
+            <span class="flex shrink-0 items-center pl-2 text-zinc-400 sm:pl-2.5" aria-hidden="true">
+              <%= heroicon "building-office", variant: :outline, options: { class: "h-4 w-4" } %>
+            </span>
+            <input
+              type="text"
+              id="client_id_query"
+              class="min-w-0 flex-1 truncate border-0 bg-transparent py-1.5 pl-1 pr-2.5 text-sm text-zinc-900 outline-none ring-0 placeholder:text-zinc-400 focus:ring-0 sm:pr-3"
+              placeholder="Selecione ou pesquise…"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              role="combobox"
+              aria-expanded="false"
+              aria-autocomplete="list"
+              aria-controls="client-autocomplete-list"
+              aria-label="Cliente ativo no sistema"
+              data-client-autocomplete-target="query"
+              data-action="focus->client-autocomplete#open input->client-autocomplete#search keydown->client-autocomplete#keydown blur->client-autocomplete#blur" />
+            <button
+              type="button"
+              class="flex shrink-0 items-center justify-center rounded-r-md border-l border-zinc-200/80 bg-zinc-50/80 px-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/30"
+              tabindex="-1"
+              aria-label="Abrir lista de clientes"
+              aria-haspopup="listbox"
+              data-action="pointerdown->client-autocomplete#chevronPointerDown click->client-autocomplete#toggle">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+          </div>
+          <ul
+            id="client-autocomplete-list"
+            class="hidden absolute right-0 top-full z-40 mt-1 max-h-52 w-[min(100vw-2rem,20rem)] overflow-y-auto rounded-md border border-zinc-200 bg-white py-1 shadow-lg sm:left-0 sm:right-auto sm:w-full"
+            role="listbox"
+            data-client-autocomplete-target="list"
+            data-action="mousedown->client-autocomplete#pick">
+          </ul>
+        </div>
       <% end %>
     <% end %>
   </div>

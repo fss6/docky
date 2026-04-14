@@ -6,6 +6,8 @@ class BankStatementImport < ApplicationRecord
   belongs_to :client
   belongs_to :institution
   has_many :bank_statements, dependent: :destroy
+  has_many :embedding_records, as: :recordable, dependent: :destroy
+  has_many :wiki_pages, foreign_key: :source_bank_statement_import_id, inverse_of: :source_bank_statement_import, dependent: :nullify
 
   has_one_attached :file
 

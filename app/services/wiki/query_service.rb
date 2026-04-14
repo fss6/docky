@@ -2,7 +2,7 @@
 
 module Wiki
   # Enriquece o contexto de uma pergunta com conhecimento acumulado do wiki.
-  # Retorna um hash { wiki_chunks:, doc_chunks: } pronto para ser usado no prompt.
+  # Retorna um hash { wiki_chunks:, doc_chunks:, statement_chunks: } para o prompt (RAG).
   class QueryService
     def initialize(question, account, options = {})
       @question     = question
@@ -21,12 +21,13 @@ module Wiki
 
       wiki_chunks = results.select { |r| r.recordable_type == "WikiPage" }
       doc_chunks  = results.select { |r| r.recordable_type == "Document" }
+      statement_chunks = results.select { |r| r.recordable_type == "BankStatementImport" }
 
       log_query(wiki_chunks)
 
-      { wiki_chunks: wiki_chunks, doc_chunks: doc_chunks }
+      { wiki_chunks: wiki_chunks, doc_chunks: doc_chunks, statement_chunks: statement_chunks }
     rescue Openai::Embeddings::MissingApiKeyError, Openai::Embeddings::Error
-      { wiki_chunks: [], doc_chunks: [] }
+      { wiki_chunks: [], doc_chunks: [], statement_chunks: [] }
     end
 
     private
