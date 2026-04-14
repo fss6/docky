@@ -52,4 +52,5 @@ module ApplicationHelper
       class: "wiki-markdown-content"
     )
   end
+
 end

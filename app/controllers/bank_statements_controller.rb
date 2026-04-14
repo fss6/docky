@@ -113,7 +113,7 @@ class BankStatementsController < ApplicationController
       scope = scope.where("occurred_on <= ?", params[:occurred_to])
     end
 
-    @bank_statements = scope.to_a
+    @pagy, @bank_statements = pagy(scope, limit: 10)
     @institution_filter_options = Institution.alphabetical.pluck(:name, :id)
     @transaction_type_filter_options = [
       [I18n.t("activerecord.enums.bank_statement.transaction_type.credit", default: "Crédito"), "credit"],
