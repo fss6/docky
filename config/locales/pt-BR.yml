@@ -145,7 +145,7 @@ pt-BR:
 
   mailers:
     layout:
-      tagline: Gestão inteligente de documentos
+      tagline: Menos trabalho manual, mais produtividade
       footer: Este e-mail foi enviado automaticamente pelo Dokivo.
     reset_password:
       preheader: Use o link seguro abaixo para criar uma nova senha no Dokivo.
