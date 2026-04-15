@@ -81,15 +81,6 @@
     </div>
 
     <aside class="xl:col-span-5 xl:sticky xl:top-20">
-      <% if @folder.client.present? %>
-        <section class="app-card mb-4 p-4 sm:p-5">
-          <h2 class="text-sm font-semibold text-zinc-900">Portal de Coleta</h2>
-          <p class="mt-1 text-sm text-zinc-600">Upload com checklist da competência para validação do contador.</p>
-          <%= link_to "Abrir portal",
-                folder_competency_checklist_path(@folder, period: Date.current.strftime("%Y-%m")),
-                class: "app-btn-primary mt-4 inline-flex" %>
-        </section>
-      <% end %>
       <%= render "documents/upload", folder: @folder, upload_context: "folder", compact: true %>
     </aside>
   </div>

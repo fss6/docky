@@ -6,6 +6,7 @@ class FoldersController < ApplicationController
   def index
     @folders = Folder.includes(:account, :client)
                      .for_nav_client(current_client)
+                     .where(visible: true)
                      .left_joins(:documents)
                      .select("folders.*, COUNT(documents.id) AS documents_count")
                      .group("folders.id")
@@ -36,6 +37,7 @@ class FoldersController < ApplicationController
   def create
     @folder = Folder.new(folder_params)
     @folder.client_id = current_client.id if current_client
+    @folder.visible = true
 
     respond_to do |format|
       if @folder.save

@@ -26,7 +26,8 @@ class MonthlyCollectionsController < ApplicationController
     Folder.find_or_create_by!(
       account: current_user.account,
       client: current_client,
-      name: period.strftime("%Y-%m")
+      name: period.strftime("%Y-%m"),
+      visible: false
     )
 
     redirect_to monthly_collection_path(period.strftime("%Y-%m")), notice: "Competência criada com sucesso."
@@ -53,7 +54,8 @@ class MonthlyCollectionsController < ApplicationController
     @collection_folder = Folder.find_or_create_by!(
       account: current_user.account,
       client: current_client,
-      name: @period.strftime("%Y-%m")
+      name: @period.strftime("%Y-%m"),
+      visible: false
     )
   end
 
