@@ -27,7 +27,7 @@
   <body class="min-h-dvh bg-zinc-100 font-sans text-zinc-900 antialiased">
     <main class="mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-center px-4 py-10 sm:px-6 lg:px-8">
       <div class="mx-auto mb-8 flex w-full max-w-lg justify-center">
-        <div class="flex items-center gap-3 sm:gap-4">
+        <%= link_to root_path, class: "flex items-center gap-3 rounded-lg sm:gap-4", aria: { label: "Voltar para a landing" } do %>
           <%= image_tag "/brand/logo.svg", alt: "", class: "h-12 w-12 shrink-0 sm:h-14 sm:w-14", role: "presentation" %>
           <div class="flex min-w-0 flex-col items-start gap-1">
             <div class="logo-text-dark leading-none">Dok<span>ivo</span></div>
@@ -35,7 +35,7 @@
               Menos trabalho manual, mais produtividade
             </p>
           </div>
-        </div>
+        <% end %>
       </div>
 
       <div class="mx-auto w-full max-w-lg">
