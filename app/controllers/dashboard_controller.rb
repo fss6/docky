@@ -4,6 +4,8 @@ class DashboardController < ApplicationController
   def index
     account = current_user.account
     documents = account_documents_for_context(account)
+    bank_statements = account_bank_statements_for_context(account)
+    checklist_items = account_checklist_items_for_context(account)
     ordered_documents = documents.order("documents.created_at DESC")
     @documents_last_30_days = documents_last_30_days_series(documents)
 
@@ -19,6 +21,29 @@ class DashboardController < ApplicationController
       .count
 
     @total_tags, @recent_tags = tags_metrics(documents: documents, recent_documents: ordered_documents.includes(:folder).limit(100))
+    @alerts = [
+      {
+        key: :duplicates,
+        label: "Duplicatas",
+        description: "Lançamentos marcados como possível duplicata.",
+        total: bank_statements.where(possible_duplicate: true).count,
+        path: bank_statements_path
+      },
+      {
+        key: :pending,
+        label: "Pendências",
+        description: "Documentos pendentes de processamento.",
+        total: documents.where(status: :pending).count,
+        path: folders_path
+      },
+      {
+        key: :checklist_pending,
+        label: "Checklist pendente",
+        description: "Itens de checklist ainda pendentes.",
+        total: checklist_items.pending.count,
+        path: timeline_path
+      }
+    ]
 
     @show_wiki_insights = WikiPagePolicy.new(current_user, :wiki_page).index?
     return unless @show_wiki_insights
@@ -35,6 +60,20 @@ class DashboardController < ApplicationController
     return rel unless current_client
 
     rel.joins(:folder).where(folders: { client_id: current_client.id })
+  end
+
+  def account_bank_statements_for_context(account)
+    rel = account.bank_statements
+    return rel unless current_client
+
+    rel.where(client_id: current_client.id)
+  end
+
+  def account_checklist_items_for_context(account)
+    rel = account.competency_checklist_items
+    return rel unless current_client
+
+    rel.joins(:competency_checklist).where(competency_checklists: { client_id: current_client.id })
   end
 
   def authorize_policy

@@ -58,6 +58,46 @@
     <% end %>
   </section>
 
+  <section>
+    <article class="app-card p-5">
+      <header class="mb-4 flex items-center justify-between">
+        <h2 class="text-base font-semibold text-zinc-900">Alertas (duplicatas e pendencias)</h2>
+      </header>
+      <% if @alerts.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead>
+              <tr class="border-b border-zinc-200 text-xs uppercase tracking-wide text-zinc-500">
+                <th class="px-2 py-2">Tipo</th>
+                <th class="px-2 py-2">Descricao</th>
+                <th class="px-2 py-2">Total</th>
+                <th class="px-2 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @alerts.each do |alert| %>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-2 py-2 font-medium text-zinc-900"><%= alert[:label] %></td>
+                  <td class="px-2 py-2 text-zinc-600"><%= alert[:description] %></td>
+                  <td class="px-2 py-2">
+                    <span class="inline-flex rounded-md px-2 py-0.5 text-xs font-semibold <%= alert[:total].positive? ? "bg-amber-100 text-amber-900" : "bg-emerald-100 text-emerald-800" %>">
+                      <%= alert[:total] %>
+                    </span>
+                  </td>
+                  <td class="px-2 py-2 text-right">
+                    <%= link_to "Ver itens", alert[:path], class: "text-xs font-medium text-accent no-underline hover:underline" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-zinc-500">Nenhum alerta encontrado.</p>
+      <% end %>
+    </article>
+  </section>
+
   <section class="grid grid-cols-1 gap-4 xl:grid-cols-12">
     <article class="app-card p-5 xl:col-span-8">
       <header class="mb-4 flex items-center justify-between">
@@ -138,6 +178,7 @@
         <p class="text-sm text-zinc-500">Nenhuma tag encontrada nos documentos.</p>
       <% end %>
     </article>
+
   </section>
 
   <% if @show_wiki_insights %>
