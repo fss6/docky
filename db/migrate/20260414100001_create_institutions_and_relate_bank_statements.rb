@@ -70,20 +70,6 @@ class CreateInstitutionsAndRelateBankStatements < ActiveRecord::Migration[8.0]
     SQL
 
     change_column_null :bank_statement_imports, :institution_id, false
-
-    add_reference :bank_statements, :institution, foreign_key: true
-
-    execute <<-SQL.squish
-      UPDATE bank_statements bs
-      SET institution_id = bsi.institution_id
-      FROM bank_statement_imports bsi
-      WHERE bsi.id = bs.bank_statement_import_id
-        AND bs.institution_id IS NULL
-    SQL
-
-    remove_column :bank_statements, :institution, :string if column_exists?(:bank_statements, :institution)
-
-    change_column_null :bank_statements, :institution_id, false
   end
 
   def down
