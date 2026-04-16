@@ -22,10 +22,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "stripe_customer_id"
-    t.string "billing_status", default: "pending", null: false
     t.index ["plan_id"], name: "index_accounts_on_plan_id"
-    t.index ["stripe_customer_id"], name: "index_accounts_on_stripe_customer_id", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -120,10 +117,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.date "occurred_on", null: false
     t.decimal "amount", precision: 16, scale: 2, null: false
     t.string "transaction_type", null: false
+    t.bigint "institution_id", null: false
     t.text "description", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "institution_id", null: false
     t.boolean "possible_duplicate", default: false, null: false
     t.index ["account_id"], name: "index_bank_statements_on_account_id"
     t.index ["bank_statement_import_id"], name: "index_bank_statements_on_bank_statement_import_id"
@@ -198,12 +195,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "integration_connection_id"
-    t.string "channel", default: "web", null: false
-    t.string "external_sender_id"
     t.index ["account_id"], name: "index_conversations_on_account_id"
-    t.index ["integration_connection_id", "external_sender_id", "channel"], name: "index_conversations_on_whatsapp_thread", unique: true, where: "(((channel)::text = 'whatsapp'::text) AND (external_sender_id IS NOT NULL))"
-    t.index ["integration_connection_id"], name: "index_conversations_on_integration_connection_id"
     t.index ["user_id"], name: "index_conversations_on_user_id"
   end
 
@@ -280,31 +272,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.index ["account_id"], name: "index_institutions_on_account_id"
   end
 
-  create_table "integration_connections", force: :cascade do |t|
-    t.bigint "account_id", null: false
-    t.string "provider", default: "whatsapp_cloud", null: false
-    t.string "phone_number_id", null: false
-    t.string "display_phone_number"
-    t.string "verify_token", null: false
-    t.text "access_token", null: false
-    t.boolean "active", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["account_id", "phone_number_id"], name: "index_integration_connections_on_account_and_phone_number_id", unique: true
-    t.index ["account_id"], name: "index_integration_connections_on_account_id"
-    t.index ["phone_number_id"], name: "index_integration_connections_on_phone_number_id_unique", unique: true
-    t.index ["verify_token"], name: "index_integration_connections_on_verify_token", unique: true
-  end
-
-  create_table "integration_inbound_events", force: :cascade do |t|
-    t.bigint "integration_connection_id", null: false
-    t.string "provider_event_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["integration_connection_id"], name: "index_integration_inbound_events_on_integration_connection_id"
-    t.index ["provider_event_id"], name: "index_integration_inbound_events_on_provider_event_id", unique: true
-  end
-
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.string "role"
@@ -325,13 +292,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "processed_stripe_events", force: :cascade do |t|
-    t.string "event_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["event_id"], name: "index_processed_stripe_events_on_event_id", unique: true
-  end
-
   create_table "settings", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.boolean "generate_tags_automatically", default: true, null: false
@@ -349,13 +309,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.datetime "canceled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "stripe_subscription_id"
-    t.string "stripe_price_id"
-    t.string "stripe_checkout_session_id"
     t.index ["account_id"], name: "index_subscriptions_on_account_id"
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
-    t.index ["stripe_checkout_session_id"], name: "index_subscriptions_on_stripe_checkout_session_id", unique: true
-    t.index ["stripe_subscription_id"], name: "index_subscriptions_on_stripe_subscription_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -455,7 +410,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
   add_foreign_key "competency_checklists", "accounts"
   add_foreign_key "competency_checklists", "clients"
   add_foreign_key "conversations", "accounts"
-  add_foreign_key "conversations", "integration_connections"
   add_foreign_key "conversations", "users"
   add_foreign_key "documents", "accounts"
   add_foreign_key "documents", "folders"
@@ -467,8 +421,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
   add_foreign_key "group_memberships", "users"
   add_foreign_key "groups", "accounts"
   add_foreign_key "institutions", "accounts"
-  add_foreign_key "integration_connections", "accounts"
-  add_foreign_key "integration_inbound_events", "integration_connections"
   add_foreign_key "messages", "conversations"
   add_foreign_key "settings", "accounts"
   add_foreign_key "subscriptions", "accounts"

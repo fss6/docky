@@ -7,7 +7,7 @@ if Rails.env.development?
   plan.save!
 
   account = Account.find_or_initialize_by(name: "Conta de desenvolvimento")
-  account.assign_attributes(plan: plan, active: true, billing_status: "pending")
+  account.assign_attributes(plan: plan, active: true)
   account.save!
   Institution.seed_defaults_for!(account)
 
