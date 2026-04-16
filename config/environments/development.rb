@@ -17,7 +17,11 @@ Rails.application.configure do
 
   # Know hosts
   allow_hosts = ENV.fetch("ALLOW_HOSTS") { "" }
-  config.hosts = allow_hosts.split(",")
+  hosts = allow_hosts.split(",").map(&:strip).reject(&:blank?)
+  config.hosts = hosts if hosts.any?
+
+  # Docker/Coolify health checks hit 127.0.0.1; ALLOW_HOSTS lists the public domain only.
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.
