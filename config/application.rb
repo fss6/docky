@@ -2,6 +2,19 @@ require_relative "boot"
 
 require "rails/all"
 
+# Audited gem compatibility fix
+# Compatibilidade temporaria para gems que ainda chamam
+# `belongs_to_required_by_default` no Rails 8.
+if defined?(ActiveRecord::Base) &&
+   ActiveRecord::Base.respond_to?(:belongs_to_required_by_default?) &&
+   !ActiveRecord::Base.respond_to?(:belongs_to_required_by_default)
+  class << ActiveRecord::Base
+    def belongs_to_required_by_default
+      belongs_to_required_by_default?
+    end
+  end
+end
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
