@@ -5,7 +5,7 @@ class InstitutionsController < ApplicationController
   before_action :authorize_policy
 
   def index
-    @institutions = Institution.alphabetical
+    @pagy, @institutions = pagy(Institution.alphabetical, limit: 10)
   end
 
   def show

@@ -18,7 +18,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def update?
-    user.role_owner? && !record.system?
+    user.role_owner?
   end
 
   def edit?

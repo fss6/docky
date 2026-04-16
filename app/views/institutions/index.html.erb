@@ -22,7 +22,7 @@
             <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
               <th class="px-5 py-3 font-semibold sm:px-6">Nome</th>
               <th class="px-5 py-3 font-semibold sm:px-6">Origem</th>
-              <th class="px-5 py-3 font-semibold sm:px-6"></th>
+              <th class="px-5 py-3 text-right font-semibold sm:px-6">Ações</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-zinc-100">
@@ -35,8 +35,28 @@
                   <%= inst.system? ? "Sistema" : "Personalizada" %>
                 </td>
                 <td class="px-5 py-3 text-right sm:px-6">
+                  <%= link_to institution_path(inst),
+                              class: "inline-flex items-center text-zinc-600 no-underline hover:text-zinc-900",
+                              aria: { label: "Ver instituição #{inst.name}" },
+                              title: "Ver" do %>
+                    <%= heroicon "eye", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+                  <% end %>
                   <% if policy(inst).edit? %>
-                    <%= link_to "Editar", edit_institution_path(inst), class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
+                    <span class="px-1.5 text-zinc-300">·</span>
+                    <%= link_to edit_institution_path(inst),
+                                class: "inline-flex items-center text-zinc-600 no-underline hover:text-zinc-900",
+                                aria: { label: "Editar instituição #{inst.name}" },
+                                title: "Editar" do %>
+                      <%= heroicon "pencil-square", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+                    <% end %>
+                  <% end %>
+                  <% if policy(inst).destroy? %>
+                    <span class="px-1.5 text-zinc-300">·</span>
+                    <%= button_to "Excluir",
+                                  institution_path(inst),
+                                  method: :delete,
+                                  form: { class: "inline", data: { turbo_confirm: "Excluir esta instituição?" } },
+                                  class: "text-sm font-medium text-red-700 hover:text-red-800" %>
                   <% end %>
                 </td>
               </tr>
@@ -44,6 +64,11 @@
           </tbody>
         </table>
       </div>
+      <% if @pagy.pages > 1 %>
+        <div class="px-4 py-3">
+          <%== @pagy.series_nav %>
+        </div>
+      <% end %>
     </div>
   <% else %>
     <div class="app-card p-8 text-center text-sm text-zinc-600">

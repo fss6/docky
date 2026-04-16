@@ -14,7 +14,8 @@
         title: "Visão Geral",
         items: [
           { key: :dashboard, label: "Dashboard", path: dashboard_path, icon: :home, policy_ok: policy(:dashboard).index? },
-          { key: :wallet, label: "Carteira", path: wallet_path, icon: :credit_card, policy_ok: policy(Client).index? }
+          { key: :wallet, label: "Carteira", path: wallet_path, icon: :credit_card, policy_ok: policy(Client).index? },
+          { key: :institutions, label: "Instituições", path: institutions_path, icon: :institutions, policy_ok: policy(Institution).index? }
         ]
       },
       {
@@ -44,6 +45,7 @@
           <% next unless item[:policy_ok] %>
           <% active = (item[:key] == :dashboard && (current_page?(root_path) || request.path.start_with?("/dashboard"))) ||
                        (item[:key] == :wallet && request.path.start_with?("/wallet")) ||
+                       (item[:key] == :institutions && request.path.start_with?("/institutions")) ||
                        (item[:key] == :folders && request.path.start_with?("/folders")) ||
                        (item[:key] == :timeline && request.path.start_with?("/timeline")) ||
                        (item[:key] == :bank_statements && (request.path.start_with?("/bank_statements") || request.path.match?(%r{\A/bank_statement_imports/\d+}))) ||
