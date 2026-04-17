@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   get "monthly-collections", to: "monthly_collections#index", as: :monthly_collections
   post "monthly-collections", to: "monthly_collections#create"
   get "monthly-collections/:id", to: "monthly_collections#show", as: :monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
+  get "monthly-collections/:id/document-statuses", to: "monthly_collections#document_statuses", as: :monthly_collection_document_statuses, constraints: { id: /\d{4}-\d{2}/ }
   resource :current_client, only: [:update]
   resources :bank_statements, except: [:show]
   resources :bank_statement_imports, only: [:show] do

@@ -57,6 +57,46 @@
       </dialog>
     </section>
 
+    <section class="app-card p-4 sm:p-5"
+             data-controller="documents-status-poll"
+             data-documents-status-poll-url-value="<%= monthly_collection_document_statuses_path(@period.strftime("%Y-%m")) %>"
+             data-documents-status-poll-interval-ms-value="4000">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base font-semibold text-zinc-900">Arquivos processados</h2>
+          <p class="mt-1 text-sm text-zinc-600">A lista atualiza automaticamente conforme o processamento avança.</p>
+        </div>
+      </div>
+
+      <ul class="mt-4 space-y-2" data-documents-status-poll-target="list">
+        <% @uploaded_documents.each do |doc| %>
+          <li class="flex items-center justify-between gap-3 rounded-md border border-zinc-200/80 bg-white px-3 py-2">
+            <div class="min-w-0">
+              <%= link_to document_file_label(doc), doc, class: "block truncate text-sm font-medium text-zinc-900 no-underline hover:text-accent" %>
+              <p class="mt-0.5 text-xs text-zinc-500">Enviado em <%= l(doc.created_at, format: :short) %></p>
+            </div>
+            <div class="inline-flex items-center gap-2">
+              <% if doc.processing? || doc.pending? %>
+                <span class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-accent" aria-hidden="true"></span>
+              <% elsif doc.processed? %>
+                <span class="inline-flex h-3.5 w-3.5 items-center justify-center text-emerald-600" aria-hidden="true">✓</span>
+              <% elsif doc.failed? %>
+                <span class="inline-flex h-3.5 w-3.5 items-center justify-center text-red-600" aria-hidden="true">!</span>
+              <% end %>
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold <%= document_status_badge_classes(doc.status) %>">
+                <%= document_status_label(doc.status) %>
+              </span>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+
+      <p class="<%= @uploaded_documents.any? ? "hidden " : "" %>mt-4 text-sm text-zinc-500"
+         data-documents-status-poll-target="emptyState">
+        Nenhum arquivo enviado para esta competência ainda.
+      </p>
+    </section>
+
     <% if @checklist.present? %>
       <section class="app-card overflow-hidden p-0">
         <div class="border-b border-zinc-100 bg-zinc-50/60 px-5 py-4 sm:px-6">

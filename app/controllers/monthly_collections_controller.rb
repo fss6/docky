@@ -1,10 +1,11 @@
 class MonthlyCollectionsController < ApplicationController
   before_action :authorize_policy
   before_action :require_current_client!
-  before_action :set_period_from_id!, only: :show
-  before_action :set_collection_folder, only: :show
+  before_action :set_period_from_id!, only: %i[show document_statuses]
+  before_action :set_collection_folder, only: %i[show document_statuses]
   before_action :set_checklist, only: :show
   before_action :set_available_documents, only: :show
+  before_action :set_uploaded_documents, only: :show
 
   def index
     @pagy, @periods = pagy(available_periods_scope, limit: 8)
@@ -40,6 +41,13 @@ class MonthlyCollectionsController < ApplicationController
 
   def show
     @items = @checklist ? @checklist.items.includes(:validated_by_user).order(:id) : []
+  end
+
+  def document_statuses
+    docs = uploaded_documents_scope.limit(30)
+    render json: {
+      documents: docs.map { |doc| document_status_payload(doc) }
+    }
   end
 
   private
@@ -78,10 +86,30 @@ class MonthlyCollectionsController < ApplicationController
   end
 
   def set_available_documents
-    @available_documents = current_user.account.documents
+    @available_documents = uploaded_documents_scope
+  end
+
+  def set_uploaded_documents
+    @uploaded_documents = uploaded_documents_scope.limit(30)
+  end
+
+  def uploaded_documents_scope
+    current_user.account.documents
       .where(folder_id: @collection_folder.id)
       .with_attached_file
       .order(created_at: :desc)
+  end
+
+  def document_status_payload(doc)
+    {
+      id: doc.id,
+      name: helpers.document_file_label(doc),
+      status: doc.status,
+      status_label: helpers.document_status_label(doc.status),
+      status_badge_classes: helpers.document_status_badge_classes(doc.status),
+      created_at_label: I18n.l(doc.created_at, format: :short),
+      show_path: document_path(doc)
+    }
   end
 
   def parse_period(raw_period)
