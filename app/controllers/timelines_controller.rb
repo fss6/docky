@@ -63,11 +63,7 @@ class TimelinesController < ApplicationController
   end
 
   def parse_period(raw_period)
-    return nil if raw_period.blank?
-
-    Date.strptime(raw_period, "%Y-%m").beginning_of_month
-  rescue ArgumentError
-    nil
+    parse_period_param(raw_period)
   end
 
   def build_timeline_days(documents, pending_items)

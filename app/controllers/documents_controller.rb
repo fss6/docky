@@ -219,9 +219,7 @@ class DocumentsController < ApplicationController
   end
 
   def upload_period
-    Date.strptime(params[:period].to_s, "%Y-%m").beginning_of_month
-  rescue ArgumentError
-    Date.current.beginning_of_month
+    parse_period_param(params[:period]) || Date.current.beginning_of_month
   end
 
   def enqueue_bank_statement_import!

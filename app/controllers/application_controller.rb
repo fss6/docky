@@ -84,4 +84,13 @@ class ApplicationController < ActionController::Base
       metadata: metadata
     )
   end
+
+  def parse_period_param(raw_period)
+    return nil if raw_period.blank?
+
+    normalized = raw_period.to_s.strip.tr("/", "-")
+    Date.strptime(normalized, "%Y-%m").beginning_of_month
+  rescue ArgumentError
+    nil
+  end
 end

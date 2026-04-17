@@ -14,7 +14,12 @@
     <%= form_with url: timeline_path, method: :get, local: true, class: "flex flex-wrap items-end gap-3" do %>
       <div>
         <label for="timeline_period" class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Competencia</label>
-        <input id="timeline_period" name="period" type="month" value="<%= @period_param %>" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-800">
+        <%= text_field_tag :period,
+              @period_param.tr("-", "/"),
+              id: "timeline_period",
+              autocomplete: "off",
+              data: { controller: "month-picker" },
+              class: "mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800" %>
       </div>
       <button type="submit" class="app-btn-primary">Atualizar timeline</button>
     <% end %>

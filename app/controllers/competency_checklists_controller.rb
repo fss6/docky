@@ -116,11 +116,7 @@ class CompetencyChecklistsController < ApplicationController
   end
 
   def parse_period(raw)
-    return nil if raw.blank?
-
-    Date.strptime(raw.to_s, "%Y-%m").beginning_of_month
-  rescue ArgumentError
-    nil
+    parse_period_param(raw)
   end
 
   def parse_match_terms(raw_terms)

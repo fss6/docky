@@ -37,11 +37,11 @@
           </div>
           <div>
             <%= label_tag :from, "Data inicial", class: "app-label" %>
-            <%= date_field_tag :from, params[:from], class: "app-input" %>
+            <%= text_field_tag :from, params[:from], class: "app-input", autocomplete: "off", data: { controller: "date-picker" } %>
           </div>
           <div>
             <%= label_tag :to, "Data final", class: "app-label" %>
-            <%= date_field_tag :to, params[:to], class: "app-input" %>
+            <%= text_field_tag :to, params[:to], class: "app-input", autocomplete: "off", data: { controller: "date-picker" } %>
           </div>
           <div class="sm:col-span-2">
             <%= label_tag :q, "Busca", class: "app-label" %>

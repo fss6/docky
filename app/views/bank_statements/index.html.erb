@@ -71,11 +71,11 @@
             </div>
             <div>
               <%= label_tag :occurred_from, "Data inicial", class: "app-label" %>
-              <%= date_field_tag :occurred_from, params[:occurred_from], class: "app-input" %>
+              <%= text_field_tag :occurred_from, params[:occurred_from], class: "app-input", autocomplete: "off", data: { controller: "date-picker" } %>
             </div>
             <div>
               <%= label_tag :occurred_to, "Data final", class: "app-label" %>
-              <%= date_field_tag :occurred_to, params[:occurred_to], class: "app-input" %>
+              <%= text_field_tag :occurred_to, params[:occurred_to], class: "app-input", autocomplete: "off", data: { controller: "date-picker" } %>
             </div>
           </div>
           <div class="mt-3 flex items-center justify-end gap-2">

@@ -21,7 +21,12 @@
     <%= form_with url: folder_competency_checklist_path(@folder), method: :get, local: true, class: "flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between" do %>
       <div>
         <label for="period" class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Competência</label>
-        <input id="period" name="period" type="month" value="<%= @period.strftime("%Y-%m") %>" class="mt-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-800 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20">
+        <%= text_field_tag :period,
+              @period.strftime("%Y/%m"),
+              id: "period",
+              autocomplete: "off",
+              data: { controller: "month-picker" },
+              class: "mt-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20" %>
       </div>
       <button type="submit" class="app-btn-primary">Aplicar</button>
     <% end %>
