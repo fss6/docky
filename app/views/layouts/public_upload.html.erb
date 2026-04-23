@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Upload de arquivos · Dokivo" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/brand/favicon.ico" sizes="any">
+    <link rel="icon" href="/brand/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/brand/logo_96x96.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-dvh bg-zinc-100 font-sans text-zinc-900 antialiased">
+    <main class="mx-auto flex min-h-dvh w-full max-w-5xl flex-col justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <div class="mx-auto mb-6 flex w-full max-w-3xl justify-center">
+        <%= image_tag "/brand/logo.svg", alt: "Dokivo", class: "h-10 w-10 sm:h-12 sm:w-12" %>
+      </div>
+
+      <div class="mx-auto w-full max-w-3xl">
+        <%= render "shared/flash" %>
+        <%= yield %>
+      </div>
+    </main>
+  </body>
+</html>

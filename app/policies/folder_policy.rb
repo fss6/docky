@@ -33,6 +33,18 @@ class FolderPolicy < ApplicationPolicy
     user.role_member? || user.role_owner?
   end
 
+  def generate_share_link?
+    update?
+  end
+
+  def regenerate_share_link?
+    update?
+  end
+
+  def expire_share_link?
+    update?
+  end
+
   class Scope < ApplicationPolicy::Scope
     # NOTE: Be explicit about which records you allow access to!
     # def resolve

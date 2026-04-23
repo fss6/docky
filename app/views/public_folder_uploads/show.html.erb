@@ -1,0 +1,56 @@
+<% content_for :title, "Upload de arquivos · #{@folder.name}" %>
+
+<div class="mx-auto w-full max-w-3xl space-y-6">
+  <header class="space-y-2 text-center">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-500">Link de envio</p>
+    <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= @folder.name %></h1>
+    <p class="text-sm text-zinc-600">
+      Envie o arquivo para esta pasta.
+    </p>
+  </header>
+
+  <div class="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-[var(--shadow-card)] sm:p-6">
+    <%= form_with url: public_folder_upload_path(token: @folder.public_upload_token),
+          method: :post,
+          html: { multipart: true, class: "space-y-4" } do %>
+      <div>
+        <%= label_tag :public_document_file, "Selecione o arquivo", class: "mb-2 block text-sm font-medium text-zinc-700" %>
+        <%= file_field_tag "document[file]",
+              id: :public_document_file,
+              required: true,
+              class: "block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-700 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200" %>
+      </div>
+      <%= submit_tag "Enviar arquivo", class: "app-btn-primary w-full sm:w-auto" %>
+    <% end %>
+  </div>
+
+  <section class="rounded-xl border border-zinc-200/80 bg-white shadow-[var(--shadow-card)]">
+    <div class="border-b border-zinc-100 px-5 py-4 sm:px-6">
+      <h2 class="text-sm font-semibold text-zinc-900">Últimos arquivos enviados</h2>
+    </div>
+    <% if @recent_public_documents.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <th class="px-5 py-3 font-semibold sm:px-6">Arquivo</th>
+              <th class="w-52 px-5 py-3 font-semibold sm:px-6">Enviado em</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            <% @recent_public_documents.each do |doc| %>
+              <tr>
+                <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6"><%= doc.file.filename.to_s %></td>
+                <td class="px-5 py-3 text-zinc-600 whitespace-nowrap sm:px-6"><%= doc.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="px-5 py-10 text-center text-sm text-zinc-600 sm:px-6">
+        Nenhum arquivo enviado por este link ainda.
+      </div>
+    <% end %>
+  </section>
+</div>

@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  before_action :set_folder, only: %i[show edit update destroy]
+  before_action :set_folder, only: %i[show edit update destroy generate_share_link regenerate_share_link expire_share_link]
   before_action :authorize_policy
 
   # GET /folders or /folders.json
@@ -71,6 +71,24 @@ class FoldersController < ApplicationController
       format.html { redirect_to folders_path, notice: "Pasta excluída com sucesso.", status: :see_other }
       format.json { head :no_content }
     end
+  end
+
+  def generate_share_link
+    @folder.ensure_public_upload_token!
+
+    redirect_to @folder, notice: "Link de upload criado com sucesso.", status: :see_other
+  end
+
+  def regenerate_share_link
+    @folder.regenerate_public_upload_token!
+
+    redirect_to @folder, notice: "Link de upload atualizado com sucesso.", status: :see_other
+  end
+
+  def expire_share_link
+    @folder.expire_public_upload_token!
+
+    redirect_to @folder, notice: "Link de upload expirado.", status: :see_other
   end
 
   private

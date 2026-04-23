@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -240,8 +240,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_182717) do
     t.datetime "updated_at", null: false
     t.bigint "client_id"
     t.boolean "visible", default: false, null: false
+    t.string "public_upload_token"
+    t.datetime "public_upload_token_expires_at"
     t.index ["account_id"], name: "index_folders_on_account_id"
     t.index ["client_id"], name: "index_folders_on_client_id"
+    t.index ["public_upload_token"], name: "index_folders_on_public_upload_token", unique: true
   end
 
   create_table "group_memberships", force: :cascade do |t|

@@ -43,6 +43,11 @@ Rails.application.routes.draw do
   resource :settings, only: %i[show update]
 
   resources :folders do
+    member do
+      post :generate_share_link
+      post :regenerate_share_link
+      post :expire_share_link
+    end
     resources :documents, shallow: true, only: %i[index create show destroy]
     resource :competency_checklist, only: %i[show], controller: "competency_checklists" do
       post :create_template_item
@@ -54,6 +59,8 @@ Rails.application.routes.draw do
       patch :mark_pending
     end
   end
+  get "public/folders/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
+  post "public/folders/:token/upload", to: "public_folder_uploads#create"
   resources :documents, only: [] do
     member do
       patch :move
