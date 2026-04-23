@@ -9,9 +9,24 @@
         <h1 class="mt-2 text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl"><%= page.title %></h1>
         <p class="mt-1 text-xs text-zinc-400 font-mono"><%= page.slug %></p>
       </div>
-      <p class="shrink-0 text-xs text-zinc-400">
-        Atualizado <%= l(page.updated_at, format: :short) %>
-      </p>
+      <div class="flex shrink-0 items-center gap-2">
+        <p class="text-xs text-zinc-400">
+          Atualizado <%= l(page.updated_at, format: :short) %>
+        </p>
+        <%= button_tag type: "button",
+              class: "app-btn-secondary text-xs !border-red-200 !text-red-700 hover:!bg-red-50",
+              data: app_confirm_modal_open_data(
+                url: wiki_page_path(slug: page.slug),
+                item_label: page.title,
+                heading: "Remover página da base?",
+                body_prefix: "Você está prestes a remover a página ",
+                body_suffix: ". Esta ação não pode ser desfeita.",
+                confirm_text: "Remover página",
+                confirm_variant: "danger"
+              ) do %>
+          Remover página
+        <% end %>
+      </div>
     </div>
   </header>
 

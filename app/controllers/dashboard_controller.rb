@@ -34,7 +34,7 @@ class DashboardController < ApplicationController
         label: "Pendências",
         description: "Documentos pendentes de processamento.",
         total: documents.where(status: :pending).count,
-        path: folders_path
+        path: "/folders"
       },
       {
         key: :checklist_pending,

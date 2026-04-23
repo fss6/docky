@@ -23,6 +23,14 @@ class WikiPagesController < ApplicationController
     @links_in  = @wiki_page.incoming_links.includes(:source_page)
   end
 
+  def destroy
+    @wiki_page = current_account.wiki_pages.find_by!(slug: params[:slug])
+    authorize :wiki_page, :destroy?, policy_class: WikiPagePolicy
+
+    @wiki_page.destroy!
+    redirect_to wiki_path, notice: "Página removida da base de conhecimento."
+  end
+
   def log
     @wiki_logs = current_account.wiki_logs.recent.limit(50)
   end

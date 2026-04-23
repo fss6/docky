@@ -40,6 +40,7 @@ Rails.application.routes.draw do
   get "audit", to: "audits#index", as: :audits
   get "wiki/log", to: "wiki_pages#log", as: :wiki_log
   get "wiki/lint_report", to: "wiki_pages#lint_report", as: :wiki_lint_report
+  delete "wiki/:slug", to: "wiki_pages#destroy", constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   get "wiki/:slug", to: "wiki_pages#show", as: :wiki_page, constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   resource :settings, only: %i[show update]
 
