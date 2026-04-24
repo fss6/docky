@@ -2,10 +2,18 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["folder"]
-  static values = { documentId: Number, selectedFolderId: Number, dragging: Boolean }
+  static values = { documentId: Number, selectedFolderId: Number, dragging: Boolean, opening: Boolean }
 
   connect() {
+    this.openingValue = false
+    this.resetOpeningState()
+    this.beforeCacheHandler = () => this.resetOpeningState()
+    document.addEventListener("turbo:before-cache", this.beforeCacheHandler)
     this.syncFolderSelection()
+  }
+
+  disconnect() {
+    document.removeEventListener("turbo:before-cache", this.beforeCacheHandler)
   }
 
   selectFolder(event) {
@@ -20,11 +28,14 @@ export default class extends Controller {
   }
 
   openFolder(event) {
-    if (this.draggingValue) return
+    if (this.draggingValue || this.openingValue) return
 
-    const url = event.currentTarget.dataset.folderUrl
+    const folderEl = event.currentTarget
+    const url = folderEl.dataset.folderUrl
     if (!url) return
 
+    this.openingValue = true
+    this.showOpeningState(folderEl)
     window.location = url
   }
 
@@ -120,6 +131,36 @@ export default class extends Controller {
         } else {
           el.classList.add(...inactiveClasses)
         }
+      }
+    })
+  }
+
+  showOpeningState(folderEl) {
+    const openingClasses = (folderEl.dataset.openingClasses || "").split(" ").filter(Boolean)
+    if (openingClasses.length) folderEl.classList.add(...openingClasses)
+
+    folderEl.setAttribute("aria-busy", "true")
+    folderEl.setAttribute("disabled", "disabled")
+
+    const openingLabel = folderEl.querySelector("[data-folder-opening-indicator]")
+    if (openingLabel) {
+      openingLabel.classList.remove("hidden")
+      openingLabel.classList.add("inline-flex")
+    }
+  }
+
+  resetOpeningState() {
+    this.folderTargets.forEach((folderEl) => {
+      const openingClasses = (folderEl.dataset.openingClasses || "").split(" ").filter(Boolean)
+      if (openingClasses.length) folderEl.classList.remove(...openingClasses)
+
+      folderEl.removeAttribute("aria-busy")
+      folderEl.removeAttribute("disabled")
+
+      const openingLabel = folderEl.querySelector("[data-folder-opening-indicator]")
+      if (openingLabel) {
+        openingLabel.classList.add("hidden")
+        openingLabel.classList.remove("inline-flex")
       }
     })
   }
