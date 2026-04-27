@@ -27,7 +27,7 @@ gem 'pundit', '~> 2.5', '>= 2.5.2'
 gem 'acts_as_tenant', '~> 1.0', '>= 1.0.1'
 
 # Pagination
-gem 'pagy', '~> 43.5', '>= 43.5.1'
+gem 'pagy', '~> 43.5'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
