@@ -1,0 +1,87 @@
+<% linked = linked_item.present? %>
+<% category = document_heuristic_category(document) %>
+<% link_query = { period: period_param } %>
+<% link_query[:page] = params[:page] if params[:page].present? %>
+<li id="<%= dom_id(document, :card) %>"
+    class="app-card flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+    data-document-filter-target="item"
+    data-document-category="<%= category %>">
+  <div class="flex min-w-0 flex-1 gap-3">
+    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-50 <%= document_icon_classes(document) %>">
+      <%= heroicon "document", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
+    </div>
+    <div class="min-w-0">
+      <p class="truncate text-sm font-semibold text-zinc-900"><%= document_file_label(document) %></p>
+      <p class="mt-0.5 text-xs text-zinc-500"><%= document_card_subtitle(document, linked_item) %></p>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+    <% if linked %>
+      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20">
+        <%= heroicon "check", variant: :outline, options: { class: "h-3.5 w-3.5", "aria-hidden": "true" } %>
+        Vinculado
+      </span>
+    <% else %>
+      <details class="relative" data-controller="document-link-menu" data-action="toggle->document-link-menu#closeOthers click@window->document-link-menu#closeOnOutside">
+        <summary class="client-badge-vincular">
+          <%= heroicon "plus", variant: :outline, options: { class: "h-3.5 w-3.5", "aria-hidden": "true" } %>
+          Vincular
+        </summary>
+        <div class="absolute right-0 z-30 mt-1 w-64 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
+          <% pending_link_items.each do |item| %>
+            <%= button_to item.name_snapshot,
+                  link_client_document_path(client, document, **link_query, item_id: item.id),
+                  method: :patch,
+                  form: { data: { turbo_stream: true } },
+                  class: "block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50 border-0 bg-transparent" %>
+          <% end %>
+          <% if pending_link_items.empty? %>
+            <p class="px-3 py-2 text-xs text-zinc-500">Nenhum item pendente.</p>
+          <% end %>
+          <div class="border-t border-zinc-100 px-3 py-2" data-document-link-menu-target="newItemForm" hidden>
+            <%= form_with url: link_client_document_path(client, document, **link_query),
+                  method: :patch,
+                  data: { turbo_stream: true },
+                  class: "flex gap-2" do %>
+              <%= text_field_tag :new_item_name, nil, placeholder: "Nome do item", class: "app-input text-xs", required: true %>
+              <%= submit_tag "Criar", class: "app-btn-primary text-xs px-2 py-1" %>
+            <% end %>
+          </div>
+          <button type="button" class="block w-full px-3 py-2 text-left text-sm text-accent hover:bg-zinc-50 border-0 bg-transparent" data-action="click->document-link-menu#showNewItem">
+            Criar novo item…
+          </button>
+        </div>
+      </details>
+    <% end %>
+
+    <% if document.file.attached? %>
+      <%= link_to rails_blob_path(document.file, disposition: "inline"), class: "inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100", title: "Visualizar" do %>
+        <%= heroicon "eye", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+      <% end %>
+      <%= link_to rails_blob_path(document.file, disposition: "attachment"), class: "inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100", title: "Baixar" do %>
+        <%= heroicon "arrow-down-tray", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+      <% end %>
+    <% end %>
+
+    <details class="relative">
+      <summary class="inline-flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 [&::-webkit-details-marker]:hidden" title="Mais ações" aria-label="Mais ações">
+        <%= heroicon "ellipsis-vertical", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+      </summary>
+      <div class="absolute right-0 z-30 mt-1 w-48 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
+        <% if linked %>
+          <%= button_to "Desvincular",
+                unlink_client_document_path(client, document, **link_query),
+                method: :patch,
+                form: { data: { turbo_stream: true } },
+                class: "block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50 border-0 bg-transparent" %>
+        <% end %>
+        <% if policy(document).destroy? %>
+          <%= button_to "Excluir", document_path(document), method: :delete,
+                form: { data: { turbo_confirm: "Excluir este documento?" } },
+                class: "block w-full px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50 border-0 bg-transparent" %>
+        <% end %>
+      </div>
+    </details>
+  </div>
+</li>

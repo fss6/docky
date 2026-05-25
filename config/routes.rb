@@ -31,7 +31,28 @@ Rails.application.routes.draw do
       get :original
     end
   end
-  resources :clients
+  resources :clients do
+    member do
+      get :summary
+    end
+    resources :documents, only: [:index], module: :clients do
+      member do
+        patch :link
+        patch :unlink
+      end
+    end
+    resources :checklist_items, only: %i[index create], module: :clients do
+      collection do
+        post :sync_to_month
+      end
+    end
+    resources :upload_invites, only: [:create]
+  end
+  resources :upload_invites, only: [] do
+    member do
+      patch :revoke
+    end
+  end
   resources :institutions
   get "documents/tags", to: "documents#tags_search", as: :documents_tags_search
   get "documents/search", to: "documents#term_search", as: :documents_term_search

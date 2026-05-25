@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -153,6 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "monthly_deadline_day", default: 10, null: false
     t.index ["account_id", "tax_id"], name: "index_clients_on_account_id_and_tax_id", unique: true, where: "((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))"
     t.index ["account_id"], name: "index_clients_on_account_id"
   end
@@ -210,7 +211,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "tags", default: [], null: false
+    t.bigint "client_id"
+    t.date "collection_period"
     t.index ["account_id"], name: "index_documents_on_account_id"
+    t.index ["client_id", "collection_period", "created_at"], name: "index_documents_on_client_collection_created"
+    t.index ["client_id"], name: "index_documents_on_client_id"
     t.index ["folder_id"], name: "index_documents_on_folder_id"
     t.index ["tags"], name: "index_documents_on_tags", using: :gin
     t.index ["user_id"], name: "index_documents_on_user_id"
@@ -316,6 +321,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
   end
 
+  create_table "upload_invites", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.date "period", null: false
+    t.string "token", null: false
+    t.bigint "created_by_user_id"
+    t.datetime "expires_at"
+    t.datetime "revoked_at"
+    t.integer "access_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_upload_invites_on_account_id"
+    t.index ["client_id", "period", "created_at"], name: "index_upload_invites_on_client_period_created"
+    t.index ["client_id"], name: "index_upload_invites_on_client_id"
+    t.index ["created_by_user_id"], name: "index_upload_invites_on_created_by_user_id"
+    t.index ["token"], name: "index_upload_invites_on_token", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "email"
@@ -415,6 +438,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
   add_foreign_key "conversations", "accounts"
   add_foreign_key "conversations", "users"
   add_foreign_key "documents", "accounts"
+  add_foreign_key "documents", "clients"
   add_foreign_key "documents", "folders"
   add_foreign_key "documents", "users"
   add_foreign_key "embedding_records", "accounts"
@@ -428,6 +452,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_23_123000) do
   add_foreign_key "settings", "accounts"
   add_foreign_key "subscriptions", "accounts"
   add_foreign_key "subscriptions", "plans"
+  add_foreign_key "upload_invites", "accounts"
+  add_foreign_key "upload_invites", "clients"
+  add_foreign_key "upload_invites", "users", column: "created_by_user_id"
   add_foreign_key "users", "accounts"
   add_foreign_key "wiki_links", "wiki_pages", column: "source_page_id"
   add_foreign_key "wiki_links", "wiki_pages", column: "target_page_id"

@@ -1,0 +1,217 @@
+---
+description: Docker workflow para Rails MVC
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Ambiente do Projeto
+
+Este projeto roda totalmente com Docker Compose.
+
+O serviço principal da aplicação Rails chama-se `web`.
+
+Stack principal:
+- Ruby on Rails MVC
+- Docker Compose
+- PostgreSQL
+- Redis
+
+A aplicação utiliza a estrutura MVC padrão do Ruby on Rails.
+
+O frontend faz parte do próprio Rails:
+- ERB
+- Hotwire/Turbo quando aplicável
+- Stimulus quando aplicável
+- Assets gerenciados pelo próprio Rails
+
+Não assumir frontend separado.
+
+---
+
+# Regra Obrigatória
+
+NUNCA execute comandos Rails, Bundler, Rake ou testes diretamente no host.
+
+Sempre utilize Docker Compose.
+
+---
+
+# Uso correto dos containers
+
+## Use `docker compose run web` quando:
+
+- Executar comandos únicos
+- Rodar generators
+- Executar testes
+- Executar migrations
+- Abrir console Rails
+- Rodar linters
+- Rodar scripts
+
+Exemplos:
+
+```bash
+docker compose run web rails console
+docker compose run web rails db:migrate
+docker compose run web bundle exec rspec
+docker compose run web bundle exec rubocop
+docker compose run web rails generate migration CreateUsers
+```
+
+---
+
+## Use `docker compose exec web` quando:
+
+O container `web` já estiver rodando e o comando precisar executar dentro dele.
+
+Exemplos:
+
+```bash
+docker compose exec web bash
+docker compose exec web rails console
+docker compose exec web bundle exec sidekiq
+```
+
+---
+
+# Testes
+
+Todos os testes devem ser executados via Docker Compose.
+
+Exemplos válidos:
+
+```bash
+docker compose run web bundle exec rspec
+docker compose run web rails test
+docker compose run web bundle exec cucumber
+```
+
+Nunca sugerir:
+
+```bash
+bundle exec rspec
+rails test
+```
+
+---
+
+# Bundler
+
+Nunca executar comandos Bundler diretamente no host.
+
+Sempre utilizar:
+
+```bash
+docker compose run web bundle install
+docker compose run web bundle exec [comando]
+```
+
+---
+
+# Rails Commands
+
+Sempre prefixar comandos Rails com Docker Compose.
+
+Exemplos:
+
+```bash
+docker compose run web rails routes
+docker compose run web rails db:seed
+docker compose run web rails db:reset
+docker compose run web rails runner
+```
+
+---
+
+# Geração de código
+
+Generators SEMPRE devem usar Docker Compose.
+
+Exemplos:
+
+```bash
+docker compose run web rails generate model User
+docker compose run web rails generate controller Admin::Users
+docker compose run web rails generate migration AddStatusToDeals
+```
+
+---
+
+# Estrutura Rails
+
+Seguir convenções padrão do Ruby on Rails.
+
+Priorizar:
+- Fat Models quando fizer sentido
+- Service Objects para regras complexas
+- Concerns apenas quando realmente necessário
+- RESTful controllers
+- Strong Parameters
+- ActiveRecord idiomático
+- Helpers para lógica de view
+- Partials reutilizáveis
+
+Evitar:
+- Lógica complexa em views
+- Controllers gigantes
+- Queries N+1
+- Callbacks excessivos
+- Services desnecessários para CRUD simples
+
+---
+
+# Banco de Dados
+
+Sempre assumir PostgreSQL.
+
+Comandos devem usar Docker Compose:
+
+```bash
+docker compose run web rails db:create
+docker compose run web rails db:migrate
+docker compose run web rails db:seed
+docker compose run web rails db:reset
+```
+
+---
+
+# Sidekiq e Jobs
+
+Quando utilizar jobs assíncronos:
+
+- Priorizar ActiveJob
+- Sidekiq como backend
+- Jobs idempotentes
+- Evitar lógica pesada síncrona
+
+Executar sempre via Docker Compose.
+
+---
+
+# Má prática proibida
+
+Nunca sugerir comandos locais como:
+
+```bash
+rails
+rake
+bundle
+bundle exec
+rspec
+rubocop
+brakeman
+```
+
+sem o prefixo Docker Compose.
+
+---
+
+# Assumir sempre
+
+Antes de sugerir qualquer comando:
+1. Assuma que Docker Compose é obrigatório
+2. Assuma que o serviço Rails chama-se `web`
+3. Assuma ambiente containerizado
+4. Nunca assumir Ruby instalado localmente
+5. Assuma arquitetura Rails MVC tradicional
+6. Não assumir frontend separado

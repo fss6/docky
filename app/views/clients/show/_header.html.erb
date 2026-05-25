@@ -1,0 +1,46 @@
+<header class="space-y-4">
+  <%= link_to clients_path, class: "inline-flex items-center gap-1 text-sm font-medium text-accent no-underline hover:text-accent-hover" do %>
+    <%= heroicon "arrow-left", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+    Voltar para clientes
+  <% end %>
+
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div class="flex gap-4">
+      <div class="client-avatar" aria-hidden="true">
+        <%= client_initials(client) %>
+      </div>
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= client.name %></h1>
+        <p class="mt-1 text-sm text-zinc-500">
+          <% if client.tax_id.present? %>CNPJ <%= client.tax_id %><% end %>
+          <% if client.email.present? %> · <%= client.email %><% end %>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->app-form-modal#open">
+        <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        Gerar link
+      </button>
+      <%= link_to client_show_path(client, aba: "email", period: period),
+            class: "app-btn-secondary inline-flex items-center gap-2 no-underline" do %>
+        <%= heroicon "envelope", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        E-mail forward
+      <% end %>
+      <details class="relative">
+        <summary class="app-btn-primary inline-flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+          <%= heroicon "cog-6-tooth", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+          Configurar
+        </summary>
+        <div class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
+          <%= link_to "Editar checklist (template)", client_checklist_items_path(client, period: period_param), class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+          <%= link_to "Dados do cliente", edit_client_path(client), class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+          <%= button_to "Remover cliente", client, method: :delete, form: { data: { turbo_confirm: "Excluir este cliente?" } }, class: "block w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 border-0 bg-transparent" %>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <%= render "clients/show/summary_band", summary: summary %>
+</header>

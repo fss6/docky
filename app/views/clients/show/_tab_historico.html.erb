@@ -1,0 +1,31 @@
+<section class="space-y-6">
+  <div class="app-card p-4 sm:p-6">
+    <h2 class="text-base font-semibold text-zinc-900">Checklists de meses anteriores</h2>
+    <ul class="mt-4 space-y-2">
+      <% past_checklists.each do |cl| %>
+        <li>
+          <%= link_to l(cl.period, format: "%B %Y"), client_path(client, aba: "documentos", period: cl.period.strftime("%Y-%m")), class: "text-sm font-medium text-accent no-underline hover:text-accent-hover" %>
+        </li>
+      <% end %>
+      <% if past_checklists.blank? %>
+        <li class="text-sm text-zinc-500">Nenhuma competência anterior.</li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="app-card p-4 sm:p-6">
+    <h2 class="text-base font-semibold text-zinc-900">Trilha de auditoria</h2>
+    <ul class="mt-4 divide-y divide-zinc-100">
+      <% audit_logs.each do |log| %>
+        <li class="py-3 text-sm">
+          <p class="font-medium text-zinc-900"><%= log[:verb] %></p>
+          <p class="text-xs text-zinc-500"><%= log[:actor] %> · <%= l(log[:at], format: :short) %></p>
+          <% if log[:detail].present? %><p class="mt-1 text-xs text-zinc-600"><%= log[:detail] %></p><% end %>
+        </li>
+      <% end %>
+      <% if audit_logs.blank? %>
+        <li class="py-4 text-sm text-zinc-500">Sem eventos registrados.</li>
+      <% end %>
+    </ul>
+  </div>
+</section>

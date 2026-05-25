@@ -186,12 +186,26 @@ class DocumentsController < ApplicationController
   def assign_defaults_for_upload!(doc)
     account = @folder.account
     user = current_user
+    period = collection_period_for_folder
 
     doc.assign_attributes(
       account_id: account&.id,
       user_id: user&.id,
-      status: :pending
+      status: :pending,
+      client_id: @folder.client_id,
+      collection_period: period
     )
+
+    meta = (doc.metadata || {}).dup
+    meta["upload_source"] ||= "account_upload"
+    doc.metadata = meta
+  end
+
+  def collection_period_for_folder
+    return parse_period_param(params[:period]) if params[:period].present?
+    return Date.strptime(@folder.name, "%Y-%m").beginning_of_month if @folder.name.to_s.match?(/\A\d{4}-\d{2}\z/)
+
+    nil
   end
 
   def upload_params

@@ -38,6 +38,13 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   test "should show client" do
     get client_url(@client)
     assert_response :success
+    assert_match "Status do mês", response.body
+  end
+
+  test "should show client documents tab" do
+    get client_url(@client, aba: "documentos")
+    assert_response :success
+    assert_match "Documentos", response.body
   end
 
   test "should get edit" do

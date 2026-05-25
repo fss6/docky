@@ -39,16 +39,15 @@ class CompetencyChecklistItem < ApplicationRecord
   def last_document_must_match_checklist_competency
     return if last_document.blank? || competency_checklist.blank?
 
-    folder = last_document.folder
-    expected_folder_name = competency_checklist.period.strftime("%Y-%m")
+    doc = last_document
+    expected_period = competency_checklist.period
 
-    valid_folder = folder.present? &&
-      folder.account_id == competency_checklist.account_id &&
-      folder.client_id == competency_checklist.client_id &&
-      folder.name == expected_folder_name
+    valid = doc.account_id == competency_checklist.account_id &&
+      doc.client_id == competency_checklist.client_id &&
+      doc.collection_period == expected_period
 
-    return if valid_folder
+    return if valid
 
-    errors.add(:last_document, "deve pertencer a pasta da mesma competencia do checklist")
+    errors.add(:last_document, "deve pertencer ao cliente e competencia do checklist")
   end
 end

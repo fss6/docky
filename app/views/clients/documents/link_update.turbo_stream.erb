@@ -1,0 +1,18 @@
+<%= turbo_stream.replace "client_executive_summary" do %>
+  <%= render "clients/show/summary_band", summary: @summary %>
+<% end %>
+
+<% @documents.each do |document| %>
+  <%= turbo_stream.replace dom_id(document, :card) do %>
+    <%= render "clients/documents/document_card",
+          document: document,
+          client: @client,
+          linked_item: @linked_items_by_document_id[document.id],
+          pending_link_items: @pending_link_items,
+          period_param: @period_param %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.update "flash_messages" do %>
+  <%= render "shared/flash" %>
+<% end %>

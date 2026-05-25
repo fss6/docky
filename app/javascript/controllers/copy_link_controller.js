@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["source", "button", "feedback"]
+  static targets = ["source", "button", "label", "feedback"]
 
   async copy() {
     const text = this.sourceTarget?.textContent?.trim()
@@ -13,9 +13,9 @@ export default class extends Controller {
       } else {
         this.fallbackCopy(text)
       }
-      this.showFeedback("Link copiado.")
+      this.showFeedback("Link copiado.", "Copiado!")
     } catch (_error) {
-      this.showFeedback("Nao foi possivel copiar automaticamente.")
+      this.showFeedback("Nao foi possivel copiar automaticamente.", "Erro ao copiar")
     }
   }
 
@@ -31,17 +31,20 @@ export default class extends Controller {
     document.body.removeChild(input)
   }
 
-  showFeedback(message) {
+  showFeedback(message, label) {
     if (this.hasFeedbackTarget) {
       this.feedbackTarget.textContent = message
       this.feedbackTarget.classList.remove("hidden")
     }
 
-    if (this.hasButtonTarget) {
-      this.buttonTarget.textContent = "Copiado!"
+    const labelTarget = this.hasLabelTarget ? this.labelTarget : (this.hasButtonTarget ? this.buttonTarget : null)
+    if (labelTarget) {
+      const originalLabel = labelTarget.dataset.originalLabel || labelTarget.textContent
+      labelTarget.dataset.originalLabel = originalLabel
+      labelTarget.textContent = label
       window.clearTimeout(this.resetTimer)
       this.resetTimer = window.setTimeout(() => {
-        this.buttonTarget.textContent = "Copiar link"
+        labelTarget.textContent = originalLabel
         if (this.hasFeedbackTarget) this.feedbackTarget.classList.add("hidden")
       }, 1800)
     }

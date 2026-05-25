@@ -1,34 +1,53 @@
 <% content_for :title, "#{@client.name} · Dokivo" %>
+<% period_param = @period.strftime("%Y-%m") %>
 
-<div class="space-y-8" data-controller="app-confirm-modal">
-  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-    <div>
-      <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
-        <ol class="flex items-center gap-1.5">
-          <li><%= link_to "Clientes", clients_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
-          <li aria-hidden="true">/</li>
-          <li class="text-zinc-700"><%= @client.name %></li>
-        </ol>
-      </nav>
-      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= @client.name %></h1>
-      <dl class="mt-3 grid gap-2 text-sm text-zinc-600 sm:grid-cols-2">
-        <div><span class="font-medium text-zinc-500">CNPJ / CPF:</span> <%= @client.tax_id.presence || "—" %></div>
-        <div><span class="font-medium text-zinc-500">E-mail:</span> <%= @client.email.presence || "—" %></div>
-        <div><span class="font-medium text-zinc-500">Telefone:</span> <%= @client.phone.presence || "—" %></div>
-      </dl>
-      <% if @client.notes.present? %>
-        <div class="mt-4 rounded-lg border border-zinc-100 bg-zinc-50/80 p-4 text-sm text-zinc-700">
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Observações</p>
-          <p class="mt-2 whitespace-pre-wrap"><%= @client.notes %></p>
-        </div>
+<div class="client-detail space-y-6"
+     data-controller="app-form-modal client-documents-channel"
+     data-client-documents-channel-client-id-value="<%= @client.id %>"
+     data-client-documents-channel-active-tab-value="<%= @active_tab %>"
+     data-client-documents-channel-documents-url-value="<%= client_documents_path(@client, period: period_param) %>">
+  <%= render "clients/show/header", client: @client, summary: @summary, period: @period, period_param: period_param, active_upload_invite: @active_upload_invite %>
+
+  <nav class="border-b border-zinc-200" aria-label="Abas do cliente">
+    <ul class="flex flex-wrap gap-x-6 gap-y-1">
+      <% ClientsHelper::VALID_TABS.each do |tab| %>
+        <li>
+          <%= link_to client_show_path(@client, aba: tab, period: @period),
+                class: client_tab_classes(tab, @active_tab) do %>
+            <% if tab == "documentos" %>
+              <span data-client-tab-badge class="<%= "client-tab-badge--pulse" if false %>">
+                <%= heroicon "document-text", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+              </span>
+            <% elsif tab == "checklist" %>
+              <%= heroicon "clipboard-document-check", variant: :outline, options: { class: "h-4 w-4 text-emerald-600", "aria-hidden": "true" } %>
+            <% elsif tab == "convites" %>
+              <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+            <% elsif tab == "email" %>
+              <%= heroicon "envelope", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+            <% else %>
+              <%= heroicon "archive-box", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+            <% end %>
+            <span><%= { "documentos" => "Documentos", "checklist" => "Checklist do mês", "convites" => "Convites & Links", "email" => "E-mail Forward", "historico" => "Histórico" }[tab] %></span>
+          <% end %>
+        </li>
       <% end %>
-    </div>
-    <div class="flex flex-wrap gap-2">
-      <% if policy(BankStatement).index? %>
-        <%= link_to "Extratos bancários", bank_statements_path, class: "app-btn-secondary" %>
-      <% end %>
-      <%= link_to "Editar", edit_client_path(@client), class: "app-btn-secondary" %>
-      <%= button_to "Excluir", @client, method: :delete, form: { data: { turbo_confirm: "Excluir este cliente? Pastas vinculadas ficarão sem cliente." } }, class: "app-btn-secondary border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50" %>
-    </div>
-  </header>
+    </ul>
+  </nav>
+
+  <div id="client_tab_content">
+    <% case @active_tab %>
+    <% when "documentos" %>
+      <%= render "clients/show/tab_documentos", client: @client, documents: @documents, pagy: @pagy, checklist: @checklist, linked_items_by_document_id: @linked_items_by_document_id, pending_link_items: @pending_link_items, category_counts: @category_counts, period_param: period_param %>
+    <% when "checklist" %>
+      <%= render "clients/show/tab_checklist", client: @client, checklist_items: @checklist_items, period: @period, period_param: period_param, summary: @summary %>
+    <% when "convites" %>
+      <%= render "clients/show/tab_convites", client: @client, upload_invites: @upload_invites, period_param: period_param, active_upload_invite: @active_upload_invite %>
+    <% when "email" %>
+      <%= render "clients/show/tab_email" %>
+    <% when "historico" %>
+      <%= render "clients/show/tab_historico", client: @client, past_checklists: @past_checklists, audit_logs: @client_audit_logs, period_param: period_param %>
+    <% end %>
+  </div>
+
+  <%= render "clients/show/share_link_modal", client: @client, period_param: period_param, active_upload_invite: @active_upload_invite %>
 </div>

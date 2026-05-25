@@ -10,6 +10,10 @@
   --color-accent-hover: #1557e6;
   --color-accent-foreground: #172554;
 
+  --color-client-accent: #0d9488;
+  --color-client-accent-hover: #0f766e;
+  --color-client-accent-muted: #ccfbf1;
+
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
   --shadow-float: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 4px 12px -2px rgb(0 0 0 / 0.08);
 }
@@ -119,6 +123,46 @@
 
   .animation-delay-400 {
     animation-delay: 400ms;
+  }
+
+
+
+  /* Tela detalhe do cliente — tabs, filtros e badges em teal; CTAs usam app-btn-* (azul) */
+  .client-tab-active {
+    @apply border-client-accent text-client-accent;
+  }
+
+  .client-filter-active {
+    @apply border-client-accent bg-client-accent text-white;
+  }
+
+  .client-filter-inactive {
+    @apply border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300;
+  }
+
+  .client-avatar {
+    @apply flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-client-accent text-lg font-bold text-white;
+  }
+
+  .client-badge-vincular {
+    @apply inline-flex cursor-pointer list-none items-center gap-1 rounded-full border border-client-accent bg-white px-2.5 py-1 text-xs font-semibold text-client-accent [&::-webkit-details-marker]:hidden;
+  }
+
+  .client-summary-band {
+    @apply rounded-lg border border-zinc-200/90 bg-zinc-50/90;
+  }
+
+  .client-tab-badge--pulse {
+    @apply relative;
+  }
+  .client-tab-badge--pulse::after {
+    content: "";
+    @apply absolute -right-1 -top-1 h-2 w-2 rounded-full bg-client-accent;
+    animation: client-tab-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes client-tab-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.25); }
   }
 
   @keyframes dokivo-thinking-pulse {

@@ -2,6 +2,7 @@ class Document < ApplicationRecord
   acts_as_tenant(:account)
   belongs_to :user
   belongs_to :folder
+  belongs_to :client, optional: true
 
   has_one_attached :file
 
@@ -13,6 +14,12 @@ class Document < ApplicationRecord
     processed: "processed",
     failed: "failed"
   }, default: :pending
+
+  scope :for_client_period, ->(client, period) {
+    where(client_id: client.id, collection_period: period.to_date.beginning_of_month)
+  }
+
+  after_create_commit :notify_client_documents_channel, if: :client_id?
 
   validate :user_belongs_to_account
   validate :folder_belongs_to_account
@@ -31,6 +38,19 @@ class Document < ApplicationRecord
 
       normalized.truncate(80, omission: "")
     end.uniq { |t| t.downcase }.first(max)
+  end
+
+  def upload_source_label
+    source = metadata.is_a?(Hash) ? metadata["upload_source"] : nil
+    case source
+    when "public_link" then "portal"
+    when "email_forward" then "e-mail forward"
+    else "conta"
+    end
+  end
+
+  def linked_checklist_item
+    CompetencyChecklistItem.find_by(last_document_id: id)
   end
 
   private
@@ -58,5 +78,12 @@ class Document < ApplicationRecord
     return if folder&.account_id == account_id
 
     errors.add(:folder_id, "deve pertencer à mesma conta selecionada")
+  end
+
+  def notify_client_documents_channel
+    ActionCable.server.broadcast(
+      "client_#{client_id}_documents",
+      { "event" => "document_created", "document_id" => id }
+    )
   end
 end
