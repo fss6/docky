@@ -46,6 +46,12 @@ Rails.application.routes.draw do
         post :sync_to_month
       end
     end
+    resources :competency_checklist_items, only: [], module: :clients do
+      member do
+        patch :mark_validated
+        patch :mark_pending
+      end
+    end
     resources :upload_invites, only: [:create]
   end
   resources :upload_invites, only: [] do

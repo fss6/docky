@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "client_executive_summary" do %>
+  <%= render "clients/show/summary_band", summary: @summary %>
+<% end %>
+
+<%= turbo_stream.replace "client_checklist_panel" do %>
+  <%= render "clients/show/checklist_panel_frame",
+        client: @client,
+        checklist_items: @checklist_items,
+        period: @period,
+        period_param: @period_param,
+        summary: @summary %>
+<% end %>
+
+<%= turbo_stream.update "flash_messages" do %>
+  <%= render "shared/flash" %>
+<% end %>

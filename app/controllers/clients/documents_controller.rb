@@ -112,7 +112,7 @@ module Clients
       @linked_items_by_document_id = @checklist_items
         .select { |i| i.last_document_id.present? }
         .index_by(&:last_document_id)
-      @pending_link_items = @checklist_items.select { |i| i.last_document_id.blank? }
+      @pending_link_items = @checklist_items.select(&:awaiting_receipt?)
       @summary = Clients::MonthlySummary.new(client: @client, checklist: @checklist, period: @period).call
       @period_param = @period.strftime("%Y-%m")
       load_visible_documents_for_cards

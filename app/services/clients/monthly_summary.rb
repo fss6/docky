@@ -21,8 +21,8 @@ module Clients
     def build
       items = @checklist&.items&.to_a || []
       total = items.size
-      linked = items.count { |i| i.last_document_id.present? }
-      pending = items.count { |i| i.last_document_id.blank? }
+      linked = items.count(&:complete_for_collection?)
+      pending = items.count(&:awaiting_receipt?)
 
       last_upload = Document.where(client_id: @client.id, collection_period: @period).maximum(:created_at)
 

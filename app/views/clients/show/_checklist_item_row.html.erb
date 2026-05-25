@@ -1,0 +1,42 @@
+<% row_classes = item.validated? ? "bg-emerald-50/70" : "bg-zinc-50 hover:bg-zinc-100/80" %>
+<% checked_by_document = item.last_document.present? %>
+<li class="flex items-start gap-3 rounded-md px-2 py-2 transition-colors <%= row_classes %>">
+  <% if item.validated? %>
+    <%= button_to mark_pending_client_competency_checklist_item_path(client, item, period: period_param),
+          method: :patch,
+          class: "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-emerald-600 bg-emerald-600 text-white",
+          title: "Reabrir item",
+          form: { data: { turbo_stream: true, turbo_frame: "_top" } } do %>
+      ✓
+    <% end %>
+  <% elsif checked_by_document %>
+    <span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-emerald-600 bg-emerald-600 text-white" title="Documento vinculado">
+      ✓
+    </span>
+  <% else %>
+    <%= button_to mark_validated_client_competency_checklist_item_path(client, item, period: period_param),
+          method: :patch,
+          class: "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-zinc-400 bg-white text-transparent hover:border-emerald-600 hover:text-emerald-600",
+          title: "Conferir item",
+          form: { data: { turbo_stream: true, turbo_frame: "_top" } } do %>
+      ✓
+    <% end %>
+  <% end %>
+
+  <div class="min-w-0 flex-1">
+    <p class="text-sm <%= item.validated? ? "text-zinc-500 line-through" : "font-medium text-zinc-900" %>"><%= item.name_snapshot %></p>
+    <p class="text-xs text-zinc-500">
+      <% if item.last_document.present? %>
+        <%= document_file_label(item.last_document) %> · Recebido em <%= l(item.last_document.created_at, format: :short) %>
+      <% elsif item.validated? && item.validated_at.present? %>
+        Conferido manualmente · <%= l(item.validated_at, format: :short) %>
+      <% else %>
+        Pendente
+      <% end %>
+    </p>
+  </div>
+
+  <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold <%= item.complete_for_collection? ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900" %>">
+    <%= item.complete_for_collection? ? "Recebido" : "Pendente" %>
+  </span>
+</li>

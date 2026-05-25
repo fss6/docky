@@ -84,7 +84,7 @@ class ClientsController < ApplicationController
     @summary = Clients::MonthlySummary.new(client: @client, checklist: @checklist, period: @period).call
     @checklist_items = @checklist.items.includes(:last_document, :validated_by_user).order(:id)
     @linked_items_by_document_id = @checklist_items.select { |i| i.last_document_id.present? }.index_by(&:last_document_id)
-    @pending_link_items = @checklist_items.select { |i| i.last_document_id.blank? }
+    @pending_link_items = @checklist_items.select(&:awaiting_receipt?)
     @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
     @active_upload_invite = @upload_invites.find(&:active?)
   end

@@ -34,6 +34,14 @@ class CompetencyChecklistItem < ApplicationRecord
     )
   end
 
+  def awaiting_receipt?
+    pending? && last_document_id.blank?
+  end
+
+  def complete_for_collection?
+    !awaiting_receipt?
+  end
+
   private
 
   def last_document_must_match_checklist_competency
