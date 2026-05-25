@@ -24,11 +24,19 @@ if Rails.env.development?
       user.password_confirmation = "dev@dev.com"
     end
     user.save!
+
+    client = Client.find_or_initialize_by(account: account, name: "Pão de Forma LTDA")
+    client.assign_attributes(
+      tax_id: "12345678901234",
+      email: "contato@paodeforma.test"
+    )
+    client.save!
   end
 
   puts <<~MSG
     [seeds:dev] Plano: #{plan.name.inspect} (id=#{plan.id})
     [seeds:dev] Conta: #{account.name.inspect} (id=#{account.id})
     [seeds:dev] Utilizador: dev@dev.com / dev@dev.com (owner)
+    [seeds:dev] Cliente: "Pão de Forma LTDA"
   MSG
 end

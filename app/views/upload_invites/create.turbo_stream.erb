@@ -1,0 +1,15 @@
+<%= turbo_stream.replace "share_link_modal_content" do %>
+  <%= render "clients/show/share_link_modal_content",
+        client: @client,
+        invite: @invite,
+        period_param: @period.strftime("%Y-%m") %>
+<% end %>
+<% if defined?(@upload_invites) && @upload_invites.present? %>
+  <%= turbo_stream.replace "client_upload_invites_panel" do %>
+    <%= render "clients/show/tab_convites",
+          client: @client,
+          upload_invites: @upload_invites,
+          period_param: @period.strftime("%Y-%m"),
+          active_upload_invite: @invite %>
+  <% end %>
+<% end %>

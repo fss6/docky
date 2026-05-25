@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     member do
       get :summary
     end
-    resources :documents, only: [:index], module: :clients do
+    resources :documents, only: %i[index create], module: :clients do
       member do
         patch :link
         patch :unlink

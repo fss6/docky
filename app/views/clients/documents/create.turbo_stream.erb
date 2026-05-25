@@ -1,0 +1,19 @@
+<%= turbo_stream.replace "client_executive_summary" do %>
+  <%= render "clients/show/summary_band", summary: @summary %>
+<% end %>
+
+<%= turbo_stream.replace "client_documents_frame" do %>
+  <%= render "clients/show/tab_documentos",
+        client: @client,
+        documents: @documents,
+        pagy: @pagy,
+        checklist: @checklist,
+        linked_items_by_document_id: @linked_items_by_document_id,
+        pending_link_items: @pending_link_items,
+        category_counts: @category_counts,
+        period_param: @period_param %>
+<% end %>
+
+<%= turbo_stream.update "flash_messages" do %>
+  <%= render "shared/flash" %>
+<% end %>

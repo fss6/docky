@@ -19,9 +19,9 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->app-form-modal#open">
+      <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->share-link-modal#open">
         <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-        Gerar link
+        Gerar link de upload
       </button>
       <%= link_to client_show_path(client, aba: "email", period: period),
             class: "app-btn-secondary inline-flex items-center gap-2 no-underline" do %>

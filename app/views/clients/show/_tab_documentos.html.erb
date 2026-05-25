@@ -1,19 +1,25 @@
 <%= turbo_frame_tag "client_documents_frame" do %>
-  <section class="space-y-4" data-controller="document-filter">
-    <div class="flex flex-wrap items-center gap-2">
-      <span class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Filtrar:</span>
-      <% %w[todos nfe extrato comprovante outros].each do |cat| %>
-        <% label = cat == "todos" ? "Todos" : document_heuristic_category_label(cat) %>
-        <% count = cat == "todos" ? documents.size : (category_counts[cat] || 0) %>
-        <% active = cat == "todos" %>
-        <button type="button"
-                class="rounded-full border px-3 py-1 text-xs font-medium transition-colors <%= active ? 'client-filter-active' : 'client-filter-inactive' %>"
-                data-document-filter-target="button"
-                data-action="click->document-filter#filter"
-                data-document-filter="<%= cat %>">
-          <%= label %> · <%= count %>
-        </button>
-      <% end %>
+  <section class="space-y-4" data-controller="document-filter app-form-modal">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Filtrar:</span>
+        <% %w[todos nfe extrato comprovante outros].each do |cat| %>
+          <% label = cat == "todos" ? "Todos" : document_heuristic_category_label(cat) %>
+          <% count = cat == "todos" ? documents.size : (category_counts[cat] || 0) %>
+          <% active = cat == "todos" %>
+          <button type="button"
+                  class="rounded-full border px-3 py-1 text-xs font-medium transition-colors <%= active ? 'client-filter-active' : 'client-filter-inactive' %>"
+                  data-document-filter-target="button"
+                  data-action="click->document-filter#filter"
+                  data-document-filter="<%= cat %>">
+            <%= label %> · <%= count %>
+          </button>
+        <% end %>
+      </div>
+      <button type="button" class="app-btn-secondary inline-flex items-center gap-2 self-start sm:self-auto" data-action="click->app-form-modal#open">
+        <%= heroicon "arrow-up-tray", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        Adicionar documento
+      </button>
     </div>
 
     <% if documents.any? %>
@@ -33,9 +39,14 @@
     <% else %>
       <div class="app-card flex flex-col items-center gap-4 p-10 text-center">
         <p class="text-base font-medium text-zinc-900">Sem documentos ainda neste mês</p>
-        <p class="max-w-md text-sm text-zinc-600">Compartilhe o link com seu cliente para começar a receber arquivos.</p>
-        <button type="button" class="app-btn-primary" data-action="click->app-form-modal#open">Gerar link de upload</button>
+        <p class="max-w-md text-sm text-zinc-600">Compartilhe o link com seu cliente ou adicione um arquivo recebido por outro canal.</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button type="button" class="app-btn-secondary" data-action="click->app-form-modal#open">Adicionar documento</button>
+          <button type="button" class="app-btn-primary" data-action="click->share-link-modal#open">Gerar link de upload</button>
+        </div>
       </div>
     <% end %>
+
+    <%= render "clients/show/document_upload_modal", client: client, period_param: period_param %>
   </section>
 <% end %>

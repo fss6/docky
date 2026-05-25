@@ -56,7 +56,11 @@
     <% end %>
 
     <% if document.file.attached? %>
-      <%= link_to rails_blob_path(document.file, disposition: "inline"), class: "inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100", title: "Visualizar" do %>
+      <%= link_to rails_blob_path(document.file, disposition: "inline"),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            class: "inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100",
+            title: "Visualizar" do %>
         <%= heroicon "eye", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
       <% end %>
       <%= link_to rails_blob_path(document.file, disposition: "attachment"), class: "inline-flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100", title: "Baixar" do %>
@@ -64,7 +68,7 @@
       <% end %>
     <% end %>
 
-    <details class="relative">
+    <details class="relative" data-controller="document-link-menu" data-action="toggle->document-link-menu#closeOthers click@window->document-link-menu#closeOnOutside">
       <summary class="inline-flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 [&::-webkit-details-marker]:hidden" title="Mais ações" aria-label="Mais ações">
         <%= heroicon "ellipsis-vertical", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
       </summary>

@@ -7,14 +7,49 @@ class UploadInvitesController < ApplicationController
     @client = Client.find(params.expect(:client_id))
     authorize @client, :show?
 
-    period = parse_period_param(params[:period]) || Date.current.beginning_of_month
-    @invite = Clients::CreateUploadInvite.call(
-      client: @client,
-      period: period,
-      user: current_user
-    )
+    @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
 
-    redirect_to client_path(@client, aba: "convites", period: period.strftime("%Y-%m")), notice: "Link gerado com sucesso."
+    respond_to do |format|
+      format.html do
+        @invite = Clients::CreateUploadInvite.call(
+          client: @client,
+          period: @period,
+          user: current_user
+        )
+        redirect_to client_path(@client, aba: "convites", period: @period.strftime("%Y-%m")),
+                    notice: "Link gerado com sucesso."
+      end
+      format.turbo_stream do
+        @invite = find_or_create_active_invite
+        @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
+        render :create, formats: :turbo_stream
+      end
+      format.json do
+        @invite = find_or_create_active_invite
+        @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
+        render json: {
+          html: render_to_string(
+            partial: "clients/show/share_link_modal_content",
+            locals: {
+              client: @client,
+              invite: @invite,
+              period_param: @period.strftime("%Y-%m")
+            },
+            formats: [ :html ]
+          ),
+          invites_html: render_to_string(
+            partial: "clients/show/tab_convites",
+            locals: {
+              client: @client,
+              upload_invites: @upload_invites,
+              period_param: @period.strftime("%Y-%m"),
+              active_upload_invite: @invite
+            },
+            formats: [ :html ]
+          )
+        }
+      end
+    end
   end
 
   def revoke
@@ -32,5 +67,16 @@ class UploadInvitesController < ApplicationController
 
   def set_invite
     @invite = UploadInvite.find(params.expect(:id))
+  end
+
+  def find_or_create_active_invite
+    existing = UploadInvite.where(client: @client, period: @period).newest_first.find(&:active?)
+    return existing if existing
+
+    Clients::CreateUploadInvite.call(
+      client: @client,
+      period: @period,
+      user: current_user
+    )
   end
 end

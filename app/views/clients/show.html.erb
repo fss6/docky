@@ -2,7 +2,9 @@
 <% period_param = @period.strftime("%Y-%m") %>
 
 <div class="client-detail space-y-6"
-     data-controller="app-form-modal client-documents-channel"
+     data-controller="share-link-modal client-documents-channel app-form-modal"
+     data-share-link-modal-create-url-value="<%= client_upload_invites_path(@client, period: period_param) %>"
+     data-share-link-modal-has-invite-value="<%= @active_upload_invite&.active? ? true : false %>"
      data-client-documents-channel-client-id-value="<%= @client.id %>"
      data-client-documents-channel-active-tab-value="<%= @active_tab %>"
      data-client-documents-channel-documents-url-value="<%= client_documents_path(@client, period: period_param) %>">

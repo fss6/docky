@@ -38,4 +38,36 @@ module ClientsHelper
       "bg-zinc-100 text-zinc-700"
     end
   end
+
+  def public_upload_host
+    raw = ENV["PUBLIC_APP_HOST"].presence || request&.host || "localhost"
+    raw.sub(/\Aportal\./, "")
+  end
+
+  def public_upload_protocol
+    request&.protocol&.delete_suffix("://") || "https"
+  end
+
+  def client_public_upload_url(token)
+    public_folder_upload_url(
+      token: token,
+      host: public_upload_host,
+      protocol: public_upload_protocol
+    )
+  end
+
+  def upload_invite_share_text(client, url)
+    "Olá! Envie seus documentos de #{client.name} pelo link: #{url}"
+  end
+
+  def upload_invite_whatsapp_url(client, url)
+    text = upload_invite_share_text(client, url)
+    "https://wa.me/?text=#{ERB::Util.url_encode(text)}"
+  end
+
+  def upload_invite_mailto_url(client, url)
+    subject = "Envio de documentos — #{client.name}"
+    body = upload_invite_share_text(client, url)
+    "mailto:?subject=#{ERB::Util.url_encode(subject)}&body=#{ERB::Util.url_encode(body)}"
+  end
 end

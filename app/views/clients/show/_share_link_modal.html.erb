@@ -1,26 +1,25 @@
-<dialog data-app-form-modal-target="dialog"
-        data-action="click->app-form-modal#backdropClick"
+<dialog data-share-link-modal-target="dialog"
+        data-action="click->share-link-modal#backdropClick"
         class="z-[200] m-0 w-[min(100%,32rem)] max-w-lg border-0 bg-transparent p-0 shadow-none outline-none [&:not([open])]:hidden [&::backdrop]:bg-black/50"
         style="position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);"
         aria-labelledby="share-link-modal-title">
-  <div class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xl">
-    <div class="flex items-center justify-between">
-      <h2 id="share-link-modal-title" class="text-base font-semibold text-zinc-900">Gerar link de upload</h2>
-      <button type="button" class="app-btn-secondary text-xs" data-action="click->app-form-modal#close">Fechar</button>
-    </div>
-    <p class="mt-2 text-sm text-zinc-600">Compartilhe com seu cliente para receber documentos nesta competência.</p>
+  <div class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl">
+    <h2 id="share-link-modal-title" class="text-xl font-semibold text-zinc-900">Link de upload</h2>
+    <p class="mt-1 text-sm text-zinc-500">
+      <%= client.name %> · válido por 30 dias
+    </p>
 
     <% if active_upload_invite&.active? %>
-      <div class="mt-4 space-y-2" data-controller="copy-link">
-        <% url = public_folder_upload_url(token: active_upload_invite.token) %>
-        <div class="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm break-all" data-copy-link-target="source"><%= url %></div>
-        <button type="button" class="app-btn-secondary text-sm" data-action="copy-link#copy">Copiar link</button>
-      </div>
+      <%= render "clients/show/share_link_modal_content",
+            client: client,
+            invite: active_upload_invite,
+            period_param: period_param %>
     <% else %>
-      <%= button_to "Gerar link agora",
-            client_upload_invites_path(client, period: period_param),
-            method: :post,
-            class: "app-btn-primary mt-4 w-full" %>
+      <div id="share_link_modal_content"
+           class="mt-5"
+           data-share-link-modal-target="content">
+        <p class="text-sm text-zinc-500">Gerando link…</p>
+      </div>
     <% end %>
   </div>
 </dialog>

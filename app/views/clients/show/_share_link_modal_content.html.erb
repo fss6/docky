@@ -1,0 +1,46 @@
+<%# locals: (client:, invite:, period_param:) %>
+<% url = client_public_upload_url(invite.token) %>
+<div id="share_link_modal_content"
+     class="mt-5 space-y-5"
+     data-share-link-modal-target="content"
+     data-controller="copy-link">
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Link de upload</p>
+    <div class="mt-2 flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+      <div class="min-w-0 flex-1 px-3 py-2.5 text-sm text-zinc-800 break-all" data-copy-link-target="source"><%= url %></div>
+      <button type="button"
+              class="inline-flex shrink-0 items-center gap-1.5 border-l border-zinc-200 bg-client-accent px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-client-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-client-accent"
+              data-action="copy-link#copy"
+              data-copy-link-target="button">
+        <%= heroicon "clipboard-document", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        <span data-copy-link-target="label">Copiar</span>
+      </button>
+    </div>
+    <p class="mt-1.5 hidden text-xs font-medium text-emerald-700" data-copy-link-target="feedback" aria-live="polite"></p>
+  </div>
+
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Compartilhar diretamente</p>
+    <div class="mt-2 grid grid-cols-2 gap-3">
+      <%= link_to upload_invite_whatsapp_url(client, url),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            class: "flex flex-col items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-4 text-sm font-medium text-zinc-700 no-underline transition-colors hover:border-zinc-300 hover:bg-zinc-50" do %>
+        <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-6 w-6 text-[#25D366]", "aria-hidden": "true" } %>
+        WhatsApp
+      <% end %>
+      <%= link_to upload_invite_mailto_url(client, url),
+            class: "flex flex-col items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-4 text-sm font-medium text-zinc-700 no-underline transition-colors hover:border-zinc-300 hover:bg-zinc-50" do %>
+        <%= heroicon "envelope", variant: :outline, options: { class: "h-6 w-6 text-[#EA4335]", "aria-hidden": "true" } %>
+        E-mail
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+    <%= heroicon "exclamation-triangle", variant: :outline, options: { class: "h-5 w-5 shrink-0 text-amber-600", "aria-hidden": "true" } %>
+    <p class="text-sm text-amber-900">
+      Este link só funciona para esta empresa. Pode ser usado várias vezes até expirar. Você pode revogá-lo a qualquer momento.
+    </p>
+  </div>
+</div>

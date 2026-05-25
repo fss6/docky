@@ -22,7 +22,8 @@ module Clients
           client: @client,
           period: @period,
           created_by_user: @user,
-          token: UploadInvite.generate_token
+          token: UploadInvite.generate_token,
+          expires_at: 30.days.from_now
         )
 
         AuditEvents::Recorder.call(
