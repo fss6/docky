@@ -30,6 +30,10 @@
         </summary>
         <div class="absolute right-0 z-20 mt-2 w-56 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg">
           <%= link_to "Itens padrão do cliente", client_checklist_items_path(client, period: period_param), class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+          <% if client.active? %>
+            <%= button_to "Iniciar onboarding", client_onboarding_start_path(client), method: :post, params: { onboarding_kind: "new_client" }, form: { data: { turbo_confirm: "Iniciar onboarding para este cliente?" } }, class: "block w-full px-4 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50 border-0 bg-transparent" %>
+            <%= button_to "Reabrir onboarding", client_onboarding_reopen_path(client), method: :post, form: { data: { turbo_confirm: "Reabrir onboarding? O cliente voltará ao estado de configuração." } }, class: "block w-full px-4 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50 border-0 bg-transparent" %>
+          <% end %>
           <%= link_to "Dados do cliente", edit_client_path(client), class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
           <% if policy(Setting).show? %>
             <%= link_to "Mensagens de compartilhamento", settings_path(anchor: "upload-share"), class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>

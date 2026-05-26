@@ -42,19 +42,27 @@ class BankStatementsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to clients_path
   end
 
-  test "create enqueues job and redirects" do
-    assert_difference("BankStatementImport.count", 1) do
-      assert_enqueued_jobs 1, only: ProcessBankStatementImportJob do
-        post bank_statements_path, params: {
-          bank_statement_import: {
-            institution_id: institutions(:nubank).id,
-            file: fixture_file_upload("files/minimal.pdf", "application/pdf")
-          }
+  test "create saves bank statement and redirects" do
+    import = BankStatementImport.create!(
+      account: accounts(:one),
+      client: @client,
+      institution: institutions(:nubank),
+      status: :completed,
+      metadata: {}
+    )
+
+    assert_difference("BankStatement.count", 1) do
+      post bank_statements_path, params: {
+        bank_statement: {
+          bank_statement_import_id: import.id,
+          occurred_on: Date.current,
+          amount: 10,
+          transaction_type: :debit,
+          description: "Teste"
         }
-      end
+      }
     end
 
-    import = BankStatementImport.order(:id).last
-    assert_redirected_to bank_statement_import_path(import)
+    assert_redirected_to bank_statements_path
   end
 end

@@ -7,7 +7,7 @@ module Clients
     include ActiveJob::TestHelper
 
     setup do
-      @user = users(:one)
+      @user = users(:owner)
       sign_in @user
       @client = clients(:alpha)
       @period = Date.current.beginning_of_month

@@ -2,6 +2,7 @@ require "test_helper"
 
 class AccountsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in users(:administrator)
     @account = accounts(:one)
   end
 
@@ -39,8 +40,11 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy account" do
+    disposable_plan = Plan.create!(name: "Plano descartável", price: 0)
+    disposable_account = Account.create!(name: "Conta descartável", plan: disposable_plan, active: false)
+
     assert_difference("Account.count", -1) do
-      delete account_url(@account)
+      delete account_url(disposable_account)
     end
 
     assert_redirected_to accounts_url

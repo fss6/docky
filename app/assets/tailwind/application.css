@@ -156,6 +156,34 @@
     @apply rounded-lg border border-zinc-200/90 bg-zinc-50/90;
   }
 
+  .client-onboarding-badge {
+    @apply bg-violet-100 text-violet-800;
+  }
+
+  .client-onboarding-progress-track {
+    @apply h-2 rounded-full bg-violet-100;
+  }
+
+  .client-onboarding-progress-bar {
+    @apply h-2 rounded-full bg-violet-600 transition-all duration-300;
+  }
+
+  .client-onboarding-card {
+    @apply rounded-lg border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50/50;
+  }
+
+  .portal-onboarding-hero {
+    @apply rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 px-6 py-5 text-center text-white shadow-sm;
+  }
+
+  .onboarding-radio-selected {
+    @apply border-2 border-client-accent bg-client-accent-muted/40;
+  }
+
+  .onboarding-radio-default {
+    @apply border border-zinc-200 bg-white hover:border-zinc-300;
+  }
+
   .client-tab-badge--pulse {
     @apply relative;
   }

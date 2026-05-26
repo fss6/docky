@@ -17,6 +17,14 @@ module Periods
         return Result.new(allowed: true, reason: nil)
       end
 
+      client = @period.client
+      if client&.onboarding?
+        return Result.new(
+          allowed: false,
+          reason: "Esta conta ainda está em configuração. Conclua o onboarding antes de enviar documentos mensais."
+        )
+      end
+
       if @period.closed?
         return Result.new(
           allowed: false,

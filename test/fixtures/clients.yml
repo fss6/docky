@@ -6,6 +6,7 @@ alpha:
   tax_id: "11222333000181"
   email: alpha@example.com
   phone: ""
+  status: active
 
 beta:
   account: one
@@ -13,3 +14,4 @@ beta:
   tax_id: ""
   email: ""
   phone: ""
+  status: active

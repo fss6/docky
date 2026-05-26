@@ -19,8 +19,10 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create client" do
+    seed_onboarding_templates!
     assert_difference("Client.count") do
       post clients_url, params: {
+        onboarding_kind: "new_client",
         client: {
           name: "Novo cliente Ltda",
           tax_id: "99888777000166",
@@ -32,10 +34,12 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     end
 
     created = Client.find_by!(name: "Novo cliente Ltda")
+    assert created.onboarding?
     assert_redirected_to client_url(created)
   end
 
   test "should show client" do
+    seed_onboarding_templates!
     get client_url(@client, period: Date.current.strftime("%Y-%m"))
     assert_response :success
     assert_match 'aria-label="Competência"', response.body
@@ -43,7 +47,7 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show client documents tab" do
-    get client_url(@client, aba: "documentos")
+    get client_url(@client, aba: "documentos", period: Date.current.strftime("%Y-%m"))
     assert_response :success
     assert_match "Documentos", response.body
   end

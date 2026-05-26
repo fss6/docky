@@ -1,0 +1,28 @@
+<section class="app-card p-5">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Checklist de onboarding</h2>
+    <%= link_to "Editar itens →", client_onboarding_checklist_items_path(client), class: "text-sm font-medium text-client-accent no-underline hover:text-client-accent-hover" %>
+  </div>
+
+  <% if items.any? %>
+    <ul class="mt-4 space-y-2">
+      <% items.each do |item| %>
+        <%= render "clients/show/onboarding_checklist_item_row", client: client, item: item %>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="mt-4 text-sm text-zinc-500">Nenhum item no checklist.</p>
+  <% end %>
+
+  <div class="mt-5 flex flex-col gap-3 border-t border-zinc-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-zinc-600">
+      Quando todos os itens forem recebidos, o cliente será marcado como <strong class="text-zinc-900">Ativo</strong> automaticamente.
+    </p>
+    <button type="button"
+            class="app-btn-secondary shrink-0"
+            data-action="click->app-confirm-modal#open"
+            <%= onboarding_activate_confirm_modal_data(url: client_onboarding_activation_path(client), client_name: client.name) %>>
+      Marcar como ativo manualmente
+    </button>
+  </div>
+</section>

@@ -2,16 +2,37 @@
 
 one:
   account: one
-  email: owner-one@example.com
-  name: Owner One
-  role: owner
-  active: true
-  encrypted_password: "$2a$12$abcdefghijklmnopqrstuuR0n9j2xqNQe9eGx1J8n5hQmA4D3xFv6"
+  email: fixture_one@example.com
+  name: Fixture One
+  role: member
+  active: false
 
 two:
   account: two
-  email: owner-two@example.com
-  name: Owner Two
+  email: fixture_two@example.com
+  name: Fixture Two
+  role: member
+  active: false
+
+three:
+  account: one
+  email: outro@example.com
+  name: Outro usuário
+  role: member
+  active: true
+
+owner:
+  account: one
+  email: owner@example.com
+  name: Owner
   role: owner
   active: true
-  encrypted_password: "$2a$12$abcdefghijklmnopqrstuuR0n9j2xqNQe9eGx1J8n5hQmA4D3xFv6"
+  encrypted_password: "$2a$04$LllVvLaS.23FmYh5cq//vub3L4uhhol1S20bxqR2F/2CjxP2iiily"
+
+administrator:
+  account: one
+  email: admin@example.com
+  name: Administrator
+  role: administrator
+  active: true
+  encrypted_password: "$2a$04$LllVvLaS.23FmYh5cq//vub3L4uhhol1S20bxqR2F/2CjxP2iiily"

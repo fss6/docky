@@ -12,7 +12,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create document with file only" do
-    file = fixture_file_upload("files/sample.txt", "text/plain")
+    file = fixture_file_upload("sample.txt", "text/plain")
     assert_difference("Document.count") do
       assert_enqueued_jobs 1, only: DocumentOcrJob do
         post folder_documents_url(@folder), params: { document: { file: file } }
@@ -28,7 +28,7 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create document and redirect to folder when upload_context is folder" do
-    file = fixture_file_upload("files/sample.txt", "text/plain")
+    file = fixture_file_upload("sample.txt", "text/plain")
     assert_difference("Document.count") do
       assert_enqueued_jobs 1, only: DocumentOcrJob do
         post folder_documents_url(@folder), params: {

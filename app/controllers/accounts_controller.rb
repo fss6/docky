@@ -59,7 +59,7 @@ class AccountsController < ApplicationController
 
   private
     def authorize_policy
-      authorize Subscription
+      authorize Account
     end
 
     # Use callbacks to share common setup or constraints between actions.

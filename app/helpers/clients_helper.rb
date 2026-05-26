@@ -214,6 +214,59 @@ module ClientsHelper
     )
   end
 
+  def client_onboarding_public_url(token)
+    public_onboarding_upload_url(
+      token: token,
+      host: public_upload_host,
+      protocol: public_upload_protocol
+    )
+  end
+
+  def client_onboarding_badge_classes(stale: false)
+    if stale
+      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-50 text-red-800 ring-1 ring-inset ring-red-600/20"
+    else
+      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold client-onboarding-badge ring-1 ring-inset ring-violet-600/20"
+    end
+  end
+
+  def client_onboarding_stale?(client)
+    return false unless client.onboarding?
+
+    checklist = client.onboarding_checklist
+    checklist.present? && checklist.started_at <= 30.days.ago
+  end
+
+  def onboarding_activate_confirm_modal_data(url:, client_name:)
+    app_confirm_modal_open_data(
+      url: url,
+      item_label: client_name,
+      http_method: "post",
+      heading: "Marcar como ativo?",
+      body_prefix: "Tem certeza? Itens pendentes de ",
+      body_suffix: " ficarão como não recebidos no histórico do onboarding. A primeira competência mensal será aberta.",
+      confirm_text: "Marcar como ativo",
+      confirm_variant: "primary"
+    )
+  end
+
+  def onboarding_share_rendered(client, url)
+    setting = current_user.account.setting || current_user.account.create_setting!
+    progress = client.onboarding_checklist ? Onboarding::Progress.call(checklist: client.onboarding_checklist) : nil
+    UploadShareMessageRenderer.call(
+      setting: setting,
+      client: client,
+      url: url,
+      context: :onboarding,
+      progress: progress
+    )
+  end
+
+  def onboarding_whatsapp_url(client, url)
+    text = onboarding_share_rendered(client, url).whatsapp_text
+    "https://wa.me/?text=#{ERB::Util.url_encode(text)}"
+  end
+
   def upload_invite_share_rendered(client, url, period_param: nil)
     setting = current_user.account.setting || current_user.account.create_setting!
     period = upload_invite_period_from_param(period_param)

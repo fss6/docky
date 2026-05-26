@@ -21,9 +21,11 @@ class Account < ApplicationRecord
   has_many :bank_statements, dependent: :destroy
   has_many :institutions, dependent: :destroy
   has_many :audit_events, dependent: :destroy
+  has_many :onboarding_templates, dependent: :destroy
 
   after_create :create_default_setting!
   after_create :seed_default_institutions!
+  after_create :seed_onboarding_templates!, unless: :skip_onboarding_template_seed?
 
   def generate_tags_automatically?
     setting&.generate_tags_automatically == true
@@ -37,5 +39,13 @@ class Account < ApplicationRecord
 
   def seed_default_institutions!
     Institution.seed_defaults_for!(self)
+  end
+
+  def seed_onboarding_templates!
+    Onboarding::SeedDefaultTemplates.call(account: self)
+  end
+
+  def skip_onboarding_template_seed?
+    Rails.env.test?
   end
 end

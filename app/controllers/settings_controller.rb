@@ -28,7 +28,10 @@ class SettingsController < ApplicationController
       :generate_tags_automatically,
       :upload_share_whatsapp_template,
       :upload_share_email_subject_template,
-      :upload_share_email_body_template
+      :upload_share_email_body_template,
+      :onboarding_share_whatsapp_template,
+      :onboarding_share_email_subject_template,
+      :onboarding_share_email_body_template
     ])
   end
 end

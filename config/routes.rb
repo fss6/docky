@@ -39,6 +39,16 @@ Rails.application.routes.draw do
       patch :close_period, to: "clients/periods#close"
       patch :reopen_period, to: "clients/periods#reopen"
     end
+    resource :onboarding_activation, only: :create, module: :clients
+    resource :onboarding_reopen, only: :create, module: :clients
+    resource :onboarding_start, only: :create, module: :clients
+    resources :onboarding_checklist_items, only: %i[index create update destroy], module: :clients do
+      member do
+        patch :mark_received
+        patch :mark_pending
+      end
+    end
+    resources :onboarding_upload_invites, only: [:create], module: :clients
     resources :documents, only: %i[index create], module: :clients do
       member do
         patch :link
@@ -98,6 +108,9 @@ Rails.application.routes.draw do
   end
   get "public/folders/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
   post "public/folders/:token/upload", to: "public_folder_uploads#create"
+  get "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
+  post "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
+  post "public/folders/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
   resources :documents, only: [] do
     member do
       patch :move

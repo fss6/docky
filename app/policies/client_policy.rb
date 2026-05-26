@@ -29,6 +29,22 @@ class ClientPolicy < ApplicationPolicy
     user.role_member? || user.role_owner?
   end
 
+  def activate_onboarding?
+    show?
+  end
+
+  def reopen_onboarding?
+    show?
+  end
+
+  def start_onboarding?
+    show?
+  end
+
+  def manage_onboarding_checklist?
+    show?
+  end
+
   class Scope < ApplicationPolicy::Scope
   end
 end

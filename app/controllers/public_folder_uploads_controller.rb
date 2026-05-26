@@ -7,11 +7,13 @@ class PublicFolderUploadsController < ApplicationController
   skip_before_action :set_nav_client_autocomplete_json
   skip_after_action :verify_authorized
 
-  before_action :resolve_upload_target!
-  before_action :ensure_period_allows_upload!
-  before_action :ensure_public_upload_enabled!
+  before_action :resolve_upload_target!, except: %i[onboarding onboarding_upload onboarding_extra_upload]
+  before_action :resolve_onboarding_invite!, only: %i[onboarding onboarding_upload onboarding_extra_upload]
+  before_action :ensure_period_allows_upload!, only: %i[show create]
+  before_action :ensure_public_upload_enabled!, only: %i[show create]
+  before_action :ensure_onboarding_invite_active!, only: %i[onboarding onboarding_upload onboarding_extra_upload]
   before_action :set_account_tenant
-  before_action :track_invite_access, only: :show
+  before_action :track_invite_access, only: %i[show onboarding]
 
   def show
     @document = @folder.documents.build
@@ -51,12 +53,78 @@ class PublicFolderUploadsController < ApplicationController
     end
   end
 
+  def onboarding
+    load_onboarding_portal_context
+    @selected_item = @onboarding_items.find { |i| i.id == params[:item_id].to_i } if params[:item_id].present?
+    @selected_item ||= @onboarding_items.find(&:pending?)
+  end
+
+  def onboarding_upload
+    item = @client.onboarding_checklist.items.find(params.expect(:onboarding_checklist_item_id))
+    file = params.dig(:document, :file)
+
+    unless file.present?
+      redirect_to public_onboarding_upload_path(token: @upload_token, item_id: item.id),
+                  alert: "Selecione um arquivo.",
+                  status: :see_other
+      return
+    end
+
+    Onboarding::ReceiveDocument.call(
+      item: item,
+      file: file,
+      client: @client,
+      account: @upload_invite.account,
+      upload_owner_user: upload_owner_user
+    )
+
+    redirect_to public_onboarding_upload_path(token: @upload_token),
+                notice: "Documento enviado com sucesso.",
+                status: :see_other
+  rescue ActiveRecord::RecordNotFound
+    redirect_to public_onboarding_upload_path(token: @upload_token), alert: "Item não encontrado."
+  end
+
+  def onboarding_extra_upload
+    file = params.dig(:document, :file)
+    unless file.present?
+      redirect_to public_onboarding_upload_path(token: @upload_token), alert: "Selecione um arquivo."
+      return
+    end
+
+    folder = ensure_client_folder!
+    document = folder.documents.build
+    document.file.attach(file)
+    document.metadata = {
+      "upload_source" => "onboarding_extra",
+      "uploaded_via_token" => true
+    }
+    document.save!
+    AuditEvents::RecordDocumentReceived.call(document: document, user: upload_owner_user)
+
+    redirect_to public_onboarding_upload_path(token: @upload_token),
+                notice: "Documento extra recebido. Sua contabilidade irá analisá-lo.",
+                status: :see_other
+  end
+
   private
 
   def resolve_upload_target!
     @upload_invite = UploadInvite.find_by(token: params[:token])
     if @upload_invite
       @client = @upload_invite.client
+      if @upload_invite.onboarding?
+        redirect_to public_onboarding_upload_path(token: @upload_invite.token), status: :see_other
+        return
+      end
+
+      if @client.onboarding?
+        onboarding_invite = UploadInvite.purpose_onboarding.where(client: @client).newest_first.find(&:active?)
+        @onboarding_redirect_url = onboarding_invite ? public_onboarding_upload_path(token: onboarding_invite.token) : nil
+        @expired_message = "Sua conta ainda está em configuração. Termine o onboarding primeiro."
+        return render :onboarding_required, status: :forbidden
+      end
+
       @period = @upload_invite.period
       @upload_token = @upload_invite.token
       monthly = Clients::EnsureMonthlyCollection.call(
@@ -90,6 +158,31 @@ class PublicFolderUploadsController < ApplicationController
     render_expired_link(status: :not_found)
   end
 
+  def resolve_onboarding_invite!
+    @upload_invite = UploadInvite.purpose_onboarding.find_by(token: params[:token])
+    unless @upload_invite&.active?
+      @expired_message = "Este link de onboarding não está mais disponível."
+      return render_expired_link(status: :gone)
+    end
+
+    @client = @upload_invite.client
+    @upload_token = @upload_invite.token
+    @account = @upload_invite.account
+  end
+
+  def ensure_onboarding_invite_active!
+    return unless performed?
+
+    render_expired_link(status: :gone) unless @upload_invite&.active?
+  end
+
+  def load_onboarding_portal_context
+    @checklist = @client.onboarding_checklist
+    @onboarding_items = @checklist&.items&.ordered || []
+    @progress = @checklist ? Onboarding::Progress.call(checklist: @checklist) : nil
+    @account_name = @account.name
+  end
+
   def ensure_period_allows_upload!
     return if performed?
     return if @period_record.blank?
@@ -102,11 +195,13 @@ class PublicFolderUploadsController < ApplicationController
   end
 
   def set_account_tenant
-    set_current_tenant(@folder.account)
+    account = @upload_invite&.account || @folder&.account
+    set_current_tenant(account) if account
   end
 
   def upload_owner_user
-    @upload_owner_user ||= @folder.account.users.role_owner.first || @folder.account.users.first
+    account = @upload_invite&.account || @folder&.account
+    @upload_owner_user ||= account&.users&.role_owner&.first || account&.users&.first
   end
 
   def upload_params
@@ -151,5 +246,17 @@ class PublicFolderUploadsController < ApplicationController
   def render_expired_link(status:)
     @expired_message = @upload_blocked_reason if @upload_blocked_reason.present?
     render :expired, status: status
+  end
+
+  def ensure_client_folder!
+    folder = @client.folders.visible.first
+    return folder if folder
+
+    Folder.create!(
+      account: @account,
+      client: @client,
+      name: "Documentos",
+      visible: true
+    )
   end
 end

@@ -1,0 +1,16 @@
+<% content_for :title, "Conta em configuração · Dokivo" %>
+
+<div class="mx-auto w-full max-w-xl">
+  <section class="rounded-xl border border-violet-200 bg-violet-50/50 p-6 text-center shadow-[var(--shadow-card)] sm:p-8">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-700">Onboarding</p>
+    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-zinc-900">Sua conta ainda está em configuração</h1>
+    <p class="mt-3 text-sm text-zinc-600">
+      <%= @expired_message %>
+    </p>
+    <% if @onboarding_redirect_url.present? %>
+      <p class="mt-5">
+        <%= link_to "Ir para o portal de onboarding", @onboarding_redirect_url, class: "app-btn-primary inline-flex no-underline" %>
+      </p>
+    <% end %>
+  </section>
+</div>

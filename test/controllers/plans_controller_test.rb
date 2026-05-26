@@ -2,6 +2,7 @@ require "test_helper"
 
 class PlansControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in users(:administrator)
     @plan = plans(:one)
   end
 
@@ -39,8 +40,10 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy plan" do
+    disposable_plan = Plan.create!(name: "Plano descartável", price: 0)
+
     assert_difference("Plan.count", -1) do
-      delete plan_url(@plan)
+      delete plan_url(disposable_plan)
     end
 
     assert_redirected_to plans_url

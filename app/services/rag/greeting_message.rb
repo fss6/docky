@@ -5,14 +5,14 @@ require "set"
 module Rag
   # Mensagens curtas só de saudação/despedida/cortesia — sem pergunta sobre documentos.
   module GreetingMessage
-    PHRASES = Set.new(%w[
-      olá ola oi oie
-      hello hi hey
-      bom dia boa tarde boa noite
-      obrigado obrigada valeu
-      thanks ty
-      thank you thankyou
-      tchau adeus bye
+    PHRASES = Set.new([
+      "olá", "ola", "oi", "oie",
+      "hello", "hi", "hey",
+      "bom dia", "boa tarde", "boa noite",
+      "obrigado", "obrigada", "valeu",
+      "thanks", "ty",
+      "thank you", "thankyou",
+      "tchau", "adeus", "bye"
     ].freeze)
 
     def self.only?(text)

@@ -7,14 +7,24 @@ class UploadInvite < ApplicationRecord
   belongs_to :client
   belongs_to :created_by_user, class_name: "User", optional: true
 
+  enum :purpose, {
+    monthly: "monthly",
+    onboarding: "onboarding"
+  }, default: :monthly, prefix: true
+
   validates :token, presence: true, uniqueness: true
-  validates :period, presence: true
+  validates :period, presence: true, if: :purpose_monthly?
 
   before_validation :normalize_period!
   before_validation :ensure_token, on: :create
 
   scope :for_period, ->(period) { where(period: period.beginning_of_month.to_date) }
+  scope :for_onboarding, -> { purpose_onboarding }
   scope :newest_first, -> { order(created_at: :desc) }
+
+  def onboarding?
+    purpose_onboarding?
+  end
 
   def self.generate_token
     SecureRandom.urlsafe_base64(24)
@@ -52,6 +62,8 @@ class UploadInvite < ApplicationRecord
   private
 
   def normalize_period!
+    return if purpose_onboarding?
+
     self.period = period.to_date.beginning_of_month if period.present?
   end
 

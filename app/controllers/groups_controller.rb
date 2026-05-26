@@ -1,5 +1,6 @@
 class GroupsController < ApplicationController
   before_action :set_group, only: %i[ show edit update destroy ]
+  before_action :authorize_policy
 
   # GET /groups or /groups.json
   def index
@@ -66,6 +67,11 @@ class GroupsController < ApplicationController
   end
 
   private
+
+    def authorize_policy
+      authorize Group
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_group
       @group = Group.includes(:account).find(params.expect(:id))

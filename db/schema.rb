@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_26_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -154,8 +154,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "monthly_deadline_day", default: 10, null: false
+    t.string "status", default: "active", null: false
+    t.string "onboarding_kind"
     t.index ["account_id", "tax_id"], name: "index_clients_on_account_id_and_tax_id", unique: true, where: "((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))"
     t.index ["account_id"], name: "index_clients_on_account_id"
+    t.index ["status"], name: "index_clients_on_status"
   end
 
   create_table "competency_checklist_items", force: :cascade do |t|
@@ -300,6 +303,56 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
   end
 
+  create_table "onboarding_checklist_items", force: :cascade do |t|
+    t.bigint "onboarding_checklist_id", null: false
+    t.string "name", null: false
+    t.text "help_text"
+    t.integer "position", default: 0, null: false
+    t.string "state", default: "pending", null: false
+    t.bigint "last_document_id"
+    t.bigint "validated_by_user_id"
+    t.datetime "received_at"
+    t.datetime "validated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_document_id"], name: "index_onboarding_checklist_items_on_last_document_id"
+    t.index ["onboarding_checklist_id"], name: "index_onboarding_checklist_items_on_onboarding_checklist_id"
+  end
+
+  create_table "onboarding_checklists", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.string "status", default: "in_progress", null: false
+    t.string "onboarding_kind", null: false
+    t.datetime "started_at", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_onboarding_checklists_on_account_id"
+    t.index ["client_id"], name: "index_onboarding_checklists_on_client_id", unique: true
+  end
+
+  create_table "onboarding_template_items", force: :cascade do |t|
+    t.bigint "onboarding_template_id", null: false
+    t.string "name", null: false
+    t.text "help_text"
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["onboarding_template_id", "position"], name: "index_onboarding_template_items_on_template_and_position"
+  end
+
+  create_table "onboarding_templates", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "kind", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "kind"], name: "index_onboarding_templates_on_account_id_and_kind", unique: true
+    t.index ["account_id"], name: "index_onboarding_templates_on_account_id"
+  end
+
   create_table "plans", force: :cascade do |t|
     t.string "name"
     t.integer "price"
@@ -316,6 +369,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
     t.text "upload_share_whatsapp_template", null: false
     t.string "upload_share_email_subject_template", null: false
     t.text "upload_share_email_body_template", null: false
+    t.text "onboarding_share_whatsapp_template"
+    t.string "onboarding_share_email_subject_template"
+    t.text "onboarding_share_email_body_template"
     t.index ["account_id"], name: "index_settings_on_account_id", unique: true
   end
 
@@ -335,7 +391,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
   create_table "upload_invites", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "client_id", null: false
-    t.date "period", null: false
+    t.date "period"
     t.string "token", null: false
     t.bigint "created_by_user_id"
     t.datetime "expires_at"
@@ -343,8 +399,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
     t.integer "access_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "purpose", default: "monthly", null: false
     t.index ["account_id"], name: "index_upload_invites_on_account_id"
     t.index ["client_id", "period", "created_at"], name: "index_upload_invites_on_client_period_created"
+    t.index ["client_id", "purpose"], name: "index_upload_invites_on_client_purpose_active", where: "(revoked_at IS NULL)"
     t.index ["client_id"], name: "index_upload_invites_on_client_id"
     t.index ["created_by_user_id"], name: "index_upload_invites_on_created_by_user_id"
     t.index ["token"], name: "index_upload_invites_on_token", unique: true
@@ -462,6 +520,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_175306) do
   add_foreign_key "groups", "accounts"
   add_foreign_key "institutions", "accounts"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "onboarding_checklist_items", "documents", column: "last_document_id"
+  add_foreign_key "onboarding_checklist_items", "onboarding_checklists"
+  add_foreign_key "onboarding_checklist_items", "users", column: "validated_by_user_id"
+  add_foreign_key "onboarding_checklists", "accounts"
+  add_foreign_key "onboarding_checklists", "clients"
+  add_foreign_key "onboarding_template_items", "onboarding_templates"
+  add_foreign_key "onboarding_templates", "accounts"
   add_foreign_key "settings", "accounts"
   add_foreign_key "subscriptions", "accounts"
   add_foreign_key "subscriptions", "plans"

@@ -1,5 +1,6 @@
 class GroupMembershipsController < ApplicationController
   before_action :set_group
+  before_action :authorize_group
 
   def create
     @membership = @group.group_memberships.build(membership_params)
@@ -18,6 +19,10 @@ class GroupMembershipsController < ApplicationController
   end
 
   private
+
+  def authorize_group
+    authorize @group, :update?
+  end
 
   def set_group
     @group = Group.includes(:account).find(params.expect(:group_id))

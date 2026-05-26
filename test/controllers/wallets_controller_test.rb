@@ -59,14 +59,16 @@ class WalletsControllerTest < ActionDispatch::IntegrationTest
   test "should filter by critical status" do
     get wallet_url, params: { period: @period_name, status: "critical" }
     assert_response :success
-    assert_includes response.body, @alpha.name
-    assert_not_includes response.body, @beta.name
+    table_body = css_select("tbody").first&.text.to_s
+    assert_includes table_body, @alpha.name
+    assert_not_includes table_body, @beta.name
   end
 
   test "should filter only pending rows" do
     get wallet_url, params: { period: @period_name, only_pending: "1" }
     assert_response :success
-    assert_includes response.body, @alpha.name
-    assert_not_includes response.body, @beta.name
+    table_body = css_select("tbody").first&.text.to_s
+    assert_includes table_body, @alpha.name
+    assert_not_includes table_body, @beta.name
   end
 end

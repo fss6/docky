@@ -8,7 +8,7 @@
   </header>
 
   <div class="app-card p-6 sm:p-8">
-    <%= render "form", client: @client %>
+    <%= render "form", client: @client, onboarding_template_counts: @onboarding_template_counts || {} %>
   </div>
 
   <p>

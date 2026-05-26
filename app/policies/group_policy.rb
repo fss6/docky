@@ -5,6 +5,34 @@ class GroupPolicy < ApplicationPolicy
   # code, beware of possible changes to the ancestors:
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
+  def index?
+    user.role_member? || user.role_owner?
+  end
+
+  def show?
+    user.role_member? || user.role_owner?
+  end
+
+  def create?
+    user.role_owner?
+  end
+
+  def new?
+    create?
+  end
+
+  def update?
+    user.role_owner?
+  end
+
+  def edit?
+    update?
+  end
+
+  def destroy?
+    user.role_owner?
+  end
+
   class Scope < ApplicationPolicy::Scope
     # NOTE: Be explicit about which records you allow access to!
     # def resolve

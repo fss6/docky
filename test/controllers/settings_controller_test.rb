@@ -4,7 +4,7 @@ require "test_helper"
 
 class SettingsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = users(:owner)
     sign_in @user
     ActsAsTenant.with_tenant(accounts(:one)) do
       @setting = accounts(:one).setting || accounts(:one).create_setting!

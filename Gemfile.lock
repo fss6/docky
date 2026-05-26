@@ -196,6 +196,8 @@ GEM
     minitest (6.0.3)
       drb (~> 2.0)
       prism (~> 1.5)
+    mocha (3.1.0)
+      ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
     neighbor (1.0.0)
       activerecord (>= 7.2)
@@ -344,6 +346,7 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
     securerandom (0.4.1)
     selenium-webdriver (4.41.0)
@@ -456,6 +459,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  mocha
   neighbor (~> 1.0)
   pagy (~> 43.5, >= 43.5.1)
   pg (~> 1.1)

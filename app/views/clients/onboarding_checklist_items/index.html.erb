@@ -1,0 +1,36 @@
+<% content_for :title, "Itens de onboarding · #{@client.name}" %>
+
+<div class="mx-auto max-w-2xl space-y-6">
+  <%= link_to @client, class: "inline-flex items-center gap-1 text-sm font-medium text-accent no-underline hover:text-accent-hover" do %>
+    <%= heroicon "arrow-left", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+    Voltar ao onboarding
+  <% end %>
+
+  <header>
+    <h1 class="text-2xl font-semibold text-zinc-900">Itens do onboarding</h1>
+    <p class="mt-1 text-sm text-zinc-600"><%= @client.name %></p>
+  </header>
+
+  <div class="app-card p-5">
+    <ul class="space-y-2">
+      <% @items.each do |item| %>
+        <li class="flex items-center justify-between gap-3 rounded-md border border-zinc-100 px-3 py-2">
+          <span class="text-sm text-zinc-900"><%= item.name %></span>
+          <%= button_to "Remover", client_onboarding_checklist_item_path(@client, item), method: :delete, form: { data: { turbo_confirm: "Remover este item?" } }, class: "text-xs font-medium text-red-700 hover:underline border-0 bg-transparent" %>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= form_with url: client_onboarding_checklist_items_path(@client), scope: :onboarding_checklist_item, class: "mt-5 space-y-3 border-t border-zinc-100 pt-5" do |f| %>
+      <div>
+        <%= f.label :name, "Novo item", class: "app-label" %>
+        <%= f.text_field :name, class: "app-input", required: true, placeholder: "Ex: Comprovante de inscrição no CRECI" %>
+      </div>
+      <div>
+        <%= f.label :help_text, "Texto de ajuda (opcional)", class: "app-label" %>
+        <%= f.text_field :help_text, class: "app-input", placeholder: "Instruções para o cliente" %>
+      </div>
+      <%= f.submit "Adicionar item", class: "app-btn-primary cursor-pointer border-0" %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<% content_for :title, "#{@client.name} · Onboarding · Dokivo" %>
+
+<div class="client-detail space-y-6"
+     data-controller="share-link-modal app-form-modal app-confirm-modal"
+     data-share-link-modal-create-url-value="<%= client_onboarding_upload_invites_path(@client) %>"
+     data-share-link-modal-has-invite-value="<%= @active_onboarding_invite&.active? ? true : false %>">
+  <%= render "clients/show/onboarding_header",
+        client: @client,
+        progress: @onboarding_progress,
+        active_onboarding_invite: @active_onboarding_invite %>
+
+  <%= render "clients/show/onboarding_checklist",
+        client: @client,
+        items: @onboarding_items,
+        progress: @onboarding_progress %>
+
+  <%= render "clients/show/onboarding_share_modal",
+        client: @client,
+        active_onboarding_invite: @active_onboarding_invite %>
+</div>

@@ -10,7 +10,7 @@ class AuditEventTest < ActiveSupport::TestCase
     )
 
     assert_not event.valid?
-    assert_includes event.errors[:event_type], "can't be blank"
+    assert_includes event.errors[:event_type], "não pode ficar em branco"
   end
 
   test "recorder persists metadata and optional user" do

@@ -2,6 +2,7 @@ require "test_helper"
 
 class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in users(:administrator)
     @subscription = subscriptions(:one)
   end
 

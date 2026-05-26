@@ -1,0 +1,45 @@
+<%# locals: (client:, invite:) %>
+<% url = client_onboarding_public_url(invite.token) %>
+<div id="share_link_modal_content"
+     class="mt-5 space-y-5"
+     data-share-link-modal-target="content"
+     data-controller="copy-link">
+  <div>
+    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Link de onboarding</p>
+    <div class="mt-2 flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+      <div class="min-w-0 flex-1 px-3 py-2.5 text-sm text-zinc-800 break-all" data-copy-link-target="source"><%= url %></div>
+      <button type="button"
+              class="inline-flex shrink-0 items-center gap-1.5 border-l border-zinc-200 bg-client-accent px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-client-accent-hover"
+              data-action="copy-link#copy"
+              data-copy-link-target="button">
+        <%= heroicon "clipboard-document", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        <span data-copy-link-target="label">Copiar</span>
+      </button>
+    </div>
+    <p class="mt-1.5 hidden text-xs font-medium text-emerald-700" data-copy-link-target="feedback" aria-live="polite"></p>
+  </div>
+
+  <div>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Compartilhar diretamente</p>
+      <% if policy(Setting).show? %>
+        <%= link_to "Personalizar mensagens",
+              settings_path(anchor: "onboarding-share"),
+              class: "text-xs font-medium text-accent no-underline hover:text-accent-hover" %>
+      <% end %>
+    </div>
+    <div class="mt-2">
+      <%= link_to onboarding_whatsapp_url(client, url),
+            target: "_blank",
+            rel: "noopener noreferrer",
+            class: "flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 no-underline transition-colors hover:border-zinc-300 hover:bg-zinc-50" do %>
+        <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-5 w-5 text-[#25D366]", "aria-hidden": "true" } %>
+        Compartilhar no WhatsApp
+      <% end %>
+    </div>
+  </div>
+
+  <p class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+    Este link é exclusivo para o onboarding. Expira quando o cliente for marcado como ativo.
+  </p>
+</div>

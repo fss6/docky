@@ -2,6 +2,7 @@ require "test_helper"
 
 class FoldersControllerTest < ActionDispatch::IntegrationTest
   setup do
+    sign_in users(:owner)
     @folder = folders(:one)
   end
 

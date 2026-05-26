@@ -7,6 +7,10 @@ class UploadInvitesController < ApplicationController
     @client = Client.find(params.expect(:client_id))
     authorize @client, :show?
 
+    if @client.onboarding?
+      return redirect_to @client, alert: "Use o link de onboarding nesta fase.", status: :see_other
+    end
+
     @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
     period_record = Periods::FindOrOpen.call(
       account: current_user.account,
@@ -71,10 +75,16 @@ class UploadInvitesController < ApplicationController
       subject: @invite,
       metadata: { client_id: @invite.client_id, period: @invite.period.strftime("%Y-%m") }
     )
-    redirect_to client_path(@invite.client, aba: "convites", period: @invite.period.strftime("%Y-%m")), notice: "Link revogado."
+    redirect_to client_path(@invite.client, aba: "convites", period: period_param), notice: "Link revogado."
   end
 
   private
+
+  def period_param
+    return Date.current.strftime("%Y-%m") if @invite.period.blank?
+
+    @invite.period.strftime("%Y-%m")
+  end
 
   def set_invite
     @invite = UploadInvite.find(params.expect(:id))

@@ -4,15 +4,20 @@ class ClientsController < ApplicationController
 
   before_action :set_client, only: %i[show edit update destroy summary]
   before_action :authorize_policy
-  before_action :ensure_period_in_url, only: :show
-  before_action :load_monthly_context, only: %i[show summary]
+  before_action :ensure_period_in_url, only: :show, unless: :onboarding_show?
+  before_action :load_monthly_context, only: %i[show summary], unless: :onboarding_show?
+  before_action :load_onboarding_context, only: :show, if: :onboarding_show?
 
   def index
     @clients = Client.order(:name)
   end
 
   def show
-    load_tab_content
+    if onboarding_show?
+      render :show_onboarding
+    else
+      load_tab_content
+    end
   end
 
   def summary
@@ -21,6 +26,7 @@ class ClientsController < ApplicationController
 
   def new
     @client = Client.new
+    load_onboarding_template_counts
   end
 
   def edit
@@ -28,17 +34,24 @@ class ClientsController < ApplicationController
 
   def create
     @client = Client.new(client_params)
+    onboarding_kind = params.fetch(:onboarding_kind, "new_client")
 
     respond_to do |format|
-      if @client.save
-        Periods::OpenForClient.call(
+      begin
+        Clients::CreateWithOnboarding.call(
           client: @client,
-          period: Date.current.beginning_of_month,
-          account: @client.account
+          onboarding_kind: onboarding_kind,
+          user: current_user
         )
-        format.html { redirect_to @client, notice: "Cliente criado com sucesso." }
+        notice = if @client.onboarding?
+                   "Cliente cadastrado. Onboarding iniciado."
+                 else
+                   "Cliente criado com sucesso."
+                 end
+        format.html { redirect_to @client, notice: notice }
         format.json { render :show, status: :created, location: @client }
-      else
+      rescue ActiveRecord::RecordInvalid
+        load_onboarding_template_counts
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @client.errors, status: :unprocessable_entity }
       end
@@ -153,5 +166,22 @@ class ClientsController < ApplicationController
 
   def client_params
     params.expect(client: [:name, :tax_id, :email, :phone, :notes, :monthly_deadline_day])
+  end
+
+  def onboarding_show?
+    @client&.onboarding?
+  end
+
+  def load_onboarding_context
+    @onboarding_checklist = @client.onboarding_checklist
+    @onboarding_progress = Onboarding::Progress.call(checklist: @onboarding_checklist) if @onboarding_checklist
+    @onboarding_items = @onboarding_checklist&.items&.ordered&.includes(:last_document, :validated_by_user) || []
+    @active_onboarding_invite = UploadInvite.purpose_onboarding.where(client: @client).newest_first.find(&:active?)
+  end
+
+  def load_onboarding_template_counts
+    @onboarding_template_counts = OnboardingTemplate.ordered.each_with_object({}) do |template, counts|
+      counts[template.kind] = template.items.count
+    end
   end
 end
