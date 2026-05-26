@@ -2,13 +2,20 @@
 <% period_param = @period.strftime("%Y-%m") %>
 
 <div class="client-detail space-y-6"
-     data-controller="share-link-modal client-documents-channel app-form-modal"
+     data-controller="share-link-modal client-documents-channel app-form-modal app-confirm-modal"
      data-share-link-modal-create-url-value="<%= client_upload_invites_path(@client, period: period_param) %>"
      data-share-link-modal-has-invite-value="<%= @active_upload_invite&.active? ? true : false %>"
      data-client-documents-channel-client-id-value="<%= @client.id %>"
      data-client-documents-channel-active-tab-value="<%= @active_tab %>"
      data-client-documents-channel-documents-url-value="<%= client_documents_path(@client, period: period_param) %>">
-  <%= render "clients/show/header", client: @client, summary: @summary, period: @period, period_param: period_param, active_upload_invite: @active_upload_invite %>
+  <%= render "clients/show/header",
+        client: @client,
+        summary: @summary,
+        period: @period,
+        period_param: period_param,
+        period_record: @period_record,
+        active_tab: @active_tab,
+        active_upload_invite: @active_upload_invite %>
 
   <nav class="border-b border-zinc-200" aria-label="Abas do cliente">
     <ul class="flex flex-wrap gap-x-6 gap-y-1">
@@ -24,12 +31,10 @@
               <%= heroicon "clipboard-document-check", variant: :outline, options: { class: "h-4 w-4 text-emerald-600", "aria-hidden": "true" } %>
             <% elsif tab == "convites" %>
               <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-            <% elsif tab == "email" %>
-              <%= heroicon "envelope", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
             <% else %>
               <%= heroicon "archive-box", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
             <% end %>
-            <span><%= { "documentos" => "Documentos", "checklist" => "Checklist do mês", "convites" => "Convites & Links", "email" => "E-mail Forward", "historico" => "Histórico" }[tab] %></span>
+            <span><%= ClientsHelper::TAB_LABELS[tab] %></span>
           <% end %>
         </li>
       <% end %>
@@ -41,15 +46,27 @@
     <% when "documentos" %>
       <%= render "clients/show/tab_documentos", client: @client, documents: @documents, pagy: @pagy, checklist: @checklist, linked_items_by_document_id: @linked_items_by_document_id, pending_link_items: @pending_link_items, category_counts: @category_counts, period_param: period_param %>
     <% when "checklist" %>
-      <%= render "clients/show/tab_checklist", client: @client, checklist_items: @checklist_items, period: @period, period_param: period_param, summary: @summary %>
+      <%= render "clients/show/tab_checklist",
+            client: @client,
+            checklist_items: @checklist_items,
+            period: @period,
+            period_param: period_param,
+            summary: @summary,
+            template_items_count: @template_items_count %>
     <% when "convites" %>
       <%= render "clients/show/tab_convites", client: @client, upload_invites: @upload_invites, period_param: period_param, active_upload_invite: @active_upload_invite %>
-    <% when "email" %>
-      <%= render "clients/show/tab_email" %>
     <% when "historico" %>
-      <%= render "clients/show/tab_historico", client: @client, past_checklists: @past_checklists, audit_logs: @client_audit_logs, period_param: period_param %>
+      <%= render "clients/show/tab_historico",
+            period_activity: @period_activity,
+            period: @period %>
     <% end %>
   </div>
 
   <%= render "clients/show/share_link_modal", client: @client, period_param: period_param, active_upload_invite: @active_upload_invite %>
+
+  <%= render "shared/confirm_modal",
+        heading: "Fechar competência?",
+        body_prefix: "Você está encerrando a competência ",
+        body_suffix: ". Novos envios pelo portal e uploads internos ficarão bloqueados para esta competência.",
+        confirm_text: "Fechar competência" %>
 </div>

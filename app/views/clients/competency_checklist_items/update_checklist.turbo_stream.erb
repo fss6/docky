@@ -8,7 +8,8 @@
         checklist_items: @checklist_items,
         period: @period,
         period_param: @period_param,
-        summary: @summary %>
+        summary: @summary,
+        template_items_count: @client.client_checklist_items.active_only.count %>
 <% end %>
 
 <%= turbo_stream.update "flash_messages" do %>

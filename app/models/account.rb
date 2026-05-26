@@ -11,7 +11,11 @@ class Account < ApplicationRecord
   has_many :folders, dependent: :destroy
   has_many :clients, dependent: :destroy
   has_many :client_checklist_items, dependent: :destroy
-  has_many :competency_checklists, dependent: :destroy
+  has_many :competency_checklists, class_name: "Period", dependent: :destroy
+
+  def periods
+    competency_checklists
+  end
   has_many :competency_checklist_items, through: :competency_checklists, source: :items
   has_many :bank_statement_imports, dependent: :destroy
   has_many :bank_statements, dependent: :destroy

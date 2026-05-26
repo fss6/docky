@@ -80,9 +80,9 @@ class WalletsController < ApplicationController
 
   def last_documents_by_client(client_ids:)
     current_user.account.documents
-      .joins(:folder)
-      .where(folders: { client_id: client_ids, name: @period_param })
-      .group("folders.client_id")
+      .joins(:period)
+      .where(competency_checklists: { period: @period, client_id: client_ids })
+      .group("competency_checklists.client_id")
       .maximum("documents.created_at")
   end
 

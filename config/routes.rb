@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   post "monthly-collections", to: "monthly_collections#create"
   get "monthly-collections/:id", to: "monthly_collections#show", as: :monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
   delete "monthly-collections/:id", to: "monthly_collections#destroy", constraints: { id: /\d{4}-\d{2}/ }
+  patch "monthly-collections/:id/close", to: "monthly_collections#close", as: :close_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
+  patch "monthly-collections/:id/reopen", to: "monthly_collections#reopen", as: :reopen_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
   get "monthly-collections/:id/document-statuses", to: "monthly_collections#document_statuses", as: :monthly_collection_document_statuses, constraints: { id: /\d{4}-\d{2}/ }
   resource :current_client, only: [:update]
   resources :bank_statements, except: [:show]
@@ -34,6 +36,8 @@ Rails.application.routes.draw do
   resources :clients do
     member do
       get :summary
+      patch :close_period, to: "clients/periods#close"
+      patch :reopen_period, to: "clients/periods#reopen"
     end
     resources :documents, only: %i[index create], module: :clients do
       member do

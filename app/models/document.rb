@@ -3,6 +3,7 @@ class Document < ApplicationRecord
   belongs_to :user
   belongs_to :folder
   belongs_to :client, optional: true
+  belongs_to :period, optional: true
 
   has_one_attached :file
 
@@ -16,10 +17,21 @@ class Document < ApplicationRecord
   }, default: :pending
 
   scope :for_client_period, ->(client, period) {
-    where(client_id: client.id, collection_period: period.to_date.beginning_of_month)
+    month = period.to_date.beginning_of_month
+    period_record = Period.find_by(client_id: client.id, period: month)
+    if period_record
+      where(client_id: client.id, period_id: period_record.id)
+    else
+      where(client_id: client.id, collection_period: month)
+    end
+  }
+
+  scope :for_period, ->(period_record) {
+    where(period_id: period_record.id)
   }
 
   after_create_commit :notify_client_documents_channel, if: :client_id?
+  before_validation :sync_collection_period_from_period
 
   validate :user_belongs_to_account
   validate :folder_belongs_to_account
@@ -78,6 +90,14 @@ class Document < ApplicationRecord
     return if folder&.account_id == account_id
 
     errors.add(:folder_id, "deve pertencer à mesma conta selecionada")
+  end
+
+  def sync_collection_period_from_period
+    return if period.blank?
+
+    self.collection_period = period.period
+    self.client_id ||= period.client_id
+    self.account_id ||= period.account_id
   end
 
   def notify_client_documents_channel

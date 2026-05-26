@@ -2,48 +2,18 @@
 
 module Clients
   class EnsureMonthlyCollection
-    Result = Struct.new(:checklist, :documents_scope, :folder_shim, :period, keyword_init: true)
+    Result = Struct.new(:period_record, :checklist, :documents_scope, :folder_shim, :period, keyword_init: true)
 
     def self.call(client:, period:, account: ActsAsTenant.current_tenant)
-      new(client: client, period: period, account: account).call
-    end
-
-    def initialize(client:, period:, account:)
-      @client = client
-      @account = account
-      @period = period.to_date.beginning_of_month
-    end
-
-    def call
-      checklist = Checklist::BuildForCompetency.new(
-        account: @account,
-        client: @client,
-        period: @period
-      ).call
-
-      folder_shim = ensure_folder_shim!
+      context = Periods::LoadMonthlyContext.call(client: client, period: period, account: account)
 
       Result.new(
-        checklist: checklist,
-        documents_scope: documents_scope,
-        folder_shim: folder_shim,
-        period: @period
+        period_record: context.period_record,
+        checklist: context.checklist,
+        documents_scope: context.documents_scope,
+        folder_shim: context.folder_shim,
+        period: context.period
       )
-    end
-
-    private
-
-    def ensure_folder_shim!
-      Folder.find_or_create_by!(
-        account: @account,
-        client: @client,
-        name: @period.strftime("%Y-%m"),
-        visible: false
-      )
-    end
-
-    def documents_scope
-      Document.where(client_id: @client.id, collection_period: @period)
     end
   end
 end

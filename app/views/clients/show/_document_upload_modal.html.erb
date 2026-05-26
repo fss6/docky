@@ -7,7 +7,7 @@
     <div class="flex items-start justify-between gap-4">
       <div>
         <h2 id="document-upload-modal-title" class="text-xl font-semibold text-zinc-900">Adicionar documento</h2>
-        <p class="mt-1 text-sm text-zinc-500"><%= client.name %> · competência <%= period_param %></p>
+        <p class="mt-1 text-sm text-zinc-500"><%= client.name %> · competência <%= period_display_label(period_param) %></p>
       </div>
       <button type="button" class="app-btn-secondary px-2 py-1 text-xs" data-action="click->app-form-modal#close">Fechar</button>
     </div>

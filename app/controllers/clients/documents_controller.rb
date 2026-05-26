@@ -22,10 +22,28 @@ module Clients
     def create
       authorize @client, :show?
 
+      guard = Periods::UploadGuard.call(period: @monthly.period_record)
+      unless guard.allowed
+        return redirect_to client_path(@client, aba: "documentos", period: @period.strftime("%Y-%m")),
+                           alert: guard.reason,
+                           status: :see_other
+      end
+
       @document = @monthly.folder_shim.documents.build(upload_params)
-      assign_internal_upload_defaults!
+      Documents::AssignToPeriod.call(
+        document: @document,
+        period_record: @monthly.period_record,
+        folder: @monthly.folder_shim,
+        user_id: current_user.id,
+        metadata: { "upload_source" => "internal_upload" }
+      )
 
       if @document.save
+        AuditEvents::RecordDocumentReceived.call(
+          document: @document,
+          user: current_user,
+          ip: request.remote_ip
+        )
         DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
         flash.now[:notice] = "Documento adicionado com sucesso."
         load_checklist_link_context
@@ -122,18 +140,6 @@ module Clients
       scope = @monthly.documents_scope.with_attached_file.order(created_at: :desc)
       @pagy, @documents = pagy(scope, limit: 30, page: params[:page])
       @category_counts = scope.to_a.group_by { |document| heuristic_category_for(document) }.transform_values(&:size)
-    end
-
-    def assign_internal_upload_defaults!
-      folder = @monthly.folder_shim
-      @document.assign_attributes(
-        account_id: folder.account_id,
-        user_id: current_user.id,
-        status: :pending,
-        client_id: @client.id,
-        collection_period: @period,
-        metadata: { "upload_source" => "internal_upload" }
-      )
     end
 
     def upload_params

@@ -1,7 +1,8 @@
 class MonthlyCollectionsController < ApplicationController
   before_action :authorize_policy
   before_action :require_current_client!
-  before_action :set_period_from_id!, only: %i[show document_statuses destroy]
+  before_action :set_period_from_id!, only: %i[show document_statuses destroy close reopen]
+  before_action :set_period_record, only: %i[show document_statuses close reopen]
   before_action :set_collection_folder, only: %i[show document_statuses]
   before_action :set_checklist, only: :show
   before_action :set_available_documents, only: :show
@@ -15,14 +16,14 @@ class MonthlyCollectionsController < ApplicationController
     period = parse_period(params[:period])
     return redirect_to monthly_collections_path, alert: "Selecione uma competência válida." if period.nil?
 
-    existing = CompetencyChecklist.exists?(account: current_user.account, client: current_client, period: period)
+    existing = Period.exists?(account: current_user.account, client: current_client, period: period)
     return redirect_to monthly_collections_path, alert: "Essa competência já existe." if existing
 
-    Checklist::BuildForCompetency.new(
-      account: current_user.account,
+    Periods::OpenForClient.call(
       client: current_client,
-      period: period
-    ).call
+      period: period,
+      account: current_user.account
+    )
 
     folder = Folder.find_or_create_by!(
       account: current_user.account,
@@ -50,8 +51,36 @@ class MonthlyCollectionsController < ApplicationController
     }
   end
 
+  def close
+    authorize @period_record, :close?
+
+    if Periods::Close.call(period: @period_record, user: current_user, ip: request.remote_ip)
+      redirect_to monthly_collection_path(@period.strftime("%Y-%m")),
+                  notice: "Competência encerrada com sucesso.",
+                  status: :see_other
+    else
+      redirect_to monthly_collection_path(@period.strftime("%Y-%m")),
+                  alert: "Esta competência já está encerrada.",
+                  status: :see_other
+    end
+  end
+
+  def reopen
+    authorize @period_record, :reopen?
+
+    if Periods::Reopen.call(period: @period_record, user: current_user, ip: request.remote_ip)
+      redirect_to monthly_collection_path(@period.strftime("%Y-%m")),
+                  notice: "Competência reaberta com sucesso.",
+                  status: :see_other
+    else
+      redirect_to monthly_collection_path(@period.strftime("%Y-%m")),
+                  alert: "Esta competência já está aberta.",
+                  status: :see_other
+    end
+  end
+
   def destroy
-    checklist = CompetencyChecklist.find_by(
+    checklist = Period.find_by(
       account: current_user.account,
       client: current_client,
       period: @period
@@ -62,6 +91,7 @@ class MonthlyCollectionsController < ApplicationController
       return
     end
 
+    authorize checklist, :close?
     checklist.destroy!
     redirect_to monthly_collections_path, notice: "Competência removida com sucesso."
   end
@@ -79,6 +109,17 @@ class MonthlyCollectionsController < ApplicationController
     redirect_to monthly_collections_path, alert: "Competência inválida."
   end
 
+  def set_period_record
+    @period_record = Period.find_by(
+      account: current_user.account,
+      client: current_client,
+      period: @period
+    )
+    return if @period_record.present?
+
+    redirect_to monthly_collections_path, alert: "Competência não encontrada."
+  end
+
   def set_collection_folder
     @collection_folder = Folder.find_or_create_by!(
       account: current_user.account,
@@ -89,16 +130,7 @@ class MonthlyCollectionsController < ApplicationController
   end
 
   def set_checklist
-    @checklist = CompetencyChecklist.find_by(
-      account: current_user.account,
-      client: current_client,
-      period: @period
-    )
-    unless @checklist
-      redirect_to monthly_collections_path, alert: "Competência não encontrada."
-      return
-    end
-
+    @checklist = @period_record
   end
 
   def set_available_documents
@@ -110,8 +142,10 @@ class MonthlyCollectionsController < ApplicationController
   end
 
   def uploaded_documents_scope
+    return Document.none if @period_record.blank?
+
     current_user.account.documents
-      .where(folder_id: @collection_folder.id)
+      .where(period_id: @period_record.id)
       .with_attached_file
       .order(created_at: :desc)
   end
@@ -133,10 +167,8 @@ class MonthlyCollectionsController < ApplicationController
   end
 
   def available_periods_scope
-    CompetencyChecklist
+    Period
       .where(account: current_user.account, client: current_client)
-      .select(:period)
-      .distinct
       .order(period: :desc)
   end
 end

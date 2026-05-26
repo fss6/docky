@@ -1,24 +1,43 @@
 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
   <div>
-    <h2 class="text-base font-semibold text-zinc-900">Checklist do mês</h2>
-    <p class="mt-1 text-sm text-zinc-600"><%= summary[:progress_label] %> · competência <%= l(period, format: "%m/%Y") %></p>
+    <h2 class="text-base font-semibold text-zinc-900">Pendências do mês</h2>
+    <p class="mt-1 text-sm text-zinc-600"><%= summary[:progress_label] %> · <%= client_period_label(period) %></p>
   </div>
-  <div class="flex flex-wrap gap-2">
-    <%= link_to "Editar checklist", client_checklist_items_path(client, period: period_param), class: "app-btn-secondary no-underline" %>
-    <% show_next_month = summary[:pending_count].zero? || summary[:deadline][:days_left].to_i.negative? %>
-    <% if show_next_month %>
-      <%= link_to "Iniciar próximo mês",
-            client_path(client, aba: "documentos", period: (period + 1.month).strftime("%Y-%m")),
-            class: "app-btn-primary no-underline" %>
-    <% end %>
-  </div>
+  <% if checklist_items.any? %>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "Itens padrão do cliente", client_checklist_items_path(client, period: period_param), class: "app-btn-secondary no-underline" %>
+    </div>
+  <% end %>
 </div>
 
-<ul class="mt-6 divide-y divide-zinc-100">
-  <% checklist_items.each do |item| %>
-    <%= render "clients/show/checklist_item_row", client: client, item: item, period_param: period_param %>
-  <% end %>
-  <% if checklist_items.empty? %>
-    <li class="py-6 text-center text-sm text-zinc-500">Nenhum item neste mês. Edite o template e aplique ao mês.</li>
-  <% end %>
-</ul>
+<% if checklist_items.empty? %>
+  <div class="mt-6 rounded-lg border border-dashed border-zinc-300 bg-zinc-50/80 px-4 py-8 text-center sm:px-6">
+    <p class="text-sm font-medium text-zinc-900">Nenhuma pendência configurada para <%= client_period_label(period) %></p>
+    <% if template_items_count.positive? %>
+      <p class="mt-2 text-sm text-zinc-600">Use os itens padrão do cliente para começar este mês.</p>
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <%= button_to "Montar checklist deste mês",
+              sync_to_month_client_checklist_items_path(client, period: period_param),
+              method: :post,
+              class: "app-btn-primary",
+              form: { data: { turbo_stream: true, turbo_frame: "_top" } } %>
+        <%= link_to "Editar itens padrão",
+              client_checklist_items_path(client, period: period_param),
+              class: "app-btn-secondary no-underline" %>
+      </div>
+    <% else %>
+      <p class="mt-2 text-sm text-zinc-600">Cadastre os itens padrão do cliente antes de montar o checklist do mês.</p>
+      <div class="mt-5">
+        <%= link_to "Cadastrar itens padrão",
+              client_checklist_items_path(client, period: period_param),
+              class: "app-btn-primary no-underline" %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <ul class="mt-6 divide-y divide-zinc-100">
+    <% checklist_items.each do |item| %>
+      <%= render "clients/show/checklist_item_row", client: client, item: item, period_param: period_param %>
+    <% end %>
+  </ul>
+<% end %>

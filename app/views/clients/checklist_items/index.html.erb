@@ -1,7 +1,7 @@
 <% content_for :title, "Checklist · #{@client.name}" %>
 <div class="mx-auto max-w-2xl space-y-6">
   <%= link_to "← Voltar ao cliente", client_path(@client, aba: "checklist", period: @period.strftime("%Y-%m")), class: "text-sm font-medium text-accent no-underline" %>
-  <h1 class="text-2xl font-semibold text-zinc-900">Template do checklist</h1>
+  <h1 class="text-2xl font-semibold text-zinc-900">Itens padrão do cliente</h1>
 
   <%= form_with model: [@client, ClientChecklistItem.new], url: client_checklist_items_path(@client), class: "app-card space-y-3 p-4" do |f| %>
     <%= f.label :name, "Novo item", class: "app-label" %>
@@ -9,7 +9,7 @@
     <%= f.submit "Adicionar", class: "app-btn-primary" %>
   <% end %>
 
-  <%= button_to "Aplicar template ao mês atual",
+  <%= button_to "Montar checklist do mês atual",
         sync_to_month_client_checklist_items_path(@client, period: @period.strftime("%Y-%m")),
         method: :post,
         class: "app-btn-secondary" %>

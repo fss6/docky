@@ -6,7 +6,7 @@
     <h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl">Carteira</h1>
     <p class="mt-1 text-sm text-zinc-600">
       Visão operacional para acompanhamento de pendências da competência
-      <strong><%= l(@period, format: "%m/%Y") %></strong>.
+      <strong><%= period_display_label(@period) %></strong>.
     </p>
   </header>
 
@@ -46,7 +46,7 @@
       <div>
         <label for="wallet_period" class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Competência</label>
         <%= text_field_tag :period,
-              @period_param.tr("-", "/"),
+              period_picker_value(@period),
               id: "wallet_period",
               autocomplete: "off",
               data: { controller: "month-picker" },

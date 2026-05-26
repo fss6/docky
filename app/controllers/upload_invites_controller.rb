@@ -8,6 +8,17 @@ class UploadInvitesController < ApplicationController
     authorize @client, :show?
 
     @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
+    period_record = Periods::FindOrOpen.call(
+      account: current_user.account,
+      client: @client,
+      period: @period
+    )
+    guard = Periods::UploadGuard.call(period: period_record)
+    unless guard.allowed
+      return redirect_to client_path(@client, aba: "convites", period: @period.strftime("%Y-%m")),
+                         alert: guard.reason,
+                         status: :see_other
+    end
 
     respond_to do |format|
       format.html do

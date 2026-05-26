@@ -4,6 +4,7 @@ class ClientsController < ApplicationController
 
   before_action :set_client, only: %i[show edit update destroy summary]
   before_action :authorize_policy
+  before_action :ensure_period_in_url, only: :show
   before_action :load_monthly_context, only: %i[show summary]
 
   def index
@@ -30,6 +31,11 @@ class ClientsController < ApplicationController
 
     respond_to do |format|
       if @client.save
+        Periods::OpenForClient.call(
+          client: @client,
+          period: Date.current.beginning_of_month,
+          account: @client.account
+        )
         format.html { redirect_to @client, notice: "Cliente criado com sucesso." }
         format.json { render :show, status: :created, location: @client }
       else
@@ -79,14 +85,30 @@ class ClientsController < ApplicationController
     @active_tab = ClientsHelper::VALID_TABS.include?(params[:aba].to_s) ? params[:aba].to_s : "documentos"
 
     @monthly = Clients::EnsureMonthlyCollection.call(client: @client, period: @period)
+    @period_record = @monthly.period_record
     @checklist = @monthly.checklist
     @folder_shim = @monthly.folder_shim
-    @summary = Clients::MonthlySummary.new(client: @client, checklist: @checklist, period: @period).call
+    @summary = Clients::MonthlySummary.new(
+      client: @client,
+      checklist: @checklist,
+      period: @period,
+      period_record: @period_record
+    ).call
     @checklist_items = @checklist.items.includes(:last_document, :validated_by_user).order(:id)
     @linked_items_by_document_id = @checklist_items.select { |i| i.last_document_id.present? }.index_by(&:last_document_id)
     @pending_link_items = @checklist_items.select(&:awaiting_receipt?)
     @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
     @active_upload_invite = @upload_invites.find(&:active?)
+    @template_items_count = @client.client_checklist_items.active_only.count
+    @period_phase = @summary[:period_phase]
+  end
+
+  def ensure_period_in_url
+    return if params[:period].present? && parse_period_param(params[:period]).present?
+
+    redirect_params = { period: Date.current.strftime("%Y-%m") }
+    redirect_params[:aba] = params[:aba] if params[:aba].present?
+    redirect_to client_path(@client, redirect_params), status: :see_other
   end
 
   def load_tab_content
@@ -105,8 +127,12 @@ class ClientsController < ApplicationController
   end
 
   def load_history_tab
-    @past_checklists = @client.competency_checklists.where.not(period: @period).order(period: :desc).limit(12)
-    @client_audit_logs = ClientAuditTrail.new(client: @client).limit(30)
+    @period_activity = Clients::PeriodActivityTimeline.call(
+      client: @client,
+      period: @period,
+      period_record: @period_record,
+      limit: 50
+    )
   end
 
   def heuristic_category_for(document)

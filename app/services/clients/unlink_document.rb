@@ -44,6 +44,7 @@ module Clients
           document_id: document_id,
           client_id: checklist.client_id,
           period: checklist.period.strftime("%Y-%m"),
+          item_name: @item.name_snapshot,
           ip: @ip
         }.compact
       )

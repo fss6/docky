@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_23_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_26_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -185,9 +185,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_120000) do
     t.date "period", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "open", null: false
+    t.datetime "opened_at", null: false
+    t.datetime "closed_at"
+    t.bigint "closed_by_user_id"
     t.index ["account_id", "client_id", "period"], name: "idx_on_account_id_client_id_period_7cc7b2bb99", unique: true
     t.index ["account_id"], name: "index_competency_checklists_on_account_id"
     t.index ["client_id"], name: "index_competency_checklists_on_client_id"
+    t.index ["closed_by_user_id"], name: "index_competency_checklists_on_closed_by_user_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -213,10 +218,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_120000) do
     t.jsonb "tags", default: [], null: false
     t.bigint "client_id"
     t.date "collection_period"
+    t.bigint "period_id"
     t.index ["account_id"], name: "index_documents_on_account_id"
     t.index ["client_id", "collection_period", "created_at"], name: "index_documents_on_client_collection_created"
+    t.index ["client_id", "period_id", "created_at"], name: "index_documents_on_client_period_created"
     t.index ["client_id"], name: "index_documents_on_client_id"
     t.index ["folder_id"], name: "index_documents_on_folder_id"
+    t.index ["period_id"], name: "index_documents_on_period_id"
     t.index ["tags"], name: "index_documents_on_tags", using: :gin
     t.index ["user_id"], name: "index_documents_on_user_id"
   end
@@ -435,10 +443,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_120000) do
   add_foreign_key "competency_checklist_items", "users", column: "validated_by_user_id"
   add_foreign_key "competency_checklists", "accounts"
   add_foreign_key "competency_checklists", "clients"
+  add_foreign_key "competency_checklists", "users", column: "closed_by_user_id"
   add_foreign_key "conversations", "accounts"
   add_foreign_key "conversations", "users"
   add_foreign_key "documents", "accounts"
   add_foreign_key "documents", "clients"
+  add_foreign_key "documents", "competency_checklists", column: "period_id"
   add_foreign_key "documents", "folders"
   add_foreign_key "documents", "users"
   add_foreign_key "embedding_records", "accounts"

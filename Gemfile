@@ -41,6 +41,7 @@ gem "solid_queue"
 gem "solid_cable"
 
 gem 'sidekiq', '~> 8.1', '>= 8.1.2'
+gem "sidekiq-cron", "~> 2.3"
 gem "aws-sdk-s3", require: false
 
 # Reduces boot times through caching; required in config/boot.rb

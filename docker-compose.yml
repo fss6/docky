@@ -47,7 +47,7 @@ services:
       - .:/app
     environment:
       RAILS_ENV: development
-      REDIS_URL: redis://redis:6379/0
+      REDIS_URL: redis://redis-worker:6379/0
     env_file:
       - .env
     depends_on:
@@ -55,7 +55,7 @@ services:
       - redis
   redis:
     image: redis:7
-    container_name: redis
+    container_name: redis-worker
     ports:
       - "6379:6379"
     volumes:
@@ -64,7 +64,7 @@ services:
     image: pgvector/pgvector:pg13
     container_name: postgres
     ports:
-      - "5432:5432"
+      - "54329:5432"
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}

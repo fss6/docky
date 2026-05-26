@@ -22,7 +22,7 @@
       <div>
         <label for="period" class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Competência</label>
         <%= text_field_tag :period,
-              @period.strftime("%Y/%m"),
+              period_picker_value(@period),
               id: "period",
               autocomplete: "off",
               data: { controller: "month-picker" },

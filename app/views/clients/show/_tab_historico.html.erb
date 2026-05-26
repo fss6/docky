@@ -1,31 +1,34 @@
 <section class="space-y-6">
   <div class="app-card p-4 sm:p-6">
-    <h2 class="text-base font-semibold text-zinc-900">Checklists de meses anteriores</h2>
-    <ul class="mt-4 space-y-2">
-      <% past_checklists.each do |cl| %>
-        <li>
-          <%= link_to l(cl.period, format: "%B %Y"), client_path(client, aba: "documentos", period: cl.period.strftime("%Y-%m")), class: "text-sm font-medium text-accent no-underline hover:text-accent-hover" %>
-        </li>
-      <% end %>
-      <% if past_checklists.blank? %>
-        <li class="text-sm text-zinc-500">Nenhuma competência anterior.</li>
-      <% end %>
-    </ul>
-  </div>
+    <h2 class="text-base font-semibold text-zinc-900">Histórico de <%= client_period_label(period) %></h2>
+    <p class="mt-1 text-sm text-zinc-600">
+      Tudo que aconteceu nesta competência: envios, checklist e alterações de status.
+    </p>
 
-  <div class="app-card p-4 sm:p-6">
-    <h2 class="text-base font-semibold text-zinc-900">Trilha de auditoria</h2>
-    <ul class="mt-4 divide-y divide-zinc-100">
-      <% audit_logs.each do |log| %>
-        <li class="py-3 text-sm">
-          <p class="font-medium text-zinc-900"><%= log[:verb] %></p>
-          <p class="text-xs text-zinc-500"><%= log[:actor] %> · <%= l(log[:at], format: :short) %></p>
-          <% if log[:detail].present? %><p class="mt-1 text-xs text-zinc-600"><%= log[:detail] %></p><% end %>
-        </li>
-      <% end %>
-      <% if audit_logs.blank? %>
-        <li class="py-4 text-sm text-zinc-500">Sem eventos registrados.</li>
-      <% end %>
-    </ul>
+    <% if period_activity.any? %>
+      <ul class="mt-6 divide-y divide-zinc-100">
+        <% period_activity.each do |entry| %>
+          <li class="flex gap-3 py-4 first:pt-0">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg <%= period_activity_category_classes(entry.category) %>"
+                 aria-hidden="true">
+              <%= heroicon period_activity_icon(entry.category), variant: :outline, options: { class: "h-4 w-4" } %>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-medium text-zinc-900"><%= entry.title %></p>
+              <% if entry.description.present? %>
+                <p class="mt-0.5 text-sm text-zinc-600"><%= entry.description %></p>
+              <% end %>
+              <p class="mt-1 text-xs text-zinc-500">
+                <%= entry.actor %> · <%= l(entry.at, format: :short) %>
+              </p>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="mt-6 rounded-lg border border-dashed border-zinc-200 bg-zinc-50/80 px-4 py-8 text-center text-sm text-zinc-600">
+        Nenhuma atividade registrada para esta competência ainda.
+      </p>
+    <% end %>
   </div>
 </section>

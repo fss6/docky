@@ -5,7 +5,11 @@ class Client < ApplicationRecord
 
   has_many :folders, dependent: :nullify
   has_many :client_checklist_items, dependent: :destroy
-  has_many :competency_checklists, dependent: :destroy
+  has_many :competency_checklists, class_name: "Period", dependent: :destroy
+
+  def periods
+    competency_checklists
+  end
   has_many :upload_invites, dependent: :destroy
   has_many :collection_documents, class_name: "Document", dependent: :nullify
   has_many :bank_statement_imports, dependent: :destroy

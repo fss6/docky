@@ -7,7 +7,7 @@ module Checklist
     end
 
     def call
-      CompetencyChecklist.find_or_create_by!(
+      Periods::FindOrOpen.call(
         account: @account,
         client: @client,
         period: @period

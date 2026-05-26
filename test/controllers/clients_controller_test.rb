@@ -36,8 +36,9 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show client" do
-    get client_url(@client)
+    get client_url(@client, period: Date.current.strftime("%Y-%m"))
     assert_response :success
+    assert_match "Mês de referência", response.body
     assert_match "Status do mês", response.body
   end
 

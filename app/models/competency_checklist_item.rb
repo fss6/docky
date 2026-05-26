@@ -1,5 +1,8 @@
 class CompetencyChecklistItem < ApplicationRecord
-  belongs_to :competency_checklist, inverse_of: :items
+  belongs_to :competency_checklist,
+             class_name: "Period",
+             foreign_key: :competency_checklist_id,
+             inverse_of: :items
   belongs_to :client_checklist_item, optional: true
   belongs_to :last_document, class_name: "Document", optional: true
   belongs_to :validated_by_user, class_name: "User", optional: true, inverse_of: :validated_competency_checklist_items
@@ -12,6 +15,9 @@ class CompetencyChecklistItem < ApplicationRecord
 
   validates :name_snapshot, presence: true
   validate :last_document_must_match_checklist_competency
+
+  alias period competency_checklist
+  alias period= competency_checklist=
 
   def match_terms
     value = read_attribute(:match_terms)
@@ -45,14 +51,17 @@ class CompetencyChecklistItem < ApplicationRecord
   private
 
   def last_document_must_match_checklist_competency
-    return if last_document.blank? || competency_checklist.blank?
+    period_record = competency_checklist
+    return if last_document.blank? || period_record.blank?
 
     doc = last_document
-    expected_period = competency_checklist.period
+    expected_period = period_record.period
 
-    valid = doc.account_id == competency_checklist.account_id &&
-      doc.client_id == competency_checklist.client_id &&
-      doc.collection_period == expected_period
+    period_match = doc.period_id.present? && doc.period_id == period_record.id
+    legacy_match = doc.collection_period == expected_period
+    valid = doc.account_id == period_record.account_id &&
+      doc.client_id == period_record.client_id &&
+      (period_match || legacy_match)
 
     return if valid
 

@@ -64,12 +64,28 @@ class DocumentsController < ApplicationController
       return
     end
 
+    period_record = resolve_period_record_for_upload
+    if period_record
+      guard = Periods::UploadGuard.call(period: period_record)
+      unless guard.allowed
+        redirect_back fallback_location: after_upload_path, alert: guard.reason, status: :see_other
+        return
+      end
+    end
+
     @document = @folder.documents.build
-    assign_defaults_for_upload!(@document)
+    assign_defaults_for_upload!(@document, period_record: period_record)
     @document.assign_attributes(upload_params)
 
     respond_to do |format|
       if @document.save
+        if @document.client_id.present?
+          AuditEvents::RecordDocumentReceived.call(
+            document: @document,
+            user: current_user,
+            ip: request.remote_ip
+          )
+        end
         DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
         enqueue_bank_statement_import! if monthly_collection_bank_statement_upload?
 
@@ -183,14 +199,24 @@ class DocumentsController < ApplicationController
   end
 
   # Preenchimento automático: conta da pasta, usuário logado, status pendente.
-  def assign_defaults_for_upload!(doc)
+  def assign_defaults_for_upload!(doc, period_record: nil)
+    if period_record && @folder.client_id.present?
+      Documents::AssignToPeriod.call(
+        document: doc,
+        period_record: period_record,
+        folder: @folder,
+        user_id: current_user.id,
+        metadata: { "upload_source" => "account_upload" }
+      )
+      return
+    end
+
     account = @folder.account
-    user = current_user
     period = collection_period_for_folder
 
     doc.assign_attributes(
       account_id: account&.id,
-      user_id: user&.id,
+      user_id: current_user.id,
       status: :pending,
       client_id: @folder.client_id,
       collection_period: period
@@ -199,6 +225,17 @@ class DocumentsController < ApplicationController
     meta = (doc.metadata || {}).dup
     meta["upload_source"] ||= "account_upload"
     doc.metadata = meta
+  end
+
+  def resolve_period_record_for_upload
+    period_date = collection_period_for_folder
+    return nil if period_date.blank? || @folder.client_id.blank?
+
+    Periods::FindOrOpen.call(
+      account: @folder.account,
+      client: @folder.client,
+      period: period_date
+    )
   end
 
   def collection_period_for_folder

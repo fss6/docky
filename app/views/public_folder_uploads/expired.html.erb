@@ -5,7 +5,11 @@
     <p class="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-500">Link de envio</p>
     <h1 class="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Este link não está mais disponível</h1>
     <p class="mt-3 text-sm text-zinc-600">
-      O link pode ter expirado ou sido substituído por um novo. Solicite um novo link ao responsável pela pasta.
+      <% if @expired_message.present? %>
+        <%= @expired_message %>
+      <% else %>
+        O link pode ter expirado ou sido substituído por um novo. Solicite um novo link ao responsável pela pasta.
+      <% end %>
     </p>
   </section>
 </div>

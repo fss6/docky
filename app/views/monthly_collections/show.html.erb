@@ -12,7 +12,7 @@
       <h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl">Coleta Mensal</h1>
       <p class="mt-1 text-sm text-zinc-600">
         Cliente ativo: <strong><%= current_client.name %></strong>.
-        Competência: <strong><%= l(@period, format: "%m/%Y") %></strong>.
+        Competência: <strong><%= period_display_label(@period) %></strong>.
       </p>
     </div>
     <%= link_to "Lista de competências", monthly_collections_path, class: "app-btn-secondary" %>

@@ -53,4 +53,14 @@ module ApplicationHelper
     )
   end
 
+  # Ex.: maio/2026 → "Maio/2026" (URLs e params continuam YYYY-MM).
+  def period_display_label(period)
+    PeriodFormatting.display_label(period)
+  end
+
+  # Valor do flatpickr (dateFormat Y/m); o altInput exibe mês/ano por locale.
+  def period_picker_value(period)
+    PeriodFormatting.picker_value(period)
+  end
+
 end

@@ -1,0 +1,77 @@
+<section class="app-card p-4 sm:p-5" aria-label="Mês de referência">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="min-w-0">
+      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Mês de referência</p>
+      <p class="mt-1 text-sm text-zinc-600">
+        Você está vendo os documentos e pendências de <strong class="text-zinc-900"><%= client_period_label(period) %></strong>.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+      <%= link_to client_show_path(client, aba: active_tab, period: period - 1.month),
+            class: "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-700 no-underline hover:bg-zinc-50",
+            title: "Mês anterior",
+            aria: { label: "Mês anterior" } do %>
+        <%= heroicon "chevron-left", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+      <% end %>
+
+      <div class="min-w-[10rem] text-center">
+        <p class="text-sm font-semibold text-zinc-900"><%= client_period_label(period) %></p>
+        <div class="mt-1 flex flex-wrap items-center justify-center gap-1">
+          <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold <%= client_period_context_chip_classes(period) %>">
+            <%= client_period_context_label(period) %>
+          </span>
+          <% if period_record.present? %>
+            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold <%= period_lifecycle_chip_classes(period_record) %>">
+              <%= period_lifecycle_label(period_record) %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <%= link_to client_show_path(client, aba: active_tab, period: period + 1.month),
+            class: "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-700 no-underline hover:bg-zinc-50",
+            title: "Próximo mês",
+            aria: { label: "Próximo mês" } do %>
+        <%= heroicon "chevron-right", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+      <% end %>
+
+      <%= form_with url: client_path(client), method: :get, local: true, class: "flex items-end gap-2" do %>
+        <%= hidden_field_tag :aba, active_tab %>
+        <div>
+          <label for="client_period_picker" class="sr-only">Ir para o mês</label>
+          <%= text_field_tag :period,
+                period_picker_value(period),
+                id: "client_period_picker",
+                autocomplete: "off",
+                data: { controller: "month-picker" },
+                class: "w-28 rounded-lg border border-zinc-300 bg-white px-2 py-1.5 text-sm text-zinc-800" %>
+        </div>
+        <%= button_tag "Ir", type: "submit", class: "app-btn-secondary shrink-0 text-xs" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if period_record.present? && policy(period_record).close? %>
+    <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-zinc-100 pt-4">
+      <% period_label = client_period_label(period) %>
+      <% if period_record.open? %>
+        <%= button_tag "Fechar competência",
+              type: "button",
+              class: "app-btn-secondary text-xs",
+              data: period_close_confirm_modal_data(
+                url: close_period_client_path(client, period: period_param, aba: active_tab),
+                period_label: period_label
+              ) %>
+      <% else %>
+        <%= button_tag "Reabrir competência",
+              type: "button",
+              class: "app-btn-secondary text-xs",
+              data: period_reopen_confirm_modal_data(
+                url: reopen_period_client_path(client, period: period_param, aba: active_tab),
+                period_label: period_label
+              ) %>
+      <% end %>
+    </div>
+  <% end %>
+</section>

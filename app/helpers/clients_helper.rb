@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module ClientsHelper
-  VALID_TABS = %w[documentos checklist convites email historico].freeze
+  include AppConfirmModalHelper
+
+  VALID_TABS = %w[documentos checklist convites historico].freeze
 
   def client_initials(client)
     parts = client.name.to_s.split(/\s+/).reject(&:blank?).first(2)
@@ -28,14 +30,131 @@ module ClientsHelper
     client_path(client, params)
   end
 
+  def client_period_label(period)
+    period_display_label(period)
+  end
+
+  def client_period_context_label(period)
+    reference = period.to_date.beginning_of_month
+    current = Date.current.beginning_of_month
+
+    if reference == current
+      "Mês em andamento"
+    elsif reference < current
+      "Mês anterior"
+    else
+      "Mês futuro"
+    end
+  end
+
+  def client_period_phase(period)
+    reference = period.to_date.beginning_of_month
+    current = Date.current.beginning_of_month
+
+    if reference == current
+      :current
+    elsif reference < current
+      :past
+    else
+      :future
+    end
+  end
+
+  def client_period_context_chip_classes(period)
+    case client_period_phase(period)
+    when :current
+      "bg-sky-50 text-sky-800 ring-1 ring-inset ring-sky-600/20"
+    when :past
+      "bg-zinc-100 text-zinc-700 ring-1 ring-inset ring-zinc-300"
+    else
+      "bg-violet-50 text-violet-800 ring-1 ring-inset ring-violet-600/20"
+    end
+  end
+
+  TAB_LABELS = {
+    "documentos" => "Documentos",
+    "checklist" => "Pendências do mês",
+    "convites" => "Convites & Links",
+    "historico" => "Histórico"
+  }.freeze
+
   def summary_status_badge_classes(tone)
     case tone.to_sym
     when :success
       "bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-600/20"
     when :warning
       "bg-amber-50 text-amber-900 ring-1 ring-inset ring-amber-600/20"
+    when :neutral
+      "bg-zinc-100 text-zinc-700 ring-1 ring-inset ring-zinc-300"
     else
       "bg-zinc-100 text-zinc-700"
+    end
+  end
+
+  def period_lifecycle_label(period_record)
+    return "—" if period_record.blank?
+
+    period_record.closed? ? "Encerrada" : "Aberta"
+  end
+
+  def period_close_confirm_modal_data(url:, period_label:)
+    app_confirm_modal_open_data(
+      url: url,
+      item_label: period_label,
+      http_method: "patch",
+      heading: "Fechar competência?",
+      body_prefix: "Você está encerrando a competência ",
+      body_suffix: ". Novos envios pelo portal e uploads internos ficarão bloqueados para esta competência.",
+      confirm_text: "Fechar competência",
+      confirm_variant: "primary"
+    )
+  end
+
+  def period_activity_category_classes(category)
+    case category.to_sym
+    when :document
+      "bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-600/15"
+    when :checklist
+      "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/15"
+    when :period
+      "bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/15"
+    when :invite
+      "bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-600/15"
+    else
+      "bg-zinc-100 text-zinc-600 ring-1 ring-inset ring-zinc-300"
+    end
+  end
+
+  def period_activity_icon(category)
+    case category.to_sym
+    when :document then "document-text"
+    when :checklist then "clipboard-document-check"
+    when :period then "calendar"
+    when :invite then "link"
+    else "clock"
+    end
+  end
+
+  def period_reopen_confirm_modal_data(url:, period_label:)
+    app_confirm_modal_open_data(
+      url: url,
+      item_label: period_label,
+      http_method: "patch",
+      heading: "Reabrir competência?",
+      body_prefix: "Você está reabrindo a competência ",
+      body_suffix: ". O cliente poderá voltar a enviar documentos deste período.",
+      confirm_text: "Reabrir competência",
+      confirm_variant: "primary"
+    )
+  end
+
+  def period_lifecycle_chip_classes(period_record)
+    return "bg-zinc-100 text-zinc-700 ring-1 ring-inset ring-zinc-300" if period_record.blank?
+
+    if period_record.closed?
+      "bg-zinc-100 text-zinc-700 ring-1 ring-inset ring-zinc-300"
+    else
+      "bg-emerald-50 text-emerald-800 ring-1 ring-inset ring-emerald-600/20"
     end
   end
 
