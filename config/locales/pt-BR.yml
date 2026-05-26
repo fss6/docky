@@ -54,6 +54,42 @@ pt-BR:
       default: "%d/%m/%Y %H:%M"
       short: "%d/%m %H:%M"
       long: "%d de %B de %Y às %H:%M"
+  datetime:
+    distance_in_words:
+      half_a_minute: meio minuto
+      less_than_x_seconds:
+        one: menos de %{count} segundo
+        other: menos de %{count} segundos
+      x_seconds:
+        one: "%{count} segundo"
+        other: "%{count} segundos"
+      less_than_x_minutes:
+        one: menos de um minuto
+        other: menos de %{count} minutos
+      x_minutes:
+        one: "%{count} minuto"
+        other: "%{count} minutos"
+      about_x_hours:
+        one: aproximadamente %{count} hora
+        other: aproximadamente %{count} horas
+      x_days:
+        one: "%{count} dia"
+        other: "%{count} dias"
+      about_x_months:
+        one: aproximadamente %{count} mês
+        other: aproximadamente %{count} meses
+      x_months:
+        one: "%{count} mês"
+        other: "%{count} meses"
+      about_x_years:
+        one: aproximadamente %{count} ano
+        other: aproximadamente %{count} anos
+      over_x_years:
+        one: mais de %{count} ano
+        other: mais de %{count} anos
+      almost_x_years:
+        one: quase %{count} ano
+        other: quase %{count} anos
   number:
     currency:
       format:

@@ -39,13 +39,62 @@ module Clients
       assert_redirected_to client_path(@client, period: @period_param)
     end
 
-    test "checklist tab shows empty state with mount CTA" do
+    test "checklist tab shows compact period navigator without status chips" do
       get client_path(@client, aba: "checklist", period: @period_param)
 
       assert_response :success
-      assert_match "Mês de referência", response.body
+      assert_match 'aria-label="Competência"', response.body
+      assert_select 'button[aria-label*="Escolher competência"]'
+      assert_select "button.bg-sky-50.border-sky-200"
+      assert_select "button.bg-sky-50 svg.text-sky-600"
+      assert_select "button.bg-sky-50 span.text-sky-800", text: /#{Regexp.escape(PeriodFormatting.display_label(@period))}/
+      assert_no_match ">Atual<", response.body
+      assert_no_match ">Aberta<", response.body
+      assert_no_match ">Encerrada<", response.body
       assert_match "Montar checklist deste mês", response.body
       assert_no_match "Iniciar próximo mês", response.body
+      assert_no_match ">Ir<", response.body
+      assert_no_match "Você está vendo os documentos", response.body
+      assert_match "Mês em andamento", response.body
+      assert_no_match "Mês atual", response.body
+      assert_no_match "Ir para", response.body
+    end
+
+    test "past month shows go to current month action in navigator" do
+      past_period = (@period - 1.month).strftime("%Y-%m")
+      ActsAsTenant.with_tenant(@account) do
+        past_checklist = CompetencyChecklist.create!(
+          account: @account,
+          client: @client,
+          period: @period - 1.month
+        )
+        Periods::Close.call(period: past_checklist, user: @user)
+      end
+
+      get client_path(@client, aba: "checklist", period: past_period)
+
+      assert_response :success
+      go_to_label = "Ir para #{PeriodFormatting.display_label(@period)}"
+      assert_select "div.border-zinc-200 a", text: go_to_label
+      assert_no_match "Mês em andamento", response.body
+      assert_no_match "Mês atual", response.body
+      assert_select "button.border-transparent"
+      assert_select "button.border-transparent svg.text-zinc-400"
+      assert_select "button.bg-sky-50", count: 0
+      assert_match "Reabrir competência", response.body
+      assert_match "Competência encerrada", response.body
+      assert_no_match ">Retroativa<", response.body
+      assert_select "span.text-zinc-900", text: /#{Regexp.escape(PeriodFormatting.display_label(@period - 1.month))}/
+    end
+
+    test "period navigator has prev and next month links" do
+      get client_path(@client, aba: "checklist", period: @period_param)
+
+      prev_param = (@period - 1.month).strftime("%Y-%m")
+      next_param = (@period + 1.month).strftime("%Y-%m")
+
+      assert_select "a[href=?]", client_path(@client, aba: "checklist", period: prev_param)
+      assert_select "a[href=?]", client_path(@client, aba: "checklist", period: next_param)
     end
 
     test "sync_to_month builds checklist via turbo stream" do

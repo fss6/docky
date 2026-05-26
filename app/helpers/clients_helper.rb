@@ -39,11 +39,11 @@ module ClientsHelper
     current = Date.current.beginning_of_month
 
     if reference == current
-      "Mês em andamento"
+      "Atual"
     elsif reference < current
-      "Mês anterior"
+      "Retroativa"
     else
-      "Mês futuro"
+      "Futura"
     end
   end
 
@@ -69,6 +69,45 @@ module ClientsHelper
     else
       "bg-violet-50 text-violet-800 ring-1 ring-inset ring-violet-600/20"
     end
+  end
+
+  def client_period_navigator_icon_classes(period)
+    case client_period_phase(period)
+    when :current
+      "h-4 w-4 shrink-0 text-sky-600"
+    else
+      "h-4 w-4 shrink-0 text-zinc-400"
+    end
+  end
+
+  def client_period_navigator_picker_button_classes(period)
+    base = "inline-flex items-center gap-2 rounded-lg border px-2 py-1 hover:border-zinc-200 hover:bg-zinc-50"
+    if client_period_phase(period) == :current
+      "#{base} border-sky-200 bg-sky-50"
+    else
+      "#{base} border-transparent"
+    end
+  end
+
+  def client_period_navigator_label_classes(period)
+    case client_period_phase(period)
+    when :current
+      "text-sm font-semibold text-sky-800"
+    else
+      "text-sm font-semibold text-zinc-900"
+    end
+  end
+
+  def client_period_in_progress_chip_classes
+    "inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold bg-sky-50 text-sky-800 ring-1 ring-inset ring-sky-600/20"
+  end
+
+  def client_period_go_to_current_label
+    "Ir para #{period_display_label(Date.current)}"
+  end
+
+  def client_period_go_to_current_link_classes
+    "inline-flex shrink-0 items-center rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-800 no-underline hover:border-zinc-400 hover:bg-zinc-50"
   end
 
   TAB_LABELS = {

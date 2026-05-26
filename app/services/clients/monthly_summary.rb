@@ -40,8 +40,17 @@ module Clients
         period_phase: phase,
         status_badge: status_badge(pending, phase),
         deadline: deadline_payload(phase),
-        last_upload_label: last_upload ? ActionController::Base.helpers.time_ago_in_words(last_upload) : "—"
+        last_upload_label: format_last_upload_label(last_upload)
       }
+    end
+
+    def format_last_upload_label(last_upload)
+      return "—" if last_upload.blank?
+
+      I18n.with_locale(:"pt-BR") do
+        distance = ActionController::Base.helpers.time_ago_in_words(last_upload, locale: :"pt-BR")
+        "há #{distance}"
+      end
     end
 
     def period_phase
