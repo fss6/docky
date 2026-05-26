@@ -23,6 +23,9 @@
         <%= link_to "Chat", chat_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <%= link_to "Grupos", groups_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <%= link_to "Assinaturas", subscriptions_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+        <% if policy(Setting).show? %>
+          <%= link_to "Configurações", settings_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+        <% end %>
       </div>
     </details>
 
@@ -89,6 +92,12 @@
       </svg>
     </summary>
     <div class="absolute right-0 top-full mt-1 w-44 rounded-lg border border-zinc-200 bg-white py-1 shadow-[var(--shadow-float)]">
+      <% if policy(Setting).show? %>
+        <%= link_to settings_path, class: "flex w-full items-center gap-2 px-4 py-2 text-sm text-zinc-700 no-underline transition-colors hover:bg-zinc-50" do %>
+          <%= heroicon "cog-6-tooth", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-zinc-500", "aria-hidden": "true" } %>
+          <span>Configurações</span>
+        <% end %>
+      <% end %>
       <%= button_to destroy_user_session_path,
         method: :delete,
         class: "flex w-full cursor-pointer items-center gap-2 bg-transparent px-4 py-2 text-left text-sm text-zinc-700 no-underline transition-colors hover:bg-zinc-50" do %>

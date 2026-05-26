@@ -50,6 +50,7 @@ class UploadInvitesControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_includes body["html"], invite.token
     assert_includes body["html"], "WhatsApp"
+    assert_includes body["html"], "Enviar e-mail"
   end
 
   test "create turbo_stream reuses active invite" do

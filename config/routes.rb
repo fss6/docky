@@ -56,7 +56,11 @@ Rails.application.routes.draw do
         patch :mark_pending
       end
     end
-    resources :upload_invites, only: [:create]
+    resources :upload_invites, only: [:create] do
+      member do
+        post :send_email, to: "clients/upload_invite_emails#create"
+      end
+    end
   end
   resources :upload_invites, only: [] do
     member do

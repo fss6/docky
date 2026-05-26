@@ -24,6 +24,11 @@ class SettingsController < ApplicationController
   end
 
   def setting_params
-    params.expect(setting: [:generate_tags_automatically])
+    params.expect(setting: [
+      :generate_tags_automatically,
+      :upload_share_whatsapp_template,
+      :upload_share_email_subject_template,
+      :upload_share_email_body_template
+    ])
   end
 end

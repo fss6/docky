@@ -214,18 +214,28 @@ module ClientsHelper
     )
   end
 
-  def upload_invite_share_text(client, url)
-    "Olá! Envie seus documentos de #{client.name} pelo link: #{url}"
+  def upload_invite_share_rendered(client, url, period_param: nil)
+    setting = current_user.account.setting || current_user.account.create_setting!
+    period = upload_invite_period_from_param(period_param)
+    UploadShareMessageRenderer.call(
+      setting: setting,
+      client: client,
+      url: url,
+      period: period
+    )
   end
 
-  def upload_invite_whatsapp_url(client, url)
-    text = upload_invite_share_text(client, url)
+  def upload_invite_whatsapp_url(client, url, period_param: nil)
+    text = upload_invite_share_rendered(client, url, period_param: period_param).whatsapp_text
     "https://wa.me/?text=#{ERB::Util.url_encode(text)}"
   end
 
-  def upload_invite_mailto_url(client, url)
-    subject = "Envio de documentos — #{client.name}"
-    body = upload_invite_share_text(client, url)
-    "mailto:?subject=#{ERB::Util.url_encode(subject)}&body=#{ERB::Util.url_encode(body)}"
+  def upload_invite_period_from_param(period_param)
+    return nil if period_param.blank?
+
+    normalized = period_param.to_s.strip.tr("/", "-")
+    Date.strptime(normalized, "%Y-%m").beginning_of_month
+  rescue ArgumentError
+    nil
   end
 end

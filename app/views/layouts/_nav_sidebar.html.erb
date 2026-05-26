@@ -36,6 +36,12 @@
           { key: :monthly_collection, label: "Coleta Mensal", path: monthly_collections_path, icon: :arrow_up_on_square, policy_ok: policy(Folder).index? },
           { key: :erp_export, label: "Exporta ERP", icon: :circle_stack, disabled: true, policy_ok: true }
         ]
+      },
+      {
+        title: "Sistema",
+        items: [
+          { key: :settings, label: "Configurações", path: settings_path, icon: :cog, policy_ok: policy(Setting).show? }
+        ]
       }
     ] %>
 
@@ -54,7 +60,8 @@
                        (item[:key] == :conversations && request.path.match?(%r{\A/accounts/\d+/conversations})) ||
                        (item[:key] == :wiki && request.path.start_with?("/wiki")) ||
                        (item[:key] == :audit && request.path.start_with?("/audit")) ||
-                       (item[:key] == :monthly_collection && request.path.start_with?("/monthly-collections")) %>
+                       (item[:key] == :monthly_collection && request.path.start_with?("/monthly-collections")) ||
+                       (item[:key] == :settings && request.path.start_with?("/settings")) %>
 
           <% base_classes = "group flex items-center justify-center gap-3 rounded-md px-2 py-2.5 text-zinc-400 transition-colors xl:justify-start" %>
           <% if item[:disabled] %>

@@ -35,7 +35,7 @@ module Clients
       when "checklist_item.marked_validated", "checklist_item.reopened", "checklist_item.document_linked",
            "checklist_item.document_unlinked", "checklist_item.created_from_document"
         [checklist_item_name, document_filename].compact.join(" · ").presence || "—"
-      when "upload_invite.created", "upload_invite.revoked"
+      when "upload_invite.created", "upload_invite.revoked", "upload_invite.email_sent"
         "Link de upload do cliente"
       when "monthly_collection.created"
         "Competência #{month_label} disponível para trabalho"
@@ -55,7 +55,8 @@ module Clients
       "checklist_item.document_unlinked" => "Documento desvinculado",
       "checklist_item.created_from_document" => "Item criado a partir de documento",
       "upload_invite.created" => "Link de upload gerado",
-      "upload_invite.revoked" => "Link de upload revogado"
+      "upload_invite.revoked" => "Link de upload revogado",
+      "upload_invite.email_sent" => "Convite enviado por e-mail"
     }.freeze
 
     private

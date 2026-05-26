@@ -5,38 +5,92 @@
     <p class="text-xs font-semibold uppercase tracking-wide text-accent">Sistema</p>
     <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Configurações</h1>
     <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
-      Defina comportamentos globais da conta.
+      Defina comportamentos globais da conta. Cada bloco abaixo é independente.
     </p>
   </header>
 
-  <section class="app-card p-5">
-    <%= form_with model: @setting, url: settings_path, method: :patch, class: "space-y-5" do |form| %>
-      <% if @setting.errors.any? %>
-        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-          <p class="font-medium">Não foi possível salvar as configurações.</p>
-          <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
-            <% @setting.errors.full_messages.each do |error| %>
-              <li><%= error %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="rounded-md border border-zinc-200 px-4 py-3">
-        <label class="flex cursor-pointer items-start justify-between gap-4">
-          <div>
-            <p class="text-sm font-medium text-zinc-900">Gerar tags automaticamente com IA</p>
-            <p class="mt-1 text-sm text-zinc-500">
-              Quando habilitado, os documentos processados recebem sugestões iniciais de tags.
-            </p>
-          </div>
-          <%= form.check_box :generate_tags_automatically, class: "mt-1 h-4 w-4 rounded border-zinc-300 text-accent focus:ring-accent" %>
-        </label>
-      </div>
-
-      <div>
-        <%= form.submit "Salvar configurações", class: "app-btn-primary cursor-pointer border-0" %>
+  <%= form_with model: @setting, url: settings_path, method: :patch, class: "space-y-6" do |form| %>
+    <% if @setting.errors.any? %>
+      <div class="app-card rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <p class="font-medium">Não foi possível salvar as configurações.</p>
+        <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
+          <% @setting.errors.full_messages.each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
-  </section>
+
+    <section class="app-card p-5">
+      <header class="border-b border-zinc-100 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Inteligência</p>
+        <h2 class="mt-1 text-lg font-semibold text-zinc-900">Tags automáticas com IA</h2>
+        <p class="mt-1 text-sm text-zinc-500">
+          Quando habilitado, os documentos processados recebem sugestões iniciais de tags.
+        </p>
+      </header>
+      <label class="mt-4 flex cursor-pointer items-start justify-between gap-4 rounded-md border border-zinc-200 px-4 py-3">
+        <span class="text-sm font-medium text-zinc-900">Gerar tags automaticamente</span>
+        <%= form.check_box :generate_tags_automatically, class: "mt-0.5 h-4 w-4 rounded border-zinc-300 text-accent focus:ring-accent" %>
+      </label>
+    </section>
+
+    <section id="upload-share" class="app-card scroll-mt-6 p-5">
+      <header class="border-b border-zinc-100 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Compartilhamento</p>
+        <h2 class="mt-1 text-lg font-semibold text-zinc-900">Mensagem do WhatsApp</h2>
+        <p class="mt-1 text-sm text-zinc-500">
+          Texto enviado ao abrir o WhatsApp a partir do link de upload do cliente.
+        </p>
+        <p class="mt-2 text-xs text-zinc-500">
+          Placeholders:
+          <code class="rounded bg-zinc-100 px-1">{{nome_cliente}}</code>,
+          <code class="rounded bg-zinc-100 px-1">{{link}}</code>,
+          <code class="rounded bg-zinc-100 px-1">{{competencia}}</code>
+          — <code class="rounded bg-zinc-100 px-1">{{link}}</code> é obrigatório.
+        </p>
+      </header>
+      <div class="mt-4">
+        <%= form.label :upload_share_whatsapp_template, "Mensagem", class: "sr-only" %>
+        <%= form.text_area :upload_share_whatsapp_template,
+              rows: 4,
+              class: "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-accent focus:ring-accent" %>
+      </div>
+    </section>
+
+    <section id="upload-share-email" class="app-card scroll-mt-6 p-5">
+      <header class="border-b border-zinc-100 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Compartilhamento</p>
+        <h2 class="mt-1 text-lg font-semibold text-zinc-900">E-mail de convite</h2>
+        <p class="mt-1 text-sm text-zinc-500">
+          Assunto e corpo do e-mail enviado pelo Dokivo ao clicar em &ldquo;Enviar e-mail&rdquo; no link de upload.
+        </p>
+        <p class="mt-2 text-xs text-zinc-500">
+          Placeholders:
+          <code class="rounded bg-zinc-100 px-1">{{nome_cliente}}</code>,
+          <code class="rounded bg-zinc-100 px-1">{{link}}</code>,
+          <code class="rounded bg-zinc-100 px-1">{{competencia}}</code>
+          — <code class="rounded bg-zinc-100 px-1">{{link}}</code> é obrigatório no corpo.
+        </p>
+      </header>
+      <div class="mt-4 space-y-4">
+        <div>
+          <%= form.label :upload_share_email_subject_template, "Assunto", class: "text-sm font-medium text-zinc-900" %>
+          <%= form.text_field :upload_share_email_subject_template,
+                class: "mt-1.5 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-accent focus:ring-accent" %>
+        </div>
+        <div>
+          <%= form.label :upload_share_email_body_template, "Corpo da mensagem", class: "text-sm font-medium text-zinc-900" %>
+          <p class="mt-0.5 text-xs text-zinc-500">Exibido dentro do layout do e-mail (com marca da conta e link clicável no rodapé).</p>
+          <%= form.text_area :upload_share_email_body_template,
+                rows: 6,
+                class: "mt-1.5 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-accent focus:ring-accent" %>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex justify-end">
+      <%= form.submit "Salvar configurações", class: "app-btn-primary cursor-pointer border-0" %>
+    </div>
+  <% end %>
 </div>
