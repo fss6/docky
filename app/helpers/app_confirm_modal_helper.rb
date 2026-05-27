@@ -6,7 +6,7 @@ module AppConfirmModalHelper
   # @param item_label [String, nil] texto exibido em destaque no corpo do modal (nome do recurso)
   # @param http_method [String, nil] "delete" (padrão), "post", "patch" ou "put"
   # @param confirm_variant [String, nil] "danger" (padrão visual ao omitir) ou "primary"
-  def app_confirm_modal_open_data(url:, item_label: nil, http_method: nil, heading: nil, body_prefix: nil, body_suffix: nil, confirm_text: nil, confirm_variant: nil, **extra)
+  def app_confirm_modal_open_data(url:, item_label: nil, http_method: nil, heading: nil, body_prefix: nil, body_suffix: nil, confirm_text: nil, confirm_variant: nil, turbo_stream: false, **extra)
     {
       action: "click->app-confirm-modal#open",
       app_confirm_modal_url_param: url,
@@ -18,6 +18,7 @@ module AppConfirmModalHelper
       h[:app_confirm_modal_body_suffix_param] = body_suffix if body_suffix
       h[:app_confirm_modal_confirm_text_param] = confirm_text if confirm_text
       h[:app_confirm_modal_confirm_variant_param] = confirm_variant if confirm_variant
+      h[:app_confirm_modal_turbo_stream_param] = true if turbo_stream
     end
   end
 end

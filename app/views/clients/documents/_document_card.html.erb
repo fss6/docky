@@ -85,7 +85,7 @@
                 type: "button",
                 class: "block w-full cursor-pointer px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50 border-0 bg-transparent",
                 data: document_destroy_confirm_modal_data(
-                  url: document_path(document),
+                  url: client_document_path(client, document, **link_query),
                   item_label: document_file_label(document)
                 ) %>
         <% end %>

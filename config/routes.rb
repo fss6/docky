@@ -50,7 +50,7 @@ Rails.application.routes.draw do
       end
     end
     resources :onboarding_upload_invites, only: [:create], module: :clients
-    resources :documents, only: %i[index create], module: :clients do
+    resources :documents, only: %i[index create destroy], module: :clients do
       member do
         patch :link
         patch :unlink

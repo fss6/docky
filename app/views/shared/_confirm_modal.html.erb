@@ -25,7 +25,7 @@
       >
         <%= cancel_text %>
       </button>
-      <%= form_with url: "#", method: :delete, data: { app_confirm_modal_target: "form", turbo_frame: "_top" }, class: "inline-block w-full sm:w-auto" do %>
+      <%= form_with url: "#", method: :delete, data: { app_confirm_modal_target: "form" }, class: "inline-block w-full sm:w-auto" do %>
         <button
           type="submit"
           data-app-confirm-modal-target="confirmButton"

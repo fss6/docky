@@ -24,8 +24,11 @@ module Clients
       )
       ActsAsTenant.with_tenant(@account) do
         @client = Client.create!(account: @account, name: "Cliente Teste")
+        month = Date.current.beginning_of_month
+        @period = month.strftime("%Y-%m")
+        Period.create!(account: @account, client: @client, period: month)
+        Folder.create!(account: @account, client: @client, name: @period, visible: false)
       end
-      @period = Date.current.beginning_of_month.strftime("%Y-%m")
       sign_in @user
     end
 
@@ -52,6 +55,28 @@ module Clients
       assert document.file.attached?
       assert_match "client_documents_frame", response.body
       assert_match "Documento adicionado com sucesso", response.body
+    end
+
+    test "should destroy document via turbo stream" do
+      file = Rack::Test::UploadedFile.new(
+        Rails.root.join("test/fixtures/files/sample.txt"),
+        "text/plain"
+      )
+
+      post client_documents_path(@client, period: @period),
+           params: { document: { file: file } },
+           headers: { Accept: "text/vnd.turbo-stream.html" }
+
+      document = Document.order(:created_at).last
+
+      assert_difference("Document.count", -1) do
+        delete client_document_path(@client, document, period: @period),
+               headers: { Accept: "text/vnd.turbo-stream.html" }
+      end
+
+      assert_response :success
+      assert_match "client_documents_frame", response.body
+      assert_match "Documento excluído com sucesso", response.body
     end
   end
 end

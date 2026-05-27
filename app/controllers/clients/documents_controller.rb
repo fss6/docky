@@ -6,7 +6,7 @@ module Clients
 
     before_action :set_client
     before_action :load_monthly_collection_readonly
-    before_action :set_document, only: %i[link unlink]
+    before_action :set_document, only: %i[link unlink destroy]
 
     def index
       authorize @client, :show?
@@ -105,6 +105,31 @@ module Clients
       load_checklist_link_context
       flash.now[:notice] = "Documento desvinculado."
       render_link_update
+    end
+
+    def destroy
+      authorize @client, :show?
+      authorize @document, :destroy?
+
+      linked_item = @document.linked_checklist_item
+      if linked_item
+        Clients::UnlinkDocument.call(item: linked_item, user: current_user, ip: request.remote_ip)
+      end
+
+      Wiki::CleanupDocumentService.new(account: @document.account, document_id: @document.id).call
+      @document.destroy!
+
+      flash.now[:notice] = "Documento excluído com sucesso."
+      load_checklist_link_context
+
+      respond_to do |format|
+        format.turbo_stream { render :destroy }
+        format.html do
+          redirect_to client_path(@client, aba: "documentos", period: @period_param),
+                      notice: "Documento excluído com sucesso.",
+                      status: :see_other
+        end
+      end
     end
 
     private

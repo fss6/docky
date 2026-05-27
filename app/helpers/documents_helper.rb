@@ -90,7 +90,8 @@ module DocumentsHelper
       heading: t("documents.confirm_modal.heading"),
       body_prefix: t("documents.confirm_modal.body_prefix"),
       body_suffix: t("documents.confirm_modal.body_suffix"),
-      confirm_text: t("documents.confirm_modal.confirm")
+      confirm_text: t("documents.confirm_modal.confirm"),
+      turbo_stream: true
     )
   end
 end

@@ -13,6 +13,17 @@ export default class extends Controller {
 
   connect() {
     this.captureDefaults()
+    if (this.hasFormTarget) {
+      this._onSubmitEnd = (event) => this.submitEnd(event)
+      this.formTarget.addEventListener("turbo:submit-end", this._onSubmitEnd)
+      this.syncFormTurboMode({ dataset: {} })
+    }
+  }
+
+  disconnect() {
+    if (this.hasFormTarget && this._onSubmitEnd) {
+      this.formTarget.removeEventListener("turbo:submit-end", this._onSubmitEnd)
+    }
   }
 
   captureDefaults() {
@@ -75,9 +86,27 @@ export default class extends Controller {
     if (this.hasFormTarget && url) {
       this.formTarget.action = url
       this.syncFormMethod(this.formTarget, httpMethod)
+      this.syncFormTurboMode(btn)
     }
 
     if (this.hasDialogTarget) this.dialogTarget.showModal()
+  }
+
+  syncFormTurboMode(btn) {
+    if (!this.hasFormTarget) return
+
+    const useTurboStream = btn.dataset.appConfirmModalTurboStreamParam === "true"
+    if (useTurboStream) {
+      this.formTarget.dataset.turboStream = "true"
+      delete this.formTarget.dataset.turboFrame
+    } else {
+      delete this.formTarget.dataset.turboStream
+      this.formTarget.dataset.turboFrame = "_top"
+    }
+  }
+
+  submitEnd(event) {
+    if (event.detail.success) this.close()
   }
 
   syncFormMethod(form, method) {
