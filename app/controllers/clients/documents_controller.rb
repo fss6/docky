@@ -74,18 +74,6 @@ module Clients
       authorize @client, :show?
       item = @monthly.checklist.items.find(params[:item_id])
 
-      if params[:new_item_name].present?
-        item = @monthly.checklist.items.create!(
-          name_snapshot: params[:new_item_name].to_s.strip,
-          state: :pending
-        )
-        record_audit_event(
-          event_type: "checklist_item.created_from_document",
-          subject: item,
-          metadata: { client_id: @client.id, period: @period.strftime("%Y-%m"), ip: request.remote_ip }
-        )
-      end
-
       if Clients::LinkDocument.call(document: @document, item: item, user: current_user, ip: request.remote_ip)
         @document.reload
         load_checklist_link_context

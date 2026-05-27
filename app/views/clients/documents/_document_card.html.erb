@@ -39,18 +39,6 @@
           <% if pending_link_items.empty? %>
             <p class="px-3 py-2 text-xs text-zinc-500">Nenhum item pendente.</p>
           <% end %>
-          <div class="border-t border-zinc-100 px-3 py-2" data-document-link-menu-target="newItemForm" hidden>
-            <%= form_with url: link_client_document_path(client, document, **link_query),
-                  method: :patch,
-                  data: { turbo_stream: true },
-                  class: "flex gap-2" do %>
-              <%= text_field_tag :new_item_name, nil, placeholder: "Nome do item", class: "app-input text-xs", required: true %>
-              <%= submit_tag "Criar", class: "app-btn-primary text-xs px-2 py-1" %>
-            <% end %>
-          </div>
-          <button type="button" class="block w-full px-3 py-2 text-left text-sm text-accent hover:bg-zinc-50 border-0 bg-transparent" data-action="click->document-link-menu#showNewItem">
-            Criar novo item…
-          </button>
         </div>
       </details>
     <% end %>
