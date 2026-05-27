@@ -165,7 +165,7 @@ class ClientsController < ApplicationController
       client: @client,
       period: @period,
       period_record: @period_record,
-      limit: 50
+      limit: Clients::PeriodActivityTimeline::TAB_LIMIT
     )
   end
 

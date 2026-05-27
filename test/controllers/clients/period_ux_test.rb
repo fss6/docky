@@ -116,6 +116,7 @@ module Clients
 
       assert_response :success
       assert_match "Histórico de", response.body
+      assert_match "Últimas 10 atividades", response.body
       assert_match "Competência encerrada", response.body
     end
 

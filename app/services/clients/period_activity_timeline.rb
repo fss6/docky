@@ -2,6 +2,8 @@
 
 module Clients
   class PeriodActivityTimeline
+    TAB_LIMIT = 10
+
     Entry = Struct.new(:at, :actor, :category, :title, :description, keyword_init: true)
 
     def self.call(client:, period:, period_record: nil, limit: 50)

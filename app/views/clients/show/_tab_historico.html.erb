@@ -2,23 +2,26 @@
   <div class="app-card p-4 sm:p-6">
     <h2 class="text-base font-semibold text-zinc-900">Histórico de <%= client_period_label(period) %></h2>
     <p class="mt-1 text-sm text-zinc-600">
-      Tudo que aconteceu nesta competência: envios, checklist e alterações de status.
+      Últimas <%= Clients::PeriodActivityTimeline::TAB_LIMIT %> atividades desta competência: envios, checklist e alterações de status.
     </p>
 
     <% if period_activity.any? %>
-      <ul class="mt-6 divide-y divide-zinc-100">
+      <ul class="mt-4 divide-y divide-zinc-100">
         <% period_activity.each do |entry| %>
-          <li class="flex gap-3 py-4 first:pt-0">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg <%= period_activity_category_classes(entry.category) %>"
+          <li class="flex gap-2.5 py-2 first:pt-0">
+            <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md <%= period_activity_category_classes(entry.category) %>"
                  aria-hidden="true">
-              <%= heroicon period_activity_icon(entry.category), variant: :outline, options: { class: "h-4 w-4" } %>
+              <%= heroicon period_activity_icon(entry.category), variant: :outline, options: { class: "h-3.5 w-3.5" } %>
             </div>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-zinc-900"><%= entry.title %></p>
-              <% if entry.description.present? %>
-                <p class="mt-0.5 text-sm text-zinc-600"><%= entry.description %></p>
-              <% end %>
-              <p class="mt-1 text-xs text-zinc-500">
+            <div class="min-w-0 flex-1 leading-snug">
+              <p class="truncate text-sm text-zinc-900">
+                <span class="font-medium"><%= entry.title %></span>
+                <% if entry.description.present? %>
+                  <span class="mx-1 text-zinc-300" aria-hidden="true">|</span>
+                  <span class="text-zinc-600"><%= entry.description %></span>
+                <% end %>
+              </p>
+              <p class="mt-0.5 text-xs text-zinc-500">
                 <%= entry.actor %> · <%= l(entry.at, format: :short) %>
               </p>
             </div>
@@ -26,7 +29,7 @@
         <% end %>
       </ul>
     <% else %>
-      <p class="mt-6 rounded-lg border border-dashed border-zinc-200 bg-zinc-50/80 px-4 py-8 text-center text-sm text-zinc-600">
+      <p class="mt-4 rounded-lg border border-dashed border-zinc-200 bg-zinc-50/80 px-4 py-6 text-center text-sm text-zinc-600">
         Nenhuma atividade registrada para esta competência ainda.
       </p>
     <% end %>
