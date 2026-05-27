@@ -173,6 +173,27 @@ docker compose run web rails db:seed
 docker compose run web rails db:reset
 ```
 
+## Banco de teste (`RAILS_ENV=test`)
+
+Para qualquer comando que crie, apague, recrie ou migre o banco de teste, sempre definir `RAILS_ENV=test`.
+Sem isso, o Rails usa `development` por padrão e pode alterar o banco errado.
+
+Use `-e RAILS_ENV=test` no `docker compose run`:
+
+```bash
+docker compose run -e RAILS_ENV=test web rails db:test:prepare
+docker compose run -e RAILS_ENV=test web rails db:drop db:create db:migrate
+docker compose run -e RAILS_ENV=test web rails db:reset
+docker compose run -e RAILS_ENV=test web rails db:purge
+docker compose run -e RAILS_ENV=test web rails db:schema:load
+```
+
+Nunca sugerir recriar banco de teste sem `RAILS_ENV=test`, por exemplo:
+
+```bash
+docker compose run web rails db:reset
+```
+
 ---
 
 # Sidekiq e Jobs
@@ -215,3 +236,4 @@ Antes de sugerir qualquer comando:
 4. Nunca assumir Ruby instalado localmente
 5. Assuma arquitetura Rails MVC tradicional
 6. Não assumir frontend separado
+7. Para recriar/migrar banco de teste, usar `docker compose run -e RAILS_ENV=test web ...`
