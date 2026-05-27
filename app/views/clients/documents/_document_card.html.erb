@@ -81,9 +81,13 @@
                 class: "block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50 border-0 bg-transparent" %>
         <% end %>
         <% if policy(document).destroy? %>
-          <%= button_to "Excluir", document_path(document), method: :delete,
-                form: { data: { turbo_confirm: "Excluir este documento?" } },
-                class: "block w-full px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50 border-0 bg-transparent" %>
+          <%= button_tag "Excluir",
+                type: "button",
+                class: "block w-full cursor-pointer px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50 border-0 bg-transparent",
+                data: document_destroy_confirm_modal_data(
+                  url: document_path(document),
+                  item_label: document_file_label(document)
+                ) %>
         <% end %>
       </div>
     </details>

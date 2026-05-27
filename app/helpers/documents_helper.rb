@@ -82,4 +82,15 @@ module DocumentsHelper
     else "text-zinc-500"
     end
   end
+
+  def document_destroy_confirm_modal_data(url:, item_label:)
+    app_confirm_modal_open_data(
+      url: url,
+      item_label: item_label,
+      heading: t("documents.confirm_modal.heading"),
+      body_prefix: t("documents.confirm_modal.body_prefix"),
+      body_suffix: t("documents.confirm_modal.body_suffix"),
+      confirm_text: t("documents.confirm_modal.confirm")
+    )
+  end
 end
