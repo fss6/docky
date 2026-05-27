@@ -39,9 +39,7 @@ services:
     volumes:
       - minio-data:/data
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+    image: docfy-web:latest
     command: bash -c "bundle exec sidekiq -C config/sidekiq.yml"
     volumes:
       - .:/app
