@@ -8,15 +8,12 @@
     <p class="text-sm font-medium text-zinc-900">Nenhuma pendência configurada para <%= client_period_label(period) %></p>
     <% if template_items_count.positive? %>
       <p class="mt-2 text-sm text-zinc-600">Use os itens padrão do cliente para começar este mês.</p>
-      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+      <div class="mt-5 flex justify-center">
         <%= button_to "Montar checklist deste mês",
               sync_to_month_client_checklist_items_path(client, period: period_param),
               method: :post,
               class: "app-btn-primary",
               form: { data: { turbo_stream: true, turbo_frame: "_top" } } %>
-        <%= link_to "Editar itens padrão",
-              client_checklist_items_path(client, period: period_param),
-              class: "app-btn-secondary no-underline" %>
       </div>
     <% else %>
       <p class="mt-2 text-sm text-zinc-600">Cadastre os itens padrão do cliente antes de montar o checklist do mês.</p>
