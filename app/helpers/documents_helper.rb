@@ -66,10 +66,11 @@ module DocumentsHelper
 
   def document_card_subtitle(document, linked_item)
     source = document.upload_source_label
+    received_at = l(document.created_at, format: :short)
     if linked_item
-      "Recebido via #{source} · vinculado a '#{linked_item.name_snapshot}'"
+      "Recebido em #{received_at} via #{source} · vinculado a '#{linked_item.name_snapshot}'"
     else
-      "Recebido via #{source} · não vinculado"
+      "Recebido em #{received_at} via #{source} · não vinculado"
     end
   end
 
