@@ -1,0 +1,55 @@
+<% content_for :title, "Compartilhamento mensal · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Configurações</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Compartilhamento mensal</h1>
+      <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">Defina os templates usados no envio mensal por WhatsApp e e-mail.</p>
+    </div>
+    <%= link_to "Voltar para o hub", settings_path, class: "app-btn-secondary" %>
+  </header>
+
+  <%= render "shared/record_errors_toast", record: @setting %>
+
+  <%= form_with model: @setting, url: settings_upload_share_path, method: :patch, class: "space-y-6", data: { controller: "auto-resize-textarea" } do |form| %>
+    <section class="app-card p-5">
+      <header class="border-b border-zinc-100 pb-4">
+        <h2 class="text-lg font-semibold text-zinc-900">Mensagem de WhatsApp</h2>
+        <p class="mt-1 text-sm text-zinc-500">Obrigatório conter <code class="rounded bg-zinc-100 px-1">{{link}}</code>.</p>
+      </header>
+      <div class="mt-4">
+        <%= form.label :upload_share_whatsapp_template, "Mensagem", class: "sr-only" %>
+        <%= form.text_area :upload_share_whatsapp_template,
+              rows: 1,
+              class: "w-full resize-none rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-accent focus:ring-accent",
+              data: { auto_resize_textarea_target: "field", action: "input->auto-resize-textarea#resize" } %>
+      </div>
+    </section>
+
+    <section class="app-card p-5">
+      <header class="border-b border-zinc-100 pb-4">
+        <h2 class="text-lg font-semibold text-zinc-900">E-mail de convite</h2>
+        <p class="mt-1 text-sm text-zinc-500">Placeholders disponíveis: {{nome_cliente}}, {{competencia}}, {{link}}.</p>
+      </header>
+      <div class="mt-4 space-y-4">
+        <div>
+          <%= form.label :upload_share_email_subject_template, "Assunto", class: "app-label" %>
+          <%= form.text_field :upload_share_email_subject_template, class: "app-input mt-1.5" %>
+        </div>
+        <div>
+          <%= form.label :upload_share_email_body_template, "Corpo da mensagem", class: "app-label" %>
+          <%= form.text_area :upload_share_email_body_template,
+                rows: 1,
+                class: "app-input mt-1.5 resize-none",
+                data: { auto_resize_textarea_target: "field", action: "input->auto-resize-textarea#resize" } %>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex justify-end gap-2">
+      <%= link_to "Cancelar", settings_path, class: "app-btn-secondary" %>
+      <%= form.submit "Salvar compartilhamento", class: "app-btn-primary cursor-pointer border-0" %>
+    </div>
+  <% end %>
+</div>

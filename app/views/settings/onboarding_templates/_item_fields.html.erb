@@ -1,0 +1,38 @@
+<div class="bg-white px-5 py-4 sm:px-6"
+     draggable="true"
+     data-nested-sortable-list-target="item">
+  <%= form.hidden_field :id if form.object.persisted? %>
+  <%= form.hidden_field :position, data: { nested_sortable_list_target: "position" } %>
+  <%= form.hidden_field :_destroy, value: "0", data: { nested_sortable_list_target: "destroy" } %>
+
+  <div class="grid gap-4 lg:grid-cols-[2rem_1fr_auto] lg:items-start">
+    <button type="button"
+            class="inline-flex h-9 w-9 cursor-grab items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 hover:bg-zinc-100"
+            aria-label="Arrastar item"
+            data-action="mousedown->nested-sortable-list#startDragHandle mouseup->nested-sortable-list#endDragHandle mouseleave->nested-sortable-list#endDragHandle">
+      <span class="text-sm font-semibold leading-none">::</span>
+    </button>
+
+    <div class="space-y-3">
+      <div>
+      <%= form.label :name, "Nome do item", class: "app-label lg:sr-only" %>
+      <%= form.text_field :name, class: "app-input mt-1.5" %>
+      </div>
+      <div>
+      <%= form.label :help_text, "Texto de ajuda", class: "app-label lg:sr-only" %>
+      <%= form.text_area :help_text,
+            rows: 1,
+            class: "app-input mt-1.5 resize-none",
+            data: { controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
+      </div>
+    </div>
+
+    <button type="button"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 lg:mt-7 lg:justify-self-end"
+            title="Remover item"
+            aria-label="Remover item"
+            data-action="nested-sortable-list#remove">
+      <%= heroicon "trash", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+    </button>
+  </div>
+</div>

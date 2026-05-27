@@ -1,0 +1,80 @@
+<% content_for :title, "Editar #{@template.name} · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Templates de onboarding</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Editar template</h1>
+      <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
+        Atualize o template e organize seus itens. A ordem é salva junto com o restante do formulário.
+      </p>
+    </div>
+    <%= link_to "Voltar", settings_onboarding_template_path(@template), class: "app-btn-secondary" %>
+  </header>
+
+  <%= render "shared/record_errors_toast", record: @template %>
+
+  <%= form_with model: @template,
+        url: settings_onboarding_template_path(@template),
+        method: :patch,
+        class: "space-y-6",
+        data: { controller: "nested-sortable-list" } do |form| %>
+    <div class="grid gap-6 lg:grid-cols-[20rem_1fr]">
+      <aside class="space-y-4">
+        <section class="app-card p-5 sm:p-6">
+          <header class="border-b border-zinc-100 pb-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Template</p>
+            <h2 class="mt-1 text-lg font-semibold text-zinc-900">Dados principais</h2>
+          </header>
+
+          <div class="mt-4">
+            <%= form.label :name, "Nome do template", class: "app-label" %>
+            <%= form.text_field :name, class: "app-input mt-1.5" %>
+          </div>
+        </section>
+
+        <section class="app-card p-5">
+          <h3 class="text-sm font-semibold text-zinc-900">Ações</h3>
+          <div class="mt-3 grid gap-2">
+            <%= link_to "Cancelar", settings_onboarding_template_path(@template), class: "app-btn-secondary w-full text-center" %>
+            <%= form.submit "Salvar template", class: "app-btn-primary w-full cursor-pointer border-0" %>
+          </div>
+        </section>
+      </aside>
+
+      <section class="app-card overflow-hidden">
+        <div class="border-b border-zinc-100 bg-zinc-50/80 px-5 py-4 sm:px-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-zinc-900">Itens do template</h2>
+              <p class="mt-1 text-sm text-zinc-600">Arraste os itens para reordenar. Use remover para marcar exclusão antes de salvar.</p>
+            </div>
+            <button type="button"
+                    class="app-btn-secondary"
+                    data-action="nested-sortable-list#add">
+              Adicionar item
+            </button>
+          </div>
+        </div>
+
+        <div class="hidden border-b border-zinc-100 bg-zinc-50 px-5 py-2.5 text-xs font-semibold uppercase tracking-wide text-zinc-500 lg:grid lg:grid-cols-[2rem_1fr_auto] lg:items-center lg:gap-4 sm:px-6">
+          <span></span>
+          <span>Item e ajuda</span>
+          <span class="text-right">Ações</span>
+        </div>
+
+        <div class="divide-y divide-zinc-100" data-nested-sortable-list-target="list">
+          <%= form.fields_for :items, @items do |item_form| %>
+            <%= render "item_fields", form: item_form %>
+          <% end %>
+        </div>
+
+        <template data-nested-sortable-list-target="template">
+          <%= form.fields_for :items, OnboardingTemplateItem.new, child_index: "NEW_RECORD" do |item_form| %>
+            <%= render "item_fields", form: item_form %>
+          <% end %>
+        </template>
+      </section>
+    </div>
+  <% end %>
+</div>

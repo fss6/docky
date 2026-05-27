@@ -87,7 +87,13 @@ Rails.application.routes.draw do
   get "wiki/lint_report", to: "wiki_pages#lint_report", as: :wiki_lint_report
   delete "wiki/:slug", to: "wiki_pages#destroy", constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   get "wiki/:slug", to: "wiki_pages#show", as: :wiki_page, constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
-  resource :settings, only: %i[show update]
+  resource :settings, only: :show
+  namespace :settings do
+    resource :ai_settings, only: %i[edit update]
+    resource :upload_share, only: %i[edit update], controller: "upload_shares"
+    resource :onboarding_share, only: %i[edit update], controller: "onboarding_shares"
+    resources :onboarding_templates, only: %i[index show edit update]
+  end
 
   resources :folders do
     member do

@@ -11,29 +11,14 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "update persists upload share templates" do
-    patch settings_path, params: {
-      setting: {
-        upload_share_whatsapp_template: "WhatsApp {{nome_cliente}} {{link}}",
-        upload_share_email_subject_template: "Assunto {{nome_cliente}}",
-        upload_share_email_body_template: "Corpo {{link}} {{competencia}}"
-      }
-    }
+  test "show renders settings hub cards and links" do
+    get settings_path
 
-    assert_redirected_to settings_path
-  end
-
-  test "update rejects templates without link in whatsapp and body" do
-    patch settings_path, params: {
-      setting: {
-        upload_share_whatsapp_template: "Sem placeholder",
-        upload_share_email_subject_template: "Assunto ok",
-        upload_share_email_body_template: "Corpo sem link"
-      }
-    }
-
-    assert_response :unprocessable_entity
-    @setting.reload
-    assert_not_equal "Sem placeholder", @setting.upload_share_whatsapp_template
+    assert_response :success
+    assert_select "h2", text: "Templates de itens"
+    assert_select "a[href=?]", settings_onboarding_templates_path
+    assert_select "a[href=?]", edit_settings_ai_settings_path
+    assert_select "a[href=?]", edit_settings_upload_share_path
+    assert_select "a[href=?]", edit_settings_onboarding_share_path
   end
 end

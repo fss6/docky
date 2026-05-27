@@ -56,19 +56,26 @@ module Onboarding
       ActsAsTenant.with_tenant(@account) do
         TEMPLATES.each_with_index do |(kind, config), index|
           template = OnboardingTemplate.find_or_initialize_by(account: @account, kind: kind)
-          template.name = config[:name]
-          template.position = index
-          template.save!
-
-          template.items.destroy_all
-          config[:items].each_with_index do |item_config, item_index|
-            template.items.create!(
-              name: item_config[:name],
-              help_text: item_config[:help_text],
-              position: item_index
-            )
-          end
+          seed_template!(template, config:, position: index)
         end
+      end
+    end
+
+    private
+
+    def seed_template!(template, config:, position:)
+      template.name = config[:name] if template.new_record? || template.name.blank?
+      template.position = position if template.new_record?
+      template.save!
+
+      return if template.items.exists?
+
+      config[:items].each_with_index do |item_config, item_index|
+        template.items.create!(
+          name: item_config[:name],
+          help_text: item_config[:help_text],
+          position: item_index
+        )
       end
     end
   end

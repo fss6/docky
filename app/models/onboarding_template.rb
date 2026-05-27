@@ -7,6 +7,9 @@ class OnboardingTemplate < ApplicationRecord
 
   belongs_to :account
   has_many :items, class_name: "OnboardingTemplateItem", dependent: :destroy, inverse_of: :onboarding_template
+  accepts_nested_attributes_for :items,
+                                allow_destroy: true,
+                                reject_if: ->(attributes) { attributes["name"].blank? && attributes["id"].blank? }
 
   validates :name, presence: true
   validates :kind, presence: true, inclusion: { in: KINDS }

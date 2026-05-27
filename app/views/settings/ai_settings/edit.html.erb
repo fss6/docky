@@ -1,0 +1,28 @@
+<% content_for :title, "IA / Tags automáticas · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Configurações</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">IA / Tags automáticas</h1>
+      <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">Ative ou desative a geração automática de tags para novos documentos.</p>
+    </div>
+    <%= link_to "Voltar para o hub", settings_path, class: "app-btn-secondary" %>
+  </header>
+
+  <%= render "shared/record_errors_toast", record: @setting %>
+
+  <%= form_with model: @setting, url: settings_ai_settings_path, method: :patch, class: "space-y-6" do |form| %>
+    <section class="app-card p-5 sm:p-6">
+      <label class="flex cursor-pointer items-start justify-between gap-4 rounded-md border border-zinc-200 px-4 py-3">
+        <span class="text-sm font-medium text-zinc-900">Gerar tags automaticamente</span>
+        <%= form.check_box :generate_tags_automatically, class: "mt-0.5 h-4 w-4 rounded border-zinc-300 text-accent focus:ring-accent" %>
+      </label>
+    </section>
+
+    <div class="flex justify-end gap-2">
+      <%= link_to "Cancelar", settings_path, class: "app-btn-secondary" %>
+      <%= form.submit "Salvar configuração", class: "app-btn-primary cursor-pointer border-0" %>
+    </div>
+  <% end %>
+</div>

@@ -41,4 +41,21 @@ class OnboardingServicesTest < ActiveSupport::TestCase
       assert client.onboarding_checklist.in_progress?
     end
   end
+
+  test "seed preserves customized templates and items" do
+    account = accounts(:one)
+    template = account.onboarding_templates.find_by!(kind: "new_company")
+    item = template.items.first
+
+    template.update!(name: "Template customizado", position: 99)
+    item.update!(name: "Documento customizado", help_text: "Texto customizado", position: 42)
+
+    Onboarding::SeedDefaultTemplates.call(account: account)
+
+    assert_equal "Template customizado", template.reload.name
+    assert_equal 99, template.position
+    assert_equal "Documento customizado", item.reload.name
+    assert_equal "Texto customizado", item.help_text
+    assert_equal 42, item.position
+  end
 end

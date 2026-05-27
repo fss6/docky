@@ -3,14 +3,7 @@ class SettingsController < ApplicationController
   before_action :authorize_policy
 
   def show
-  end
-
-  def update
-    if @setting.update(setting_params)
-      redirect_to settings_path, notice: "Configurações atualizadas com sucesso."
-    else
-      render :show, status: :unprocessable_entity
-    end
+    @onboarding_template_count = current_user.account.onboarding_templates.count
   end
 
   private
@@ -21,17 +14,5 @@ class SettingsController < ApplicationController
 
   def authorize_policy
     authorize @setting
-  end
-
-  def setting_params
-    params.expect(setting: [
-      :generate_tags_automatically,
-      :upload_share_whatsapp_template,
-      :upload_share_email_subject_template,
-      :upload_share_email_body_template,
-      :onboarding_share_whatsapp_template,
-      :onboarding_share_email_subject_template,
-      :onboarding_share_email_body_template
-    ])
   end
 end

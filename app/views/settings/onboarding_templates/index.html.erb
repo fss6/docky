@@ -1,0 +1,59 @@
+<% content_for :title, "Templates de onboarding · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Configurações</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Templates de onboarding</h1>
+      <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
+        Edite os nomes, a ordem e os itens usados no onboarding por tipo de cliente. Essas mudanças passam a valer para novos onboardings da conta.
+      </p>
+    </div>
+    <%= link_to "Voltar para configurações",
+          settings_path(anchor: "onboarding-share"),
+          class: "inline-flex items-center justify-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-900" %>
+  </header>
+
+  <section class="app-card overflow-hidden">
+    <div class="border-b border-zinc-100 bg-zinc-50/80 px-5 py-4 sm:px-6">
+      <h2 class="text-sm font-semibold text-zinc-900">Templates da conta</h2>
+      <p class="mt-1 text-sm text-zinc-600">
+        Selecione um template para visualizar ou editar seus itens de onboarding.
+      </p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-zinc-100 bg-white text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            <th class="px-5 py-3 font-semibold sm:px-6">Template</th>
+            <th class="px-5 py-3 font-semibold">Tipo</th>
+            <th class="px-5 py-3 font-semibold">Itens</th>
+            <th class="hidden px-5 py-3 font-semibold md:table-cell">Atualizado em</th>
+            <th class="px-5 py-3 text-right font-semibold sm:px-6">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100">
+          <% @templates.each do |template| %>
+            <tr class="hover:bg-zinc-50/60">
+              <td class="px-5 py-4 font-medium text-zinc-900 sm:px-6"><%= template.name %></td>
+              <td class="px-5 py-4 text-zinc-600"><%= template.kind.humanize %></td>
+              <td class="px-5 py-4 text-zinc-600"><%= "#{template.items.size} #{template.items.size == 1 ? "item" : "itens"}" %></td>
+              <td class="hidden px-5 py-4 text-zinc-500 md:table-cell"><%= l(template.updated_at.to_date) %></td>
+              <td class="px-5 py-4 text-right sm:px-6">
+                <div class="flex justify-end gap-2">
+                  <%= link_to "Ver",
+                        settings_onboarding_template_path(template),
+                        class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+                  <%= link_to "Editar",
+                        edit_settings_onboarding_template_path(template),
+                        class: "app-btn-primary px-3 py-1.5 text-xs" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
