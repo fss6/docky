@@ -1,4 +1,4 @@
-<%# locals: group, memberships, available_users %>
+<%# locals: (group, memberships, available_users, membership: nil) %>
 
 <section class="app-card overflow-hidden" aria-labelledby="group-members-heading">
   <div class="border-b border-zinc-100 bg-zinc-50/80 px-5 py-4 sm:px-6">
@@ -8,7 +8,8 @@
 
   <% if available_users.any? %>
     <div class="border-b border-zinc-100 px-5 py-4 sm:px-6">
-      <%= form_with model: [group, GroupMembership.new], url: group_memberships_path(group), class: "flex flex-col gap-3 sm:flex-row sm:items-end" do |f| %>
+      <%= form_with model: [group, membership || GroupMembership.new], url: group_memberships_path(group), class: "flex flex-col gap-3 sm:flex-row sm:items-end" do |f| %>
+        <%= render "shared/record_errors_toast", record: f.object if f.object.errors.any? %>
         <div class="min-w-0 flex-1">
           <%= f.label :user_id, "Adicionar usuário", class: "app-label" %>
           <%= f.collection_select :user_id, available_users, :id, ->(u) { "#{u.name} (#{u.email})" },

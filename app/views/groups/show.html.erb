@@ -15,7 +15,7 @@
 
   <%= render @group %>
 
-  <%= render "groups/members", group: @group, memberships: @memberships, available_users: @available_users %>
+  <%= render "groups/members", group: @group, memberships: @memberships, available_users: @available_users, membership: @membership %>
 
   <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
     <p class="text-sm font-medium text-zinc-800">Zona de risco</p>

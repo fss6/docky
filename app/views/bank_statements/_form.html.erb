@@ -1,14 +1,5 @@
 <%= form_with(model: bank_statement, class: "space-y-6") do |form| %>
-  <% if bank_statement.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert">
-      <p class="font-medium">Revise os campos para continuar:</p>
-      <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
-        <% bank_statement.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/record_errors_toast", record: bank_statement %>
 
   <div class="grid gap-5 sm:grid-cols-2">
     <div class="sm:col-span-2">

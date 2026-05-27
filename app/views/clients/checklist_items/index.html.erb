@@ -3,7 +3,8 @@
   <%= link_to "← Voltar ao cliente", client_path(@client, aba: "checklist", period: @period.strftime("%Y-%m")), class: "text-sm font-medium text-accent no-underline" %>
   <h1 class="text-2xl font-semibold text-zinc-900">Itens padrão do cliente</h1>
 
-  <%= form_with model: [@client, ClientChecklistItem.new], url: client_checklist_items_path(@client), class: "app-card space-y-3 p-4" do |f| %>
+  <%= form_with model: [@client, @item || ClientChecklistItem.new], url: client_checklist_items_path(@client), class: "app-card space-y-3 p-4" do |f| %>
+    <%= render "shared/record_errors_toast", record: f.object if f.object.errors.any? %>
     <%= f.label :name, "Novo item", class: "app-label" %>
     <%= f.text_field :name, class: "app-input", required: true %>
     <%= f.submit "Adicionar", class: "app-btn-primary" %>

@@ -37,6 +37,7 @@ class UploadInvitesController < ApplicationController
       format.turbo_stream do
         @invite = find_or_create_active_invite
         @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
+        flash.now[:notice] = "Link gerado com sucesso."
         render :create, formats: :turbo_stream
       end
       format.json do

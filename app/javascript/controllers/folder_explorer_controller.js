@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { showError } from "notyf_instance"
 
 export default class extends Controller {
   static targets = ["folder"]
@@ -103,7 +104,7 @@ export default class extends Controller {
     }
 
     this.clearFolderHighlights()
-    alert("Não foi possível mover o arquivo.")
+    showError("Não foi possível mover o arquivo.")
   }
 
   clearFolderHighlights() {

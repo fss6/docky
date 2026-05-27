@@ -28,10 +28,9 @@
         </p>
       <% end %>
       <% if @bank_statement_import.failed? && @bank_statement_import.metadata["error"].present? %>
-        <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-          <p class="font-medium">Erro</p>
-          <p class="mt-1"><%= @bank_statement_import.metadata.dig("error", "message") %></p>
-        </div>
+        <%= render "shared/toast_triggers",
+              messages: @bank_statement_import.metadata.dig("error", "message"),
+              type: "error" %>
       <% end %>
     </div>
     <div class="flex flex-col gap-2 sm:items-end">

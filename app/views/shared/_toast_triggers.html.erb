@@ -1,0 +1,4 @@
+<%# locals: (messages:, type: "success") %>
+<% Array(messages).compact_blank.each do |message| %>
+  <template data-toast-type="<%= type %>" data-toast-message><%= message %></template>
+<% end %>

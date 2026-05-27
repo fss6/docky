@@ -63,4 +63,12 @@ module ApplicationHelper
     PeriodFormatting.picker_value(period)
   end
 
+  def toast_triggers_for(record: nil, notice: nil, alert: nil)
+    safe_join([
+      (render("shared/record_errors_toast", record: record) if record&.errors&.any?),
+      (render("shared/toast_triggers", messages: notice, type: "success") if notice.present?),
+      (render("shared/toast_triggers", messages: alert, type: "error") if alert.present?)
+    ].compact)
+  end
+
 end

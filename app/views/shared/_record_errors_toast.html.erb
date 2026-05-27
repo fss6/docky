@@ -1,0 +1,6 @@
+<%# locals: (record:) %>
+<% if record.errors.any? %>
+  <%= render "shared/toast_triggers",
+        messages: record.errors.map(&:full_message),
+        type: "error" %>
+<% end %>

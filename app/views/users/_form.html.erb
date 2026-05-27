@@ -1,15 +1,5 @@
 <%= form_with(model: user, class: "space-y-6") do |form| %>
-  <% if user.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert">
-      <% err_n = user.errors.count %>
-      <p class="font-medium"><%= t("users.form.errors_header", count: err_n) %></p>
-      <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
-        <% user.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/record_errors_toast", record: user %>
 
   <div class="space-y-5">
     <div>

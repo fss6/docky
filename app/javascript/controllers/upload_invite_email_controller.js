@@ -1,13 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
+import { showError, showSuccess } from "notyf_instance"
 
 export default class extends Controller {
-  static targets = ["button", "label", "feedback", "error"]
+  static targets = ["button", "label"]
   static values = { sendUrl: String }
 
   async send(event) {
     event.preventDefault()
 
-    this.clearMessages()
     this.setSending(true)
 
     try {
@@ -28,14 +28,14 @@ export default class extends Controller {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        this.showError(data.error || "Não foi possível enviar o e-mail.")
+        showError(data.error || "Não foi possível enviar o e-mail.")
         return
       }
 
-      this.showFeedback(data.message || "E-mail enviado.")
+      showSuccess(data.message || "E-mail enviado.")
     } catch (error) {
       console.error("[upload-invite-email]", error)
-      this.showError("Não foi possível enviar o e-mail.")
+      showError("Não foi possível enviar o e-mail.")
     } finally {
       this.setSending(false)
     }
@@ -47,31 +47,6 @@ export default class extends Controller {
     this.buttonTarget.disabled = sending
     if (this.hasLabelTarget) {
       this.labelTarget.textContent = sending ? "Enviando…" : "Enviar e-mail"
-    }
-  }
-
-  showFeedback(message) {
-    if (!this.hasFeedbackTarget) return
-
-    this.feedbackTarget.textContent = message
-    this.feedbackTarget.classList.remove("hidden")
-  }
-
-  showError(message) {
-    if (!this.hasErrorTarget) return
-
-    this.errorTarget.textContent = message
-    this.errorTarget.classList.remove("hidden")
-  }
-
-  clearMessages() {
-    if (this.hasFeedbackTarget) {
-      this.feedbackTarget.textContent = ""
-      this.feedbackTarget.classList.add("hidden")
-    }
-    if (this.hasErrorTarget) {
-      this.errorTarget.textContent = ""
-      this.errorTarget.classList.add("hidden")
     }
   }
 

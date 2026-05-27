@@ -8,7 +8,8 @@ class GroupMembershipsController < ApplicationController
     if @membership.save
       redirect_to group_path(@group), notice: "Usuário adicionado ao grupo."
     else
-      redirect_to group_path(@group), alert: @membership.errors.full_messages.to_sentence
+      load_group_show_context
+      render "groups/show", status: :unprocessable_entity
     end
   end
 
@@ -26,6 +27,17 @@ class GroupMembershipsController < ApplicationController
 
   def set_group
     @group = Group.includes(:account).find(params.expect(:group_id))
+  end
+
+  def load_group_show_context
+    @memberships = @group.group_memberships.joins(:user).includes(:user).order("users.name")
+    member_ids = @group.user_ids
+    @available_users =
+      if member_ids.empty?
+        @group.account.users.order(:name)
+      else
+        @group.account.users.where.not(id: member_ids).order(:name)
+      end
   end
 
   def membership_params

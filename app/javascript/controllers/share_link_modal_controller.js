@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { showError, showSuccess } from "notyf_instance"
 
 export default class extends Controller {
   static targets = ["dialog", "content"]
@@ -27,10 +28,11 @@ export default class extends Controller {
     try {
       await this.ensureInvite()
       this.hasInviteValue = true
+      showSuccess(this.inviteSuccessMessage())
       await this.autoCopy()
     } catch (error) {
       console.error("[share-link-modal]", error)
-      this.showError("Não foi possível gerar o link. Recarregue a página e tente novamente.")
+      showError("Não foi possível gerar o link. Recarregue a página e tente novamente.")
       this.hasInviteValue = false
     }
   }
@@ -176,19 +178,16 @@ export default class extends Controller {
     document.body.removeChild(input)
   }
 
-  showAutoCopyFeedback(root) {
-    const feedback = root.querySelector("[data-copy-link-target='feedback']")
-    if (!feedback) return
-
-    feedback.textContent = "Link copiado automaticamente."
-    feedback.classList.remove("hidden")
+  showAutoCopyFeedback(_root) {
+    showSuccess("Link copiado automaticamente.")
   }
 
-  showError(message) {
-    const container = document.getElementById("share_link_modal_content")
-    if (!container) return
-
-    container.innerHTML = `<p class="text-sm font-medium text-red-700" role="alert">${message}</p>`
+  inviteSuccessMessage() {
+    const url = this.createUrlValue || ""
+    if (url.includes("onboarding_upload_invites")) {
+      return "Link de onboarding gerado."
+    }
+    return "Link gerado com sucesso."
   }
 
   get csrfToken() {

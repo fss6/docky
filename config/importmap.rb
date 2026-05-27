@@ -7,3 +7,5 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "@rails/actioncable", to: "@rails--actioncable.js" # @8.1.300
 pin_all_from "app/javascript/channels", under: "channels"
+pin "notyf" # @3.10.0
+pin "notyf_instance"

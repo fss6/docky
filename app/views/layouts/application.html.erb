@@ -45,7 +45,9 @@
   </head>
 
   <% chat_shell = chat_module_page? %>
-  <body class="bg-zinc-100 font-sans text-zinc-900 antialiased <%= chat_shell ? "h-dvh overflow-hidden" : "min-h-dvh" %>">
+  <body class="bg-zinc-100 font-sans text-zinc-900 antialiased <%= chat_shell ? "h-dvh overflow-hidden" : "min-h-dvh" %>"
+        data-controller="flash-toast"
+        data-toast-layout="app">
     <div class="flex w-full items-stretch <%= chat_shell ? "h-full min-h-0" : "min-h-dvh" %>">
       <%= render "layouts/nav_sidebar" %>
 
@@ -55,7 +57,7 @@
         <div class="flex min-h-0 flex-1 items-stretch overflow-hidden">
           <main class="min-w-0 flex-1 <%= chat_shell ? "flex min-h-0 flex-col overflow-hidden" : "overflow-y-auto" %>">
             <div class="flex w-full <%= chat_shell ? "max-w-none flex-1 min-h-0 flex-col px-4 py-4 sm:px-5 lg:px-8 lg:py-5" : "mx-auto min-h-full max-w-[112rem] flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-8" %>">
-              <div id="flash_messages" class="<%= chat_shell ? "shrink-0" : "" %>">
+              <div id="flash_messages" class="hidden" aria-hidden="true">
                 <%= render "shared/flash" %>
               </div>
               <div class="<%= chat_shell ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "flex-1" %>">

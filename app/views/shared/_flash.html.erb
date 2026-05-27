@@ -1,6 +1,2 @@
-<% if notice.present? %>
-  <div class="mb-6 rounded-lg border border-teal-200/80 bg-teal-50 px-4 py-3 text-sm text-teal-900 shadow-[var(--shadow-card)]" role="status"><%= notice %></div>
-<% end %>
-<% if alert.present? %>
-  <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert"><%= alert %></div>
-<% end %>
+<%= render "shared/toast_triggers", messages: notice, type: "success" if notice.present? %>
+<%= render "shared/toast_triggers", messages: alert, type: "error" if alert.present? %>

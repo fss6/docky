@@ -37,6 +37,7 @@ export default class extends Controller {
         .then((html) => {
           if (html.includes("turbo-stream")) {
             Turbo.renderStreamMessage(html)
+            document.dispatchEvent(new CustomEvent("docfy:process-toasts"))
           }
         })
         .catch(() => {})

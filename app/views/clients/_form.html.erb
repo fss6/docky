@@ -1,16 +1,6 @@
 <%# locals: (client:, onboarding_template_counts: {}) %>
 <%= form_with(model: client, class: "space-y-6", data: { controller: "onboarding-form" }) do |form| %>
-  <% if client.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert">
-      <% err_n = client.errors.count %>
-      <p class="font-medium"><%= err_n %> <%= err_n == 1 ? "erro impediu" : "erros impediram" %> salvar este cliente:</p>
-      <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
-        <% client.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/record_errors_toast", record: client %>
 
   <div class="space-y-5">
     <div class="app-card p-5 space-y-4">

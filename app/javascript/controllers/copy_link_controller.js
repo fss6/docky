@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { showError, showSuccess } from "notyf_instance"
 
 export default class extends Controller {
-  static targets = ["source", "button", "label", "feedback"]
+  static targets = ["source", "button", "label"]
 
   async copy() {
     const text = this.sourceTarget?.textContent?.trim()
@@ -13,9 +14,11 @@ export default class extends Controller {
       } else {
         this.fallbackCopy(text)
       }
-      this.showFeedback("Link copiado.", "Copiado!")
+      showSuccess("Link copiado.")
+      this.flashButtonLabel("Copiado!")
     } catch (_error) {
-      this.showFeedback("Nao foi possivel copiar automaticamente.", "Erro ao copiar")
+      showError("Não foi possível copiar automaticamente.")
+      this.flashButtonLabel("Erro ao copiar")
     }
   }
 
@@ -31,22 +34,16 @@ export default class extends Controller {
     document.body.removeChild(input)
   }
 
-  showFeedback(message, label) {
-    if (this.hasFeedbackTarget) {
-      this.feedbackTarget.textContent = message
-      this.feedbackTarget.classList.remove("hidden")
-    }
-
+  flashButtonLabel(label) {
     const labelTarget = this.hasLabelTarget ? this.labelTarget : (this.hasButtonTarget ? this.buttonTarget : null)
-    if (labelTarget) {
-      const originalLabel = labelTarget.dataset.originalLabel || labelTarget.textContent
-      labelTarget.dataset.originalLabel = originalLabel
-      labelTarget.textContent = label
-      window.clearTimeout(this.resetTimer)
-      this.resetTimer = window.setTimeout(() => {
-        labelTarget.textContent = originalLabel
-        if (this.hasFeedbackTarget) this.feedbackTarget.classList.add("hidden")
-      }, 1800)
-    }
+    if (!labelTarget) return
+
+    const originalLabel = labelTarget.dataset.originalLabel || labelTarget.textContent
+    labelTarget.dataset.originalLabel = originalLabel
+    labelTarget.textContent = label
+    window.clearTimeout(this.resetTimer)
+    this.resetTimer = window.setTimeout(() => {
+      labelTarget.textContent = originalLabel
+    }, 1800)
   }
 }

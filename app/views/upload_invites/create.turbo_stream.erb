@@ -1,3 +1,7 @@
+<%= turbo_stream.update "flash_messages" do %>
+  <%= render "shared/flash" %>
+<% end %>
+
 <%= turbo_stream.replace "share_link_modal_content" do %>
   <%= render "clients/show/share_link_modal_content",
         client: @client,

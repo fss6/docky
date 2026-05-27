@@ -19,7 +19,8 @@ module Clients
       if @item.save
         redirect_to @client, notice: "Item adicionado ao onboarding."
       else
-        redirect_to @client, alert: @item.errors.full_messages.to_sentence
+        @items = @checklist.items.ordered
+        render :index, status: :unprocessable_entity
       end
     end
 
@@ -29,7 +30,8 @@ module Clients
       if @item.update(item_params)
         redirect_to @client, notice: "Item atualizado."
       else
-        redirect_to @client, alert: @item.errors.full_messages.to_sentence
+        @items = @checklist.items.ordered
+        render :index, status: :unprocessable_entity
       end
     end
 

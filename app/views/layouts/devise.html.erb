@@ -24,7 +24,9 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-dvh bg-zinc-100 font-sans text-zinc-900 antialiased">
+  <body class="min-h-dvh bg-zinc-100 font-sans text-zinc-900 antialiased"
+        data-controller="flash-toast"
+        data-toast-layout="minimal">
     <main class="mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-center px-4 py-10 sm:px-6 lg:px-8">
       <div class="mx-auto mb-8 flex w-full max-w-lg justify-center">
         <%= link_to root_path, class: "flex items-center gap-3 rounded-lg sm:gap-4", aria: { label: "Voltar para a landing" } do %>
@@ -39,7 +41,9 @@
       </div>
 
       <div class="mx-auto w-full max-w-lg">
-        <%= render "shared/flash" %>
+        <div id="flash_messages" class="hidden" aria-hidden="true">
+          <%= render "shared/flash" %>
+        </div>
         <%= yield %>
       </div>
     </main>

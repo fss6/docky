@@ -1,4 +1,50 @@
 @import "tailwindcss";
+@import "../stylesheets/notyf.css";
+
+/* Notyf — posição e cores Dokivo */
+body[data-toast-layout="app"] .notyf {
+  top: 4.5rem;
+  padding: 12px 16px;
+}
+
+body[data-toast-layout="minimal"] .notyf {
+  top: 1rem;
+  padding: 12px 16px;
+}
+
+.notyf__toast--success {
+  background: #f0fdfa !important;
+  border: 1px solid rgb(153 246 228 / 0.8);
+  color: #134e4a !important;
+}
+
+.notyf__toast--success .notyf__icon--success {
+  color: #0d9488;
+  background: #ccfbf1;
+}
+
+.notyf__toast--error {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca;
+  color: #7f1d1d !important;
+}
+
+.notyf__toast--error .notyf__icon--error {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.notyf__toast--success .notyf__dismiss-btn,
+.notyf__toast--error .notyf__dismiss-btn {
+  background-color: rgb(0 0 0 / 0.06);
+}
+
+.notyf__toast--success .notyf__dismiss-btn:after,
+.notyf__toast--success .notyf__dismiss-btn:before,
+.notyf__toast--error .notyf__dismiss-btn:after,
+.notyf__toast--error .notyf__dismiss-btn:before {
+  background: currentColor;
+}
 
 /* Dokivo — design tokens (primary alinhado ao ícone / wordmark #1A6FFF) */
 @theme {

@@ -16,12 +16,13 @@ module Clients
     end
 
     def create
-      item = @client.client_checklist_items.new(template_item_params)
-      item.account = current_user.account
-      if item.save
+      @item = @client.client_checklist_items.new(template_item_params)
+      @item.account = current_user.account
+      if @item.save
         redirect_to client_checklist_items_path(@client), notice: "Item adicionado ao template."
       else
         @template_items = @client.client_checklist_items.active_only
+        @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
         render :index, status: :unprocessable_entity
       end
     end

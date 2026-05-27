@@ -1,15 +1,5 @@
 <%= form_with(model: subscription, class: "space-y-6") do |form| %>
-  <% if subscription.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 shadow-[var(--shadow-card)]" role="alert">
-      <% err_n = subscription.errors.count %>
-      <p class="font-medium"><%= err_n %> <%= err_n == 1 ? "erro impediu" : "erros impediram" %> salvar esta assinatura:</p>
-      <ul class="mt-2 list-inside list-disc space-y-0.5 text-red-800">
-        <% subscription.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/record_errors_toast", record: subscription %>
 
   <div class="space-y-5">
     <div>

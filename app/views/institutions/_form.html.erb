@@ -1,14 +1,6 @@
 <%# locals: (institution:) %>
 <%= form_with model: institution, class: "space-y-6" do |form| %>
-  <% if institution.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900" role="alert">
-      <ul class="list-inside list-disc">
-        <% institution.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/record_errors_toast", record: institution %>
 
   <div>
     <%= form.label :name, "Nome", class: "app-label" %>
