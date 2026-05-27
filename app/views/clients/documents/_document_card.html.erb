@@ -12,7 +12,22 @@
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold text-zinc-900"><%= document_file_label(document) %></p>
-      <p class="mt-0.5 text-xs text-zinc-500"><%= document_card_subtitle(document, linked_item) %></p>
+      <p class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-500">
+        <span>
+          Recebido em
+          <time datetime="<%= document.created_at.iso8601 %>" class="tabular-nums text-zinc-600">
+            <%= l(document.created_at, format: :short) %>
+          </time>
+        </span>
+        <%= document_card_meta_separator %>
+        <span>via <%= document.upload_source_label %></span>
+        <%= document_card_meta_separator %>
+        <% if linked_item %>
+          <span class="font-medium text-emerald-700">Vinculado a <%= linked_item.name_snapshot %></span>
+        <% else %>
+          <span class="text-zinc-400">Não vinculado</span>
+        <% end %>
+      </p>
     </div>
   </div>
 

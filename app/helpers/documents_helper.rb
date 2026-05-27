@@ -64,14 +64,8 @@ module DocumentsHelper
     DOCUMENT_HEURISTIC_CATEGORIES[key] || key.to_s.titleize
   end
 
-  def document_card_subtitle(document, linked_item)
-    source = document.upload_source_label
-    received_at = l(document.created_at, format: :short)
-    if linked_item
-      "Recebido em #{received_at} via #{source} · vinculado a '#{linked_item.name_snapshot}'"
-    else
-      "Recebido em #{received_at} via #{source} · não vinculado"
-    end
+  def document_card_meta_separator
+    tag.span("|", class: "select-none text-zinc-300", aria: { hidden: true })
   end
 
   def document_icon_classes(document)
