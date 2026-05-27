@@ -14,7 +14,7 @@ module Clients
     def category
       case @event.event_type
       when "document.received" then :document
-      when "period.closed", "period.reopened", "monthly_collection.created" then :period
+      when "period.closed", "period.reopened", "period.created_retroactive", "monthly_collection.created" then :period
       when /^upload_invite\./ then :invite
       when /^checklist_item\./ then :checklist
       else :other
@@ -30,7 +30,7 @@ module Clients
       when "document.received"
         filename = @metadata["filename"].presence || "arquivo"
         "#{filename} · #{upload_source_label(@metadata['upload_source'])}"
-      when "period.closed", "period.reopened"
+      when "period.closed", "period.reopened", "period.created_retroactive"
         month_label
       when "checklist_item.marked_validated", "checklist_item.reopened", "checklist_item.document_linked",
            "checklist_item.document_unlinked", "checklist_item.created_from_document"
@@ -48,6 +48,7 @@ module Clients
       "document.received" => "Arquivo recebido",
       "period.closed" => "Competência encerrada",
       "period.reopened" => "Competência reaberta",
+      "period.created_retroactive" => "Competência retroativa criada",
       "monthly_collection.created" => "Competência criada",
       "checklist_item.marked_validated" => "Item validado",
       "checklist_item.reopened" => "Item reaberto",

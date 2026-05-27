@@ -3,8 +3,45 @@
 module Clients
   class PeriodsController < ApplicationController
     before_action :set_client
-    before_action :set_period_record
-    before_action :authorize_period
+    before_action :set_period_record, only: %i[close reopen]
+    before_action :authorize_period, only: %i[close reopen]
+
+    def create
+      authorize @client, :show?
+
+      @period_date = parse_period_param(params[:period])
+      if @period_date.blank?
+        return redirect_to client_path(@client), alert: "Competência inválida.", status: :see_other
+      end
+
+      @period_param = @period_date.strftime("%Y-%m")
+      aba = params[:aba].presence || "documentos"
+
+      if Period.exists?(account: current_user.account, client: @client, period: @period_date)
+        return redirect_to client_path(@client, aba: aba, period: @period_param),
+                          notice: "Esta competência já está aberta.",
+                          status: :see_other
+      end
+
+      result = Periods::MaterializeForClient.call(
+        client: @client,
+        period: @period_date,
+        user: current_user,
+        account: current_user.account
+      )
+
+      notice = if @period_date < Date.current.beginning_of_month
+                 "Competência retroativa criada."
+               elsif @period_date > Date.current.beginning_of_month
+                 "Competência antecipada aberta com sucesso."
+               else
+                 "Competência aberta com sucesso."
+               end
+
+      redirect_to client_path(@client, aba: aba, period: @period_param),
+                  notice: notice,
+                  status: :see_other
+    end
 
     def close
       if Periods::Close.call(period: @period_record, user: current_user, ip: request.remote_ip)

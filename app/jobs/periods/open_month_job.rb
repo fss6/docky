@@ -9,6 +9,8 @@ module Periods
 
       Client.find_each do |client|
         ActsAsTenant.with_tenant(client.account) do
+          next if Period.exists?(account: client.account, client: client, period: month)
+
           Periods::OpenForClient.call(
             client: client,
             period: month,

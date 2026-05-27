@@ -19,10 +19,12 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->share-link-modal#open">
-        <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-        Gerar link de upload
-      </button>
+      <% if local_assigns.fetch(:period_open, period_record.present?) %>
+        <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->share-link-modal#open">
+          <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+          Gerar link de upload
+        </button>
+      <% end %>
       <details class="relative">
         <summary class="app-btn-primary inline-flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
           <%= heroicon "cog-6-tooth", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>

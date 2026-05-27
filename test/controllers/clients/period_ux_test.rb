@@ -119,6 +119,90 @@ module Clients
       assert_match "Competência encerrada", response.body
     end
 
+    test "missing past month shows CTA without creating period" do
+      past_period = (@period - 2.months).strftime("%Y-%m")
+
+      ActsAsTenant.with_tenant(@account) do
+        assert_not Period.exists?(client: @client, period: @period - 2.months)
+      end
+
+      assert_no_difference -> { Period.count } do
+        get client_path(@client, aba: "checklist", period: past_period)
+      end
+
+      assert_response :success
+      assert_match "Competência não aberta", response.body
+      assert_match "Criar competência retroativa", response.body
+      assert_no_match "Montar checklist deste mês", response.body
+    end
+
+    test "open_period creates current month open" do
+      ActsAsTenant.with_tenant(@account) do
+        @checklist.destroy!
+      end
+
+      assert_difference -> { Period.count }, 1 do
+        post open_period_client_path(@client), params: { period: @period_param, aba: "documentos" }
+      end
+
+      assert_redirected_to client_path(@client, aba: "documentos", period: @period_param)
+      ActsAsTenant.with_tenant(@account) do
+        record = Period.find_by!(client: @client, period: @period)
+        assert record.open?
+      end
+    end
+
+    test "open_period creates past month closed" do
+      past = @period - 2.months
+      past_param = past.strftime("%Y-%m")
+
+      assert_difference -> { Period.count }, 1 do
+        post open_period_client_path(@client), params: { period: past_param, aba: "checklist" }
+      end
+
+      ActsAsTenant.with_tenant(@account) do
+        record = Period.find_by!(client: @client, period: past)
+        assert record.closed?
+      end
+    end
+
+    test "future month shows CTA to open period early" do
+      future_param = (@period + 2.months).strftime("%Y-%m")
+
+      assert_no_difference -> { Period.count } do
+        get client_path(@client, period: future_param)
+      end
+
+      assert_response :success
+      assert_match "Competência futura", response.body
+      assert_match "Abrir competência antecipada", response.body
+    end
+
+    test "open_period creates future month open" do
+      future = @period + 2.months
+      future_param = future.strftime("%Y-%m")
+
+      assert_difference -> { Period.count }, 1 do
+        post open_period_client_path(@client), params: { period: future_param, aba: "documentos" }
+      end
+
+      ActsAsTenant.with_tenant(@account) do
+        record = Period.find_by!(client: @client, period: future)
+        assert record.open?
+      end
+    end
+
+    test "upload invite without period redirects to open competency" do
+      past_param = (@period - 3.months).strftime("%Y-%m")
+
+      assert_no_difference -> { UploadInvite.count } do
+        post client_upload_invites_path(@client, period: past_param)
+      end
+
+      assert_redirected_to client_path(@client, aba: "convites", period: past_param)
+      assert_equal "Abra a competência antes de gerar o link de upload.", flash[:alert]
+    end
+
     test "past month with no pending items shows month completed badge" do
       past_period = (@period - 1.month).strftime("%Y-%m")
       ActsAsTenant.with_tenant(@account) do

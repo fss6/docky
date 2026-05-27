@@ -21,6 +21,11 @@ class ClientsController < ApplicationController
   end
 
   def summary
+    if @period_record.blank?
+      render json: { period_exists: false, period: @period.strftime("%Y-%m") }, status: :not_found
+      return
+    end
+
     render json: @summary
   end
 
@@ -97,7 +102,11 @@ class ClientsController < ApplicationController
     @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
     @active_tab = ClientsHelper::VALID_TABS.include?(params[:aba].to_s) ? params[:aba].to_s : "documentos"
 
-    @monthly = Clients::EnsureMonthlyCollection.call(client: @client, period: @period)
+    @monthly = Clients::EnsureMonthlyCollection.call(
+      client: @client,
+      period: @period,
+      create_if_missing: false
+    )
     @period_record = @monthly.period_record
     @checklist = @monthly.checklist
     @folder_shim = @monthly.folder_shim
@@ -107,13 +116,23 @@ class ClientsController < ApplicationController
       period: @period,
       period_record: @period_record
     ).call
-    @checklist_items = @checklist.items.includes(:last_document, :validated_by_user).order(:id)
-    @linked_items_by_document_id = @checklist_items.select { |i| i.last_document_id.present? }.index_by(&:last_document_id)
-    @pending_link_items = @checklist_items.select(&:awaiting_receipt?)
-    @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
-    @active_upload_invite = @upload_invites.find(&:active?)
-    @template_items_count = @client.client_checklist_items.active_only.count
     @period_phase = @summary[:period_phase]
+
+    if @period_record.present?
+      @checklist_items = @checklist.items.includes(:last_document, :validated_by_user).order(:id)
+      @linked_items_by_document_id = @checklist_items.select { |i| i.last_document_id.present? }.index_by(&:last_document_id)
+      @pending_link_items = @checklist_items.select(&:awaiting_receipt?)
+      @upload_invites = UploadInvite.where(client: @client, period: @period).newest_first
+      @active_upload_invite = @upload_invites.find(&:active?)
+    else
+      @checklist_items = []
+      @linked_items_by_document_id = {}
+      @pending_link_items = []
+      @upload_invites = []
+      @active_upload_invite = nil
+    end
+
+    @template_items_count = @client.client_checklist_items.active_only.count
   end
 
   def ensure_period_in_url
@@ -125,6 +144,8 @@ class ClientsController < ApplicationController
   end
 
   def load_tab_content
+    return if @period_record.blank?
+
     case @active_tab
     when "documentos"
       load_documents_tab

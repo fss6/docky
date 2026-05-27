@@ -2,9 +2,10 @@
 
 module Clients
   class DocumentsController < ApplicationController
+    include RequiresPeriodRecord
+
     before_action :set_client
-    before_action :set_period
-    before_action :set_monthly
+    before_action :load_monthly_collection_readonly
     before_action :set_document, only: %i[link unlink]
 
     def index
@@ -112,12 +113,8 @@ module Clients
       @client = Client.find(params.expect(:client_id))
     end
 
-    def set_period
-      @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
-    end
-
-    def set_monthly
-      @monthly = Clients::EnsureMonthlyCollection.call(client: @client, period: @period)
+    def default_period_redirect_aba
+      "documentos"
     end
 
     def set_document

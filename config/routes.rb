@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   resources :clients do
     member do
       get :summary
+      post :open_period, to: "clients/periods#create"
       patch :close_period, to: "clients/periods#close"
       patch :reopen_period, to: "clients/periods#reopen"
     end

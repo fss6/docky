@@ -8,6 +8,13 @@ class UploadInvitesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
     @client = clients(:alpha)
     @period = Date.current.beginning_of_month.strftime("%Y-%m")
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      Periods::FindOrOpen.call(
+        account: accounts(:one),
+        client: @client,
+        period: Date.current.beginning_of_month
+      )
+    end
   end
 
   test "create html redirects and always creates new invite" do

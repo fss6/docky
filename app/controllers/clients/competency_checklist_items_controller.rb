@@ -2,9 +2,10 @@
 
 module Clients
   class CompetencyChecklistItemsController < ApplicationController
+    include RequiresPeriodRecord
+
     before_action :set_client
-    before_action :set_period
-    before_action :set_monthly
+    before_action :load_monthly_collection_readonly
     before_action :set_item
 
     def mark_validated
@@ -41,12 +42,8 @@ module Clients
       @client = Client.find(params.expect(:client_id))
     end
 
-    def set_period
-      @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
-    end
-
-    def set_monthly
-      @monthly = EnsureMonthlyCollection.call(client: @client, period: @period)
+    def default_period_redirect_aba
+      "checklist"
     end
 
     def set_item

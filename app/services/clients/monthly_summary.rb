@@ -62,7 +62,11 @@ module Clients
     end
 
     def status_badge(pending_count, phase)
-      if @period_record&.closed?
+      if @period_record.blank?
+        return missing_period_status_badge(phase)
+      end
+
+      if @period_record.closed?
         return { tone: :neutral, label: "Competência encerrada" }
       end
 
@@ -79,6 +83,14 @@ module Clients
         { tone: :warning, label: "#{pending_count} pendência#{"s" if pending_count != 1}" }
       else
         { tone: :success, label: "Em dia" }
+      end
+    end
+
+    def missing_period_status_badge(phase)
+      if phase == :future
+        { tone: :neutral, label: "Competência futura" }
+      else
+        { tone: :neutral, label: "Competência não aberta" }
       end
     end
 

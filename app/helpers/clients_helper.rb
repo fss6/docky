@@ -60,6 +60,17 @@ module ClientsHelper
     end
   end
 
+  def missing_period_cta_label(period_phase)
+    case period_phase
+    when :past
+      "Criar competência retroativa"
+    when :future
+      "Abrir competência antecipada"
+    else
+      "Abrir competência"
+    end
+  end
+
   def client_period_context_chip_classes(period)
     case client_period_phase(period)
     when :current

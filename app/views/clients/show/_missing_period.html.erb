@@ -1,0 +1,27 @@
+<section class="app-card p-6 sm:p-8 text-center">
+  <% period_label = client_period_label(period) %>
+  <% if period_phase == :future %>
+    <h2 class="text-base font-semibold text-zinc-900">Competência futura</h2>
+    <p class="mt-2 text-sm text-zinc-600">
+      <%= period_label %> ainda não foi aberta para <%= client.name %>.
+      Você pode criá-la agora para se adiantar no trabalho deste mês.
+    </p>
+  <% else %>
+    <h2 class="text-base font-semibold text-zinc-900">Competência não aberta</h2>
+    <p class="mt-2 text-sm text-zinc-600">
+      <%= period_label %> ainda não foi aberta para <%= client.name %>.
+      <% if period_phase == :past %>
+        Crie a competência para organizar documentos, checklist e histórico deste mês.
+      <% else %>
+        Abra a competência para enviar documentos, montar o checklist e gerar links de upload.
+      <% end %>
+    </p>
+  <% end %>
+  <div class="mt-6">
+    <%= button_to missing_period_cta_label(period_phase),
+          open_period_client_path(client),
+          method: :post,
+          params: { period: period_param, aba: active_tab },
+          class: "app-btn-primary" %>
+  </div>
+</section>

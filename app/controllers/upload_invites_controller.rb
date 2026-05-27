@@ -12,11 +12,17 @@ class UploadInvitesController < ApplicationController
     end
 
     @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
-    period_record = Periods::FindOrOpen.call(
+    period_record = Period.find_by(
       account: current_user.account,
       client: @client,
       period: @period
     )
+    unless period_record
+      return redirect_to client_path(@client, aba: "convites", period: @period.strftime("%Y-%m")),
+                         alert: "Abra a competência antes de gerar o link de upload.",
+                         status: :see_other
+    end
+
     guard = Periods::UploadGuard.call(period: period_record)
     unless guard.allowed
       return redirect_to client_path(@client, aba: "convites", period: @period.strftime("%Y-%m")),
