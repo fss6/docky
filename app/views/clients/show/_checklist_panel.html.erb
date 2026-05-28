@@ -20,7 +20,8 @@
       <div class="mt-5">
         <%= link_to "Cadastrar itens padrão",
               client_checklist_items_path(client, period: period_param),
-              class: "app-btn-primary no-underline" %>
+              class: "app-btn-primary no-underline",
+              data: { turbo_frame: "_top" } %>
       </div>
     <% end %>
   </div>

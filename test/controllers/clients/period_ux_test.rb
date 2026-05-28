@@ -107,6 +107,25 @@ module Clients
       assert_match "Checklist montado para o mês", response.body
     end
 
+    test "empty checklist without template items links to template page with full page navigation" do
+      ActsAsTenant.with_tenant(@account) do
+        @client.client_checklist_items.destroy_all
+        @checklist.items.destroy_all
+      end
+
+      get client_path(@client, aba: "checklist", period: @period_param)
+
+      assert_response :success
+      assert_match "Cadastrar itens padrão", response.body
+      assert_select 'a[data-turbo-frame="_top"][href=?]',
+                    client_checklist_items_path(@client, period: @period_param)
+
+      get client_checklist_items_path(@client, period: @period_param)
+
+      assert_response :success
+      assert_match "Itens padrão do cliente", response.body
+    end
+
     test "historico tab shows period activity timeline" do
       ActsAsTenant.with_tenant(@account) do
         Periods::Close.call(period: @checklist, user: @user)
