@@ -246,6 +246,54 @@ pt-BR:
         heading: Restaurar e-mail de convite?
         body: O assunto e o corpo serão substituídos pelo padrão. Clique em Salvar para gravar as alterações.
 
+  clients:
+    configure_menu:
+      trigger: Configurar
+      groups:
+        checklist: Checklist
+        onboarding: Onboarding
+        client: Cadastro
+        danger: Zona de perigo
+      checklist_template:
+        title: Documentos do mês
+        description: Lista que monta o checklist de cada competência
+      checklist_empty_state:
+        description: Cadastre os documentos do mês antes de montar o checklist desta competência.
+        cta: Configurar documentos do mês
+      onboarding_start:
+        title: Primeiro envio de documentos
+        description: Cliente entra no checklist inicial
+      onboarding_reopen:
+        title: Voltar ao checklist inicial
+        description: Para clientes ativos que precisam reenviar
+      onboarding_items:
+        title: Documentos do onboarding
+        description: Itens que o cliente deve enviar agora
+      client_data:
+        title: Editar dados cadastrais
+        description: Nome, CNPJ, e-mail e demais informações
+      delete_client:
+        title: Excluir cliente
+        description: Remove o cliente e o histórico associado
+    onboarding_start_confirm_modal:
+      heading: Iniciar checklist inicial?
+      body_prefix: "O cliente "
+      body_suffix: " entrará no modo de onboarding e receberá o checklist de primeiros documentos."
+      confirm: Iniciar checklist inicial
+    onboarding_reopen_confirm_modal:
+      heading: Voltar ao checklist inicial?
+      body_prefix: "O cliente "
+      body_suffix: " retornará ao modo de configuração para reenviar os documentos do onboarding."
+      confirm: Voltar ao checklist inicial
+    delete_confirm_modal:
+      heading: Excluir cliente?
+      body_prefix: "O cliente "
+      body_suffix: " e todo o histórico associado serão removidos permanentemente. Esta ação não pode ser desfeita."
+      confirm: Excluir cliente
+    share_modal:
+      email_status_fallback: "Envio em andamento."
+      email_error_fallback: "Não foi possível enviar o e-mail."
+
   mailers:
     layout:
       tagline: Menos trabalho manual, mais produtividade

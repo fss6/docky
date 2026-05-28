@@ -1,0 +1,52 @@
+<details class="relative">
+  <summary class="app-btn-primary inline-flex cursor-pointer list-none items-center gap-2 [&::-webkit-details-marker]:hidden">
+    <%= heroicon "cog-6-tooth", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+    <%= t("clients.configure_menu.trigger") %>
+  </summary>
+  <div class="absolute right-0 z-20 mt-2 w-80 rounded-lg border border-zinc-200 bg-white py-2 shadow-lg" data-testid="client-configure-menu">
+    <% menu_variant = local_assigns.fetch(:variant, :active).to_sym %>
+
+    <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.client") %>
+    <%= render "clients/show/configure_menu_item",
+          title: t("clients.configure_menu.client_data.title"),
+          description: t("clients.configure_menu.client_data.description"),
+          url: edit_client_path(client) %>
+
+    <% if menu_variant == :active %>
+      <div class="my-1 border-t border-zinc-100" role="separator"></div>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.checklist") %>
+      <%= render "clients/show/configure_menu_item",
+            title: t("clients.configure_menu.checklist_template.title"),
+            description: t("clients.configure_menu.checklist_template.description"),
+            url: client_checklist_items_path(client, period: period_param) %>
+
+      <% if client.active? %>
+        <div class="my-1 border-t border-zinc-100" role="separator"></div>
+        <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
+        <%= render "clients/show/configure_menu_item",
+              title: t("clients.configure_menu.onboarding_start.title"),
+              description: t("clients.configure_menu.onboarding_start.description"),
+              confirm_modal: client_onboarding_start_confirm_modal_data(client: client) %>
+        <%= render "clients/show/configure_menu_item",
+              title: t("clients.configure_menu.onboarding_reopen.title"),
+              description: t("clients.configure_menu.onboarding_reopen.description"),
+              confirm_modal: client_onboarding_reopen_confirm_modal_data(client: client) %>
+      <% end %>
+    <% else %>
+      <div class="my-1 border-t border-zinc-100" role="separator"></div>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
+      <%= render "clients/show/configure_menu_item",
+            title: t("clients.configure_menu.onboarding_items.title"),
+            description: t("clients.configure_menu.onboarding_items.description"),
+            url: client_onboarding_checklist_items_path(client) %>
+    <% end %>
+
+    <div class="my-1 border-t border-zinc-100" role="separator"></div>
+    <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.danger") %>
+    <%= render "clients/show/configure_menu_item",
+          title: t("clients.configure_menu.delete_client.title"),
+          description: t("clients.configure_menu.delete_client.description"),
+          danger: true,
+          confirm_modal: client_delete_confirm_modal_data(client: client) %>
+  </div>
+</details>

@@ -253,6 +253,45 @@ module ClientsHelper
     checklist.present? && checklist.started_at <= 30.days.ago
   end
 
+  def client_onboarding_start_confirm_modal_data(client:)
+    app_confirm_modal_open_data(
+      url: client_onboarding_start_path(client),
+      item_label: client.name,
+      http_method: "post",
+      heading: I18n.t("clients.onboarding_start_confirm_modal.heading"),
+      body_prefix: I18n.t("clients.onboarding_start_confirm_modal.body_prefix"),
+      body_suffix: I18n.t("clients.onboarding_start_confirm_modal.body_suffix"),
+      confirm_text: I18n.t("clients.onboarding_start_confirm_modal.confirm"),
+      confirm_variant: "primary"
+    )
+  end
+
+  def client_onboarding_reopen_confirm_modal_data(client:)
+    app_confirm_modal_open_data(
+      url: client_onboarding_reopen_path(client),
+      item_label: client.name,
+      http_method: "post",
+      heading: I18n.t("clients.onboarding_reopen_confirm_modal.heading"),
+      body_prefix: I18n.t("clients.onboarding_reopen_confirm_modal.body_prefix"),
+      body_suffix: I18n.t("clients.onboarding_reopen_confirm_modal.body_suffix"),
+      confirm_text: I18n.t("clients.onboarding_reopen_confirm_modal.confirm"),
+      confirm_variant: "primary"
+    )
+  end
+
+  def client_delete_confirm_modal_data(client:)
+    app_confirm_modal_open_data(
+      url: client_path(client),
+      item_label: client.name,
+      http_method: "delete",
+      heading: I18n.t("clients.delete_confirm_modal.heading"),
+      body_prefix: I18n.t("clients.delete_confirm_modal.body_prefix"),
+      body_suffix: I18n.t("clients.delete_confirm_modal.body_suffix"),
+      confirm_text: I18n.t("clients.delete_confirm_modal.confirm"),
+      confirm_variant: "danger"
+    )
+  end
+
   def onboarding_activate_confirm_modal_data(url:, client_name:)
     app_confirm_modal_open_data(
       url: url,

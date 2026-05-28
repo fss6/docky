@@ -116,14 +116,14 @@ module Clients
       get client_path(@client, aba: "checklist", period: @period_param)
 
       assert_response :success
-      assert_match "Cadastrar itens padrão", response.body
+      assert_match I18n.t("clients.configure_menu.checklist_empty_state.cta"), response.body
       assert_select 'a[data-turbo-frame="_top"][href=?]',
                     client_checklist_items_path(@client, period: @period_param)
 
       get client_checklist_items_path(@client, period: @period_param)
 
       assert_response :success
-      assert_match "Itens padrão do cliente", response.body
+      assert_match I18n.t("clients.configure_menu.checklist_template.title"), response.body
     end
 
     test "historico tab shows period activity timeline" do

@@ -1,0 +1,27 @@
+<%
+  item_hover = local_assigns[:danger] ? "hover:bg-red-50" : "hover:bg-zinc-50"
+  title_color = local_assigns[:danger] ? "text-red-700" : "text-zinc-900"
+  item_body = capture do %>
+    <span class="block text-sm font-medium <%= title_color %>"><%= title %></span>
+    <span class="mt-0.5 block text-xs text-zinc-500"><%= description %></span>
+  <% end
+%>
+<% if local_assigns[:url].present? %>
+  <%= link_to url, class: "block px-4 py-3 no-underline #{item_hover}" do %>
+    <%= item_body %>
+  <% end %>
+<% elsif local_assigns[:confirm_modal].present? %>
+  <%= button_tag type: "button",
+        class: "block w-full cursor-pointer border-0 bg-transparent px-4 py-3 text-left #{item_hover}",
+        data: confirm_modal do %>
+    <%= item_body %>
+  <% end %>
+<% else %>
+  <%= button_to path,
+        method: local_assigns.fetch(:method, :post),
+        params: local_assigns[:params],
+        form: { data: local_assigns[:confirm].present? ? { turbo_confirm: confirm } : {} },
+        class: "block w-full border-0 bg-transparent px-4 py-3 text-left #{item_hover}" do %>
+    <%= item_body %>
+  <% end %>
+<% end %>

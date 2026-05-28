@@ -70,12 +70,6 @@
     </div>
 
     <%= render "clients/show/share_link_modal", client: @client, period_param: period_param, active_upload_invite: @active_upload_invite %>
-
-    <%= render "shared/confirm_modal",
-          heading: "Fechar competência?",
-          body_prefix: "Você está encerrando a competência ",
-          body_suffix: ". Novos envios pelo portal e uploads internos ficarão bloqueados para esta competência.",
-          confirm_text: "Fechar competência" %>
   <% else %>
     <%= render "clients/show/missing_period",
           client: @client,
@@ -84,4 +78,6 @@
           period_phase: @period_phase,
           active_tab: @active_tab %>
   <% end %>
+
+  <%= render "clients/delete_confirm_modal" %>
 </div>

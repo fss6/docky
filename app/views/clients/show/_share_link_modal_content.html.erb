@@ -4,7 +4,9 @@
      class="mt-5 space-y-5"
      data-share-link-modal-target="content"
      data-controller="copy-link upload-invite-email"
-     data-upload-invite-email-send-url-value="<%= send_email_client_upload_invite_path(client, invite) %>">
+     data-upload-invite-email-send-url-value="<%= send_email_client_upload_invite_path(client, invite) %>"
+     data-upload-invite-email-success-fallback-value="<%= t("clients.share_modal.email_status_fallback") %>"
+     data-upload-invite-email-error-fallback-value="<%= t("clients.share_modal.email_error_fallback") %>">
   <div>
     <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Link de upload</p>
     <div class="mt-2 flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
@@ -53,6 +55,10 @@
         </button>
       <% end %>
     </div>
+    <p class="hidden mt-2 rounded-lg px-3 py-2 text-center text-sm"
+       role="status"
+       aria-live="polite"
+       data-upload-invite-email-target="status"></p>
   </div>
 
   <div class="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
