@@ -26,11 +26,7 @@ module Clients
       pending = items.count(&:awaiting_receipt?)
       phase = period_phase
 
-      last_upload = if @period_record&.id
-                      Document.where(client_id: @client.id, period_id: @period_record.id).maximum(:created_at)
-                    else
-                      Document.where(client_id: @client.id, collection_period: @period).maximum(:created_at)
-                    end
+      last_document = period_documents.order(created_at: :desc).first
 
       {
         pending_count: pending,
@@ -40,17 +36,32 @@ module Clients
         period_phase: phase,
         status_badge: status_badge(pending, phase),
         deadline: deadline_payload(phase),
-        last_upload_label: format_last_upload_label(last_upload)
+        last_received_label: format_last_received_label(last_document&.created_at),
+        last_received_source_label: last_received_source_label(last_document)
       }
     end
 
-    def format_last_upload_label(last_upload)
-      return "—" if last_upload.blank?
+    def period_documents
+      if @period_record&.id
+        Document.where(client_id: @client.id, period_id: @period_record.id)
+      else
+        Document.where(client_id: @client.id, collection_period: @period)
+      end
+    end
+
+    def format_last_received_label(received_at)
+      return "—" if received_at.blank?
 
       I18n.with_locale(:"pt-BR") do
-        distance = ActionController::Base.helpers.time_ago_in_words(last_upload, locale: :"pt-BR")
+        distance = ActionController::Base.helpers.time_ago_in_words(received_at, locale: :"pt-BR")
         "há #{distance}"
       end
+    end
+
+    def last_received_source_label(document)
+      return if document.blank?
+
+      "via #{document.upload_source_label}"
     end
 
     def period_phase

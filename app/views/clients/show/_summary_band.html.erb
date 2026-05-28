@@ -17,7 +17,10 @@
     <p class="mt-2 text-sm font-medium text-zinc-900"><%= summary[:deadline][:label] %></p>
   </div>
   <div class="lg:pl-5">
-    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Último envio</p>
-    <p class="mt-2 text-sm font-medium text-zinc-900"><%= summary[:last_upload_label] %></p>
+    <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Último arquivo recebido</p>
+    <p class="mt-2 text-sm font-medium text-zinc-900"><%= summary[:last_received_label] %></p>
+    <% if summary[:last_received_source_label].present? %>
+      <p class="mt-0.5 text-xs text-zinc-500"><%= summary[:last_received_source_label] %></p>
+    <% end %>
   </div>
 </div>

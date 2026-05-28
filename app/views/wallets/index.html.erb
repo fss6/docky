@@ -91,7 +91,7 @@
               <th class="px-4 py-3 sm:px-5">Cliente</th>
               <th class="px-4 py-3 sm:px-5">Completude</th>
               <th class="px-4 py-3 sm:px-5">Checklist</th>
-              <th class="px-4 py-3 sm:px-5">Último envio</th>
+              <th class="px-4 py-3 sm:px-5">Último arquivo recebido</th>
               <th class="px-4 py-3 sm:px-5">Status</th>
               <th class="px-4 py-3 text-right sm:px-5">Ação</th>
             </tr>
@@ -121,7 +121,7 @@
                   <% if row[:last_document_at].present? %>
                     <%= l(row[:last_document_at], format: :short) %>
                   <% else %>
-                    <span class="text-zinc-400">Sem envio</span>
+                    <span class="text-zinc-400">Nenhum arquivo</span>
                   <% end %>
                 </td>
                 <td class="px-4 py-3 sm:px-5">
