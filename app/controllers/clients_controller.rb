@@ -9,7 +9,10 @@ class ClientsController < ApplicationController
   before_action :load_onboarding_context, only: :show, if: :onboarding_show?
 
   def index
-    @pagy, @clients = pagy(Client.order(:name), limit: 10)
+    assign_index_filter_params
+    scope = Client.filtered_by_index_params(params)
+    @account_has_clients = Client.exists?
+    @pagy, @clients = pagy(scope.order(:name), limit: 10)
   end
 
   def show
@@ -183,6 +186,14 @@ class ClientsController < ApplicationController
     else
       "outros"
     end
+  end
+
+  def assign_index_filter_params
+    @search_query = params[:q].to_s.strip
+    @selected_status = params[:status].to_s
+    @filter_name = params[:name].to_s.strip
+    @filter_tax_id = params[:tax_id].to_s.strip
+    @filter_email = params[:email].to_s.strip
   end
 
   def client_params

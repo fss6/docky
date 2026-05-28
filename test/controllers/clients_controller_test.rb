@@ -13,6 +13,39 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "index filters by unified search q" do
+    get clients_url, params: { q: "Alpha" }
+    assert_response :success
+    assert_select "table tbody tr", count: 1
+    assert_select "table tbody a", text: "Cliente Alpha"
+  end
+
+  test "index filters by tax_id in advanced field" do
+    get clients_url, params: { tax_id: "11.222.333/0001-81" }
+    assert_response :success
+    assert_select "table tbody tr", count: 1
+    assert_select "table tbody a", text: "Cliente Alpha"
+  end
+
+  test "index filters by status" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      @client.update!(status: :onboarding)
+      clients(:beta).update!(status: :active)
+    end
+
+    get clients_url, params: { status: "onboarding" }
+    assert_response :success
+    assert_select "table tbody tr", count: 1
+    assert_select "table tbody a", text: "Cliente Alpha"
+  end
+
+  test "index shows empty state when filters match nothing" do
+    get clients_url, params: { q: "zzz-inexistente" }
+    assert_response :success
+    assert_match "Nenhum cliente encontrado para os filtros", response.body
+    assert_no_match "Nenhum cliente cadastrado ainda", response.body
+  end
+
   test "should get new" do
     get new_client_url
     assert_response :success
