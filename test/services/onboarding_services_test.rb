@@ -3,6 +3,7 @@
 require "test_helper"
 
 class OnboardingServicesTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
   setup do
     seed_onboarding_templates!
   end
@@ -28,6 +29,20 @@ class OnboardingServicesTest < ActiveSupport::TestCase
     Onboarding::MarkItemReceived.call(item: item, user: users(:owner))
     progress = Onboarding::Progress.call(checklist: checklist.reload)
     assert_equal 1, progress.received_count
+  end
+
+  test "activate from onboarding enqueues onboarding email job when client has email" do
+    client = create_onboarding_client
+
+    assert_enqueued_with(job: Clients::DeliverOnboardingActivatedEmailJob) do
+      ActsAsTenant.with_tenant(client.account) do
+        Clients::ActivateFromOnboarding.call(
+          client: client,
+          user: users(:owner),
+          account: client.account
+        )
+      end
+    end
   end
 
   test "reopen onboarding resets client status" do

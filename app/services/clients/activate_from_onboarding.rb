@@ -38,7 +38,13 @@ module Clients
           metadata: { automatic: @automatic }
         )
 
-        OnboardingMailer.client_activated(@client).deliver_later if @client.email.present?
+        if @client.email.present?
+          DeliverOnboardingActivatedEmailJob.perform_later(
+            client_id: @client.id,
+            user_id: @user&.id,
+            automatic: @automatic
+          )
+        end
       end
 
       @client

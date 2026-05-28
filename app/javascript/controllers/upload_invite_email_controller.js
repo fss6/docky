@@ -32,7 +32,7 @@ export default class extends Controller {
         return
       }
 
-      showSuccess(data.message || "E-mail enviado.")
+      showSuccess(data.message || "Envio em andamento.")
     } catch (error) {
       console.error("[upload-invite-email]", error)
       showError("Não foi possível enviar o e-mail.")

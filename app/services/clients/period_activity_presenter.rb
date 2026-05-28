@@ -37,6 +37,8 @@ module Clients
         [checklist_item_name, document_filename].compact.join(" · ").presence || "—"
       when "upload_invite.created", "upload_invite.revoked", "upload_invite.email_sent"
         "Link de upload do cliente"
+      when "upload_invite.email_failed"
+        upload_invite_email_failed_description
       when "monthly_collection.created"
         "Competência #{month_label} disponível para trabalho"
       else
@@ -57,7 +59,8 @@ module Clients
       "checklist_item.created_from_document" => "Item criado a partir de documento",
       "upload_invite.created" => "Link de upload gerado",
       "upload_invite.revoked" => "Link de upload revogado",
-      "upload_invite.email_sent" => "Convite enviado por e-mail"
+      "upload_invite.email_sent" => "Convite enviado por e-mail",
+      "upload_invite.email_failed" => "Falha ao enviar convite por e-mail"
     }.freeze
 
     private
@@ -89,6 +92,15 @@ module Clients
       return @checklist_item if defined?(@checklist_item)
 
       @checklist_item = @event.subject if @event.subject_type == "CompetencyChecklistItem"
+    end
+
+    def upload_invite_email_failed_description
+      parts = []
+      parts << @metadata["recipient"] if @metadata["recipient"].present?
+      if @metadata["error_message"].present?
+        parts << @metadata["error_message"].to_s.truncate(80)
+      end
+      parts.presence&.join(" · ") || "Link de upload do cliente"
     end
 
     def upload_source_label(source)

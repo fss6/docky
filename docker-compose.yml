@@ -45,7 +45,7 @@ services:
       - .:/app
     environment:
       RAILS_ENV: development
-      REDIS_URL: redis://redis-worker:6379/0
+      REDIS_URL: redis://redis:6379/0
     env_file:
       - .env
     depends_on:

@@ -37,6 +37,22 @@ module Clients
       assert_equal "Maio/2026", presenter.description
     end
 
+    test "formats upload invite email failed with recipient and error" do
+      event = AuditEvent.new(
+        event_type: "upload_invite.email_failed",
+        metadata: {
+          "recipient" => "cliente@example.com",
+          "error_message" => "Connection timed out"
+        }
+      )
+
+      presenter = PeriodActivityPresenter.new(event)
+
+      assert_equal "Falha ao enviar convite por e-mail", presenter.title
+      assert_includes presenter.description, "cliente@example.com"
+      assert_includes presenter.description, "Connection timed out"
+    end
+
     test "formats checklist validation with item name in metadata" do
       event = AuditEvent.new(
         event_type: "checklist_item.marked_validated",

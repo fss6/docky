@@ -16,35 +16,12 @@ module Clients
         return render json: { error: "Este link não está mais ativo." }, status: :unprocessable_entity
       end
 
-      setting = current_user.account.setting || current_user.account.create_setting!
-      upload_url = helpers.client_public_upload_url(@invite.token)
-      rendered = UploadShareMessageRenderer.call(
-        setting: setting,
-        client: @client,
-        url: upload_url,
-        period: @invite.period
+      DeliverUploadInviteEmailJob.perform_later(
+        upload_invite_id: @invite.id,
+        user_id: current_user.id
       )
 
-      UploadInviteMailer.share_link(
-        client: @client,
-        invite: @invite,
-        email_subject: rendered.email_subject,
-        email_body: rendered.email_body,
-        upload_url: upload_url,
-        account_name: current_user.account.name
-      ).deliver_later
-
-      record_audit_event(
-        event_type: "upload_invite.email_sent",
-        subject: @invite,
-        metadata: {
-          client_id: @client.id,
-          period: @invite.period.strftime("%Y-%m"),
-          recipient: @client.email
-        }
-      )
-
-      render json: { message: "E-mail enviado para #{@client.email}." }
+      render json: { message: "Envio em andamento para #{@client.email}." }
     end
 
     private

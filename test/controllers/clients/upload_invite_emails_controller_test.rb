@@ -22,14 +22,17 @@ module Clients
       end
     end
 
-    test "send_email enqueues mail when client has email" do
-      assert_enqueued_emails 1 do
-        post send_email_client_upload_invite_path(@client, @invite),
-             headers: { Accept: "application/json" }
+    test "send_email enqueues job when client has email" do
+      assert_no_difference -> { AuditEvent.count } do
+        assert_enqueued_with(job: DeliverUploadInviteEmailJob) do
+          post send_email_client_upload_invite_path(@client, @invite),
+               headers: { Accept: "application/json" }
+        end
       end
 
       assert_response :success
       body = JSON.parse(response.body)
+      assert_includes body["message"], "Envio em andamento"
       assert_includes body["message"], @client.email
     end
 
@@ -46,7 +49,7 @@ module Clients
         )
       end
 
-      assert_no_enqueued_emails do
+      assert_no_enqueued_jobs only: DeliverUploadInviteEmailJob do
         post send_email_client_upload_invite_path(client_without_email, invite),
              headers: { Accept: "application/json" }
       end

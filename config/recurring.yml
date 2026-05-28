@@ -9,23 +9,8 @@
 #     priority: 2
 #     schedule: at 5am every day
 
-# Tarefas periódicas do Solid Queue (ex.: bin/jobs ou plugin solid_queue no Puma com SOLID_QUEUE_IN_PUMA).
-# Em Docker com apenas Sidekiq, use: bin/rails embedding:sweep no cron a cada 10–15 min.
-
-production:
-  clear_solid_queue_finished_jobs:
-    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
-    schedule: every hour at minute 12
-
-  pending_embedding_records_sweep:
-    class: PendingEmbeddingRecordsSweepJob
-    schedule: every 10 minutes
-
-  wiki_lint_all_accounts:
-    command: "Account.find_each { |a| WikiLintJob.perform_later(a.id) }"
-    schedule: every Monday at 7am
-
-development:
-  pending_embedding_records_sweep:
-    class: PendingEmbeddingRecordsSweepJob
-    schedule: every 10 minutes
+# Solid Queue recurring tasks disabled — Active Job uses Sidekiq (see sidekiq_cron.rb).
+# production:
+#   clear_solid_queue_finished_jobs:
+#     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+#     schedule: every hour at minute 12

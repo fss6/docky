@@ -10,7 +10,6 @@
 :max_retries: 3
 :retry_interval: 10
 
-# Redis configuration
+# Redis configuration (Sidekiq 7+ does not support :namespace — use a dedicated DB in the URL if needed, e.g. /1)
 :redis:
   :url: "<%= ENV['REDIS_URL'] || 'redis://localhost:6379/0' %>"
-  :namespace: dokivo_redis 
