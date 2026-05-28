@@ -13,25 +13,12 @@
   </header>
 
   <%= form_with url: clients_path, method: :get, class: "app-card px-4 py-4 sm:px-5" do %>
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="sm:col-span-2">
+    <div class="flex flex-col gap-3 md:flex-row md:items-end">
+      <div class="min-w-0 flex-1">
         <%= label_tag :q, "Busca", class: "app-label" %>
         <%= text_field_tag :q, @search_query, class: "app-input", placeholder: "Buscar por nome, CNPJ/CPF ou e-mail…" %>
       </div>
-      <div>
-        <%= label_tag :visibility, t("clients.index.visibility.label"), class: "app-label" %>
-        <%= select_tag :visibility,
-              options_for_select(
-                [
-                  [t("clients.index.visibility.active"), "active"],
-                  [t("clients.index.visibility.archived"), "archived"],
-                  [t("clients.index.visibility.all"), "all"]
-                ],
-                @selected_visibility
-              ),
-              class: "app-input" %>
-      </div>
-      <div>
+      <div class="w-full md:w-48 md:shrink-0">
         <%= label_tag :status, "Status operacional", class: "app-label" %>
         <%= select_tag :status,
               options_for_select(
@@ -44,7 +31,7 @@
               ),
               class: "app-input" %>
       </div>
-      <div class="flex flex-wrap items-end justify-end gap-2 sm:col-span-2 lg:col-span-4">
+      <div class="flex shrink-0 items-center justify-end gap-2">
         <%= link_to "Limpar", clients_path, class: "app-btn-secondary no-underline" %>
         <%= submit_tag "Aplicar", class: "app-btn-primary cursor-pointer border-0" %>
       </div>

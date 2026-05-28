@@ -248,11 +248,6 @@ pt-BR:
 
   clients:
     index:
-      visibility:
-        label: Situação
-        active: Ativos
-        archived: Arquivados
-        all: Todos
       view_client: Ver
     configure_menu:
       trigger: Configurar
@@ -319,10 +314,6 @@ pt-BR:
       public_upload_blocked: Este link não está mais disponível.
       banner: "Cliente arquivado em %{date} — apenas consulta."
       badge: Arquivado
-      index_link: Clientes arquivados
-      back_to_active: Voltar para clientes ativos
-      page_title: Clientes arquivados
-      page_description: Consulta de clientes que saíram da operação ativa. Dados e histórico foram preservados.
     share_modal:
       email_status_fallback: "Envio em andamento."
       email_error_fallback: "Não foi possível enviar o e-mail."

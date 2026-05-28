@@ -48,18 +48,12 @@ module Clients
       assert_equal "Cliente Arquivado", @client.reload.name
     end
 
-    test "archived client does not appear in active index" do
+    test "archived client appears in clients index with badge" do
       get clients_path
 
       assert_response :success
-      assert_no_match "Cliente Arquivado", response.body
-    end
-
-    test "archived client appears in archived index" do
-      get clients_path(visibility: "archived")
-
-      assert_response :success
       assert_match "Cliente Arquivado", response.body
+      assert_match "Arquivado", response.body
     end
 
     test "unarchive restores client to active list" do

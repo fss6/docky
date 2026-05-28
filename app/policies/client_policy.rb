@@ -5,10 +5,6 @@ class ClientPolicy < ApplicationPolicy
     member_or_owner?
   end
 
-  def archived?
-    index?
-  end
-
   def show?
     member_or_owner?
   end

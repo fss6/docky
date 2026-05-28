@@ -1,8 +1,8 @@
 <header class="space-y-4">
-  <% back_path = client.archived? ? clients_path(visibility: "archived") : clients_path %>
+  <% back_path = clients_path %>
   <%= link_to back_path, class: "inline-flex items-center gap-1 text-sm font-medium text-accent no-underline hover:text-accent-hover" do %>
     <%= heroicon "arrow-left", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-    <%= client.archived? ? t("clients.archived.back_to_active") : "Voltar para clientes" %>
+    Voltar para clientes
   <% end %>
 
   <% if client.archived? %>

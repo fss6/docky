@@ -9,7 +9,6 @@ class Client < ApplicationRecord
   }, default: :active
 
   ONBOARDING_KINDS = %w[new_client migration skipped].freeze
-  VISIBILITIES = %w[active archived all].freeze
 
   belongs_to :archived_by_user, class_name: "User", optional: true
 
@@ -37,18 +36,6 @@ class Client < ApplicationRecord
   validates :onboarding_kind, inclusion: { in: ONBOARDING_KINDS }, allow_nil: true
 
   scope :kept, -> { where(archived_at: nil) }
-  scope :archived_records, -> { where.not(archived_at: nil) }
-
-  scope :with_visibility, ->(visibility) {
-    case visibility.to_s
-    when "archived"
-      archived_records
-    when "all"
-      all
-    else
-      kept
-    end
-  }
 
   scope :onboarding_stale, ->(days = 30) {
     onboarding.joins(:onboarding_checklist).merge(OnboardingChecklist.stale(days))
@@ -79,7 +66,7 @@ class Client < ApplicationRecord
   }
 
   def self.filtered_by_index_params(params, base_scope: all)
-    scope = base_scope.with_visibility(params[:visibility])
+    scope = base_scope
     scope = scope.search_q(params[:q]) if params[:q].present?
     scope = scope.with_status(params[:status]) if params[:status].present?
     scope

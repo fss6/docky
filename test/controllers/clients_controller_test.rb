@@ -109,18 +109,19 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
       post archive_client_url(@client)
     end
 
-    assert_redirected_to clients_url(visibility: "archived")
+    assert_redirected_to clients_url
     assert @client.reload.archived?
   end
 
-  test "index with visibility all includes archived client" do
+  test "index includes archived client" do
     ActsAsTenant.with_tenant(@client.account) do
       Clients::Archive.call(client: @client, user: users(:owner))
     end
 
-    get clients_url(visibility: "all")
+    get clients_url
 
     assert_response :success
     assert_match @client.name, response.body
+    assert_match "Arquivado", response.body
   end
 end

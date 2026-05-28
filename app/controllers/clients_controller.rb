@@ -90,7 +90,7 @@ class ClientsController < ApplicationController
       clear_session: method(:clear_current_client_session)
     )
 
-    redirect_to clients_path(visibility: "archived"), notice: t("clients.archive.notice"), status: :see_other
+    redirect_to clients_path, notice: t("clients.archive.notice"), status: :see_other
   end
 
   def unarchive
@@ -226,19 +226,10 @@ class ClientsController < ApplicationController
   def assign_index_filter_params
     @search_query = params[:q].to_s.strip
     @selected_status = params[:status].to_s
-    visibility = params[:visibility].to_s
-    @selected_visibility = Client::VISIBILITIES.include?(visibility) ? visibility : "active"
   end
 
   def index_clients_order(scope)
-    case @selected_visibility
-    when "archived"
-      scope.order(archived_at: :desc)
-    when "all"
-      scope.order(Arel.sql("archived_at NULLS FIRST"), :name)
-    else
-      scope.order(:name)
-    end
+    scope.order(:name)
   end
 
   def client_params
