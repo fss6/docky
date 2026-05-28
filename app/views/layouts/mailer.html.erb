@@ -26,11 +26,13 @@
                 <%= yield %>
               </td>
             </tr>
-            <tr>
-              <td align="center" style="padding:24px 8px 0;font-size:12px;line-height:1.5;color:#a1a1aa;">
-                <%= t("mailers.layout.footer") %>
-              </td>
-            </tr>
+            <% unless content_for?(:skip_layout_footer) %>
+              <tr>
+                <td align="center" style="padding:24px 8px 0;font-size:12px;line-height:1.5;color:#a1a1aa;">
+                  <%= t("mailers.layout.footer") %>
+                </td>
+              </tr>
+            <% end %>
           </table>
         </td>
       </tr>

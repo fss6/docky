@@ -27,7 +27,7 @@ class UploadInviteMailerTest < ActionMailer::TestCase
 
   test "share_link uses configured subject and body" do
     custom_subject = "Assunto custom — {{nome_cliente}}"
-    custom_body = "Corpo com {{link}} e {{competencia}}"
+    custom_body = "Corpo para {{nome_cliente}} com {{link}} e {{competencia}}"
     ActsAsTenant.with_tenant(@account) do
       @setting.update!(
         upload_share_email_subject_template: custom_subject,
@@ -52,7 +52,24 @@ class UploadInviteMailerTest < ActionMailer::TestCase
 
     assert_equal [ @client.email ], mail.to
     assert_includes mail.subject, @client.name
-    assert_includes mail.html_part.body.decoded, @url
-    assert_includes mail.text_part.body.decoded, @url
+
+    html = mail.html_part.body.decoded
+    text = mail.text_part.body.decoded
+
+    assert_includes html, I18n.t("mailers.upload_invite.before_cta")
+    assert_includes html, I18n.t("mailers.upload_invite.cta")
+    assert_includes html, I18n.t("mailers.upload_invite.link_fallback")
+    assert_includes html, I18n.t("mailers.upload_invite.platform_footer")
+    assert_includes html, "href=\"#{@url}\""
+    assert_includes html, "<strong"
+    assert_includes html, ERB::Util.html_escape(@client.name)
+    assert_includes html, ERB::Util.html_escape(@account.name)
+    assert_includes html, MailerHelper::DOKIVO_BRAND_COLOR
+    assert_not_includes html, I18n.t("mailers.layout.footer")
+
+    assert_includes text, @url
+    assert_includes text, @account.name
+    assert_includes text, I18n.t("mailers.upload_invite.platform_footer")
+    assert_not_includes text, Setting::LINK_PLACEHOLDER
   end
 end

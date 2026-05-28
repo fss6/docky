@@ -1,7 +1,13 @@
+<%= strip_link_from_email_body(@body, @upload_url) %>
+
+<%= t("mailers.upload_invite.before_cta") %>
+
+<%= t("mailers.upload_invite.cta") %>: <%= @upload_url %>
+
+<%= t("mailers.upload_invite.link_fallback") %>
+<%= @upload_url %>
+
+<%= t("mailers.upload_invite.signature") %>
 <%= @account_name %>
 
-<%= @body %>
-
----
-Link de upload:
-<%= @upload_url %>
+<%= t("mailers.upload_invite.platform_footer") %>

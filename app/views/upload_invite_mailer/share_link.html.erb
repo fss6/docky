@@ -1,14 +1,41 @@
-<p style="margin:0 0 8px;font-size:13px;line-height:1.45;color:#71717a;">
-  <%= @account_name %>
-</p>
+<% content_for :skip_layout_footer, true %>
 
 <div style="font-size:15px;line-height:1.6;color:#3f3f46;">
-  <%= simple_format(@body, {}, sanitize: false) %>
+  <%= upload_invite_email_body_html(@body, upload_url: @upload_url, client: @client, period: @invite.period) %>
 </div>
 
-<p style="margin:28px 0 0;font-size:14px;line-height:1.5;color:#52525b;">
-  Se o link acima não abrir, copie e cole no navegador:
+<p style="margin:24px 0 0;font-size:15px;line-height:1.55;color:#3f3f46;">
+  <%= t("mailers.upload_invite.before_cta") %>
 </p>
-<p style="margin:8px 0 0;word-break:break-all;">
-  <a href="<%= @upload_url %>" style="color:#1a6fff;font-weight:600;text-decoration:none;"><%= @upload_url %></a>
+
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:20px 0 28px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center" style="border-radius:8px;background-color:<%= MailerHelper::DOKIVO_BRAND_COLOR %>;">
+            <%= link_to t("mailers.upload_invite.cta"),
+                  @upload_url,
+                  style: "display:inline-block;padding:14px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;" %>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:0 0 12px;font-size:14px;line-height:1.5;color:#52525b;">
+  <%= t("mailers.upload_invite.link_fallback") %>
+</p>
+<p style="margin:0 0 28px;font-size:13px;line-height:1.5;color:#71717a;word-break:break-all;">
+  <a href="<%= @upload_url %>" style="color:#1a6fff;text-decoration:underline;"><%= @upload_url %></a>
+</p>
+
+<p style="margin:0 0 24px;font-size:14px;line-height:1.55;color:#52525b;">
+  <%= t("mailers.upload_invite.signature") %><br>
+  <strong style="color:#18181b;"><%= @account_name %></strong>
+</p>
+
+<p style="margin:0;font-size:11px;line-height:1.5;color:#a1a1aa;">
+  <%= t("mailers.upload_invite.platform_footer") %>
 </p>

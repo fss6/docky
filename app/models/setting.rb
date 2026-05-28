@@ -8,11 +8,9 @@ class Setting < ApplicationRecord
   DEFAULT_UPLOAD_SHARE_EMAIL_BODY_TEMPLATE = <<~TEXT.strip
     Olá,
 
-    Por favor, envie os documentos de {{nome_cliente}} referentes à competência {{competencia}} pelo link abaixo:
+    Precisamos receber os documentos da empresa {{nome_cliente}} referentes à competência {{competencia}}.
 
     #{LINK_PLACEHOLDER}
-
-    Obrigado.
   TEXT
 
   DEFAULT_ONBOARDING_SHARE_WHATSAPP_TEMPLATE = "Olá! Para concluir a abertura da conta de {{nome_cliente}}, envie os documentos pelo link: #{LINK_PLACEHOLDER} (progresso: {{progresso}})"
@@ -20,7 +18,7 @@ class Setting < ApplicationRecord
   DEFAULT_ONBOARDING_SHARE_EMAIL_BODY_TEMPLATE = <<~TEXT.strip
     Olá,
 
-    Para concluir a configuração da conta de {{nome_cliente}}, envie os documentos iniciais pelo link abaixo:
+    Para concluir a configuração da conta de {{nome_cliente}}, envie os documentos iniciais.
 
     #{LINK_PLACEHOLDER}
 

@@ -245,6 +245,12 @@ pt-BR:
       cta: Redefinir minha senha
       link_fallback: "Se o botão não funcionar, copie e cole o link abaixo no navegador:"
       ignore_note: Sua senha só será alterada depois que você acessar o link e definir uma nova senha.
+    upload_invite:
+      cta: Enviar documentos
+      before_cta: "Para enviar os arquivos, clique no botão abaixo:"
+      link_fallback: "Caso o botão não funcione, utilize o link abaixo no navegador:"
+      signature: "Atenciosamente,"
+      platform_footer: "Este e-mail foi enviado automaticamente pela plataforma Dokivo."
 
   folders:
     confirm_modal:
