@@ -15,6 +15,8 @@ module Clients
       case @event.event_type
       when "document.received" then :document
       when "period.closed", "period.reopened", "period.created_retroactive", "monthly_collection.created" then :period
+      when "upload_invite.email_sent" then :email
+      when "upload_invite.email_failed" then :email_failed
       when /^upload_invite\./ then :invite
       when /^checklist_item\./ then :checklist
       else :other

@@ -37,6 +37,15 @@ module Clients
       assert_equal "Maio/2026", presenter.description
     end
 
+    test "email sent uses email category for envelope icon" do
+      event = AuditEvent.new(event_type: "upload_invite.email_sent", metadata: {})
+
+      presenter = PeriodActivityPresenter.new(event)
+
+      assert_equal :email, presenter.category
+      assert_equal "Convite enviado por e-mail", presenter.title
+    end
+
     test "formats upload invite email failed with recipient and error" do
       event = AuditEvent.new(
         event_type: "upload_invite.email_failed",
@@ -48,6 +57,7 @@ module Clients
 
       presenter = PeriodActivityPresenter.new(event)
 
+      assert_equal :email_failed, presenter.category
       assert_equal "Falha ao enviar convite por e-mail", presenter.title
       assert_includes presenter.description, "cliente@example.com"
       assert_includes presenter.description, "Connection timed out"

@@ -170,6 +170,10 @@ module ClientsHelper
       "bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-600/15"
     when :invite
       "bg-amber-50 text-amber-800 ring-1 ring-inset ring-amber-600/15"
+    when :email
+      "bg-red-50 text-[#D93025] ring-1 ring-inset ring-[#D93025]/20"
+    when :email_failed
+      "bg-red-100 text-red-800 ring-1 ring-inset ring-red-700/25"
     else
       "bg-zinc-100 text-zinc-600 ring-1 ring-inset ring-zinc-300"
     end
@@ -181,6 +185,7 @@ module ClientsHelper
     when :checklist then "clipboard-document-check"
     when :period then "calendar"
     when :invite then "link"
+    when :email, :email_failed then "envelope"
     else "clock"
     end
   end
