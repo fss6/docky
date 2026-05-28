@@ -9,7 +9,7 @@ class ClientsController < ApplicationController
   before_action :load_onboarding_context, only: :show, if: :onboarding_show?
 
   def index
-    @clients = Client.order(:name)
+    @pagy, @clients = pagy(Client.order(:name), limit: 10)
   end
 
   def show

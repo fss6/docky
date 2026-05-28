@@ -48,6 +48,11 @@
           </tbody>
         </table>
       </div>
+      <% if @pagy.pages > 1 %>
+        <div class="px-4 py-3">
+          <%== @pagy.series_nav %>
+        </div>
+      <% end %>
     </div>
   <% else %>
     <div class="app-card p-8 text-center text-sm text-zinc-600">
