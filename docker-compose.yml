@@ -24,6 +24,8 @@ services:
     links:
       - postgres
       - redis
+    networks:
+      - app
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -38,6 +40,8 @@ services:
       S3_BUCKET: feedback-audios
     volumes:
       - minio-data:/data
+    networks:
+      - app
   worker:
     image: docfy-web:latest
     command: bash -c "bundle exec sidekiq -C config/sidekiq.yml"
@@ -51,13 +55,16 @@ services:
     depends_on:
       - postgres
       - redis
+    networks:
+      - app
   redis:
     image: redis:7
-    container_name: redis-worker
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    networks:
+      - app
   postgres:
     image: pgvector/pgvector:pg13
     container_name: postgres
@@ -67,6 +74,11 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - app
 volumes:
   minio-data:
   redis-data:
+networks:
+  app:
+    driver: bridge
