@@ -127,4 +127,15 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_match @client.name, response.body
     assert_match "Arquivado", response.body
   end
+
+  test "index status active excludes archived client" do
+    ActsAsTenant.with_tenant(@client.account) do
+      Clients::Archive.call(client: @client, user: users(:owner))
+    end
+
+    get clients_url, params: { status: "active" }
+
+    assert_response :success
+    assert_no_match @client.name, response.body
+  end
 end

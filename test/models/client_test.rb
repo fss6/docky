@@ -49,4 +49,15 @@ class ClientTest < ActiveSupport::TestCase
       assert_includes results, clients(:beta)
     end
   end
+
+  test "filtered_by_index_params status active excludes archived clients" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      alpha = clients(:alpha)
+      alpha.update!(archived_at: Time.current, archived_by_user: users(:owner), status: :active)
+
+      results = Client.filtered_by_index_params({ status: "active" })
+      assert_not_includes results, alpha
+      assert_includes results, clients(:beta)
+    end
+  end
 end

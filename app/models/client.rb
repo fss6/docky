@@ -62,7 +62,7 @@ class Client < ApplicationRecord
     key = status.to_s
     next all unless statuses.key?(key)
 
-    where(status: key)
+    kept.where(status: key)
   }
 
   def self.filtered_by_index_params(params, base_scope: all)
