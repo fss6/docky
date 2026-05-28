@@ -5,6 +5,20 @@ module ClientsHelper
 
   VALID_TABS = %w[documentos checklist convites historico].freeze
 
+  def client_archived_badge_classes
+    "inline-flex rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-700 ring-1 ring-inset ring-zinc-300"
+  end
+
+  def client_index_status_badge(client)
+    if client.archived?
+      tag.span(t("clients.archived.badge"), class: client_archived_badge_classes)
+    elsif client.onboarding?
+      tag.span("Em onboarding", class: client_onboarding_badge_classes(stale: client_onboarding_stale?(client)))
+    else
+      tag.span("Ativo", class: "inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20")
+    end
+  end
+
   def client_initials(client)
     parts = client.name.to_s.split(/\s+/).reject(&:blank?).first(2)
     parts.map { |p| p[0] }.join.upcase.presence || "?"
@@ -279,16 +293,36 @@ module ClientsHelper
     )
   end
 
-  def client_delete_confirm_modal_data(client:)
+  def client_archive_confirm_modal_data(client:)
     app_confirm_modal_open_data(
-      url: client_path(client),
+      url: archive_client_path(client),
       item_label: client.name,
-      http_method: "delete",
-      heading: I18n.t("clients.delete_confirm_modal.heading"),
-      body_prefix: I18n.t("clients.delete_confirm_modal.body_prefix"),
-      body_suffix: I18n.t("clients.delete_confirm_modal.body_suffix"),
-      confirm_text: I18n.t("clients.delete_confirm_modal.confirm"),
+      http_method: "post",
+      heading: I18n.t("clients.archive_confirm_modal.heading"),
+      body_prefix: I18n.t("clients.archive_confirm_modal.body_prefix"),
+      body_suffix: I18n.t("clients.archive_confirm_modal.body_suffix"),
+      confirm_text: I18n.t("clients.archive_confirm_modal.confirm"),
       confirm_variant: "danger"
+    )
+  end
+
+  def client_unarchive_confirm_modal_data(client:)
+    app_confirm_modal_open_data(
+      url: unarchive_client_path(client),
+      item_label: client.name,
+      http_method: "post",
+      heading: I18n.t("clients.unarchive_confirm_modal.heading"),
+      body_prefix: I18n.t("clients.unarchive_confirm_modal.body_prefix"),
+      body_suffix: I18n.t("clients.unarchive_confirm_modal.body_suffix"),
+      confirm_text: I18n.t("clients.unarchive_confirm_modal.confirm"),
+      confirm_variant: "primary"
+    )
+  end
+
+  def client_archived_banner_message(client)
+    I18n.t(
+      "clients.archived.banner",
+      date: l(client.archived_at, format: :short)
     )
   end
 

@@ -7,6 +7,10 @@ class UploadInvitesController < ApplicationController
     @client = Client.find(params.expect(:client_id))
     authorize @client, :show?
 
+    if @client.archived?
+      return redirect_to @client, alert: I18n.t("clients.archived.mutation_blocked"), status: :see_other
+    end
+
     if @client.onboarding?
       return redirect_to @client, alert: "Use o link de onboarding nesta fase.", status: :see_other
     end
@@ -76,6 +80,12 @@ class UploadInvitesController < ApplicationController
 
   def revoke
     authorize @invite.client, :show?
+    if @invite.client.archived?
+      return redirect_to client_path(@invite.client, aba: "convites", period: period_param),
+                         alert: I18n.t("clients.archived.mutation_blocked"),
+                         status: :see_other
+    end
+
     @invite.revoke!
     record_audit_event(
       event_type: "upload_invite.revoked",

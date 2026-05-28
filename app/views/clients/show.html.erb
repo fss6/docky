@@ -1,12 +1,13 @@
 <% content_for :title, "#{@client.name} · Dokivo" %>
 <% period_param = @period.strftime("%Y-%m") %>
 <% period_open = @period_record.present? %>
+<% period_writable = period_open && !@client.archived? %>
 <% stimulus_controllers = ["app-form-modal", "app-confirm-modal"] %>
-<% stimulus_controllers.unshift("share-link-modal", "client-documents-channel") if period_open %>
+<% stimulus_controllers.unshift("share-link-modal", "client-documents-channel") if period_writable %>
 
 <div class="client-detail space-y-6"
      data-controller="<%= stimulus_controllers.join(" ") %>"
-     <% if period_open %>
+     <% if period_writable %>
      data-share-link-modal-create-url-value="<%= client_upload_invites_path(@client, period: period_param) %>"
      data-share-link-modal-has-invite-value="<%= @active_upload_invite&.active? ? true : false %>"
      data-client-documents-channel-client-id-value="<%= @client.id %>"
@@ -21,7 +22,7 @@
         period_record: @period_record,
         active_tab: @active_tab,
         active_upload_invite: @active_upload_invite,
-        period_open: period_open %>
+        period_open: period_writable %>
 
   <% if period_open %>
     <nav class="border-b border-zinc-200" aria-label="Abas do cliente">
@@ -79,5 +80,5 @@
           active_tab: @active_tab %>
   <% end %>
 
-  <%= render "clients/delete_confirm_modal" %>
+  <%= render "clients/archive_confirm_modal" %>
 </div>

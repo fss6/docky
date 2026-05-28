@@ -9,6 +9,7 @@ class PublicFolderUploadsController < ApplicationController
 
   before_action :resolve_upload_target!, except: %i[onboarding onboarding_upload onboarding_extra_upload]
   before_action :resolve_onboarding_invite!, only: %i[onboarding onboarding_upload onboarding_extra_upload]
+  before_action :ensure_client_not_archived_for_public!, only: %i[show create onboarding onboarding_upload onboarding_extra_upload]
   before_action :ensure_period_allows_upload!, only: %i[show create]
   before_action :ensure_public_upload_enabled!, only: %i[show create]
   before_action :ensure_onboarding_invite_active!, only: %i[onboarding onboarding_upload onboarding_extra_upload]
@@ -241,6 +242,14 @@ class PublicFolderUploadsController < ApplicationController
 
   def track_invite_access
     @upload_invite&.record_access!
+  end
+
+  def ensure_client_not_archived_for_public!
+    return if performed?
+    return unless @client&.archived?
+
+    @expired_message = I18n.t("clients.archived.public_upload_blocked")
+    render_expired_link(status: :gone)
   end
 
   def render_expired_link(status:)

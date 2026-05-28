@@ -2,7 +2,10 @@
 
 class ClientsController < ApplicationController
 
-  before_action :set_client, only: %i[show edit update destroy summary]
+  before_action :set_client, only: %i[show edit update archive unarchive summary]
+  before_action :ensure_client_writable!, only: %i[edit update]
+  before_action :ensure_client_kept!, only: :archive
+  before_action :ensure_client_archived!, only: :unarchive
   before_action :authorize_policy
   before_action :ensure_period_in_url, only: :show, unless: :onboarding_show?
   before_action :load_monthly_context, only: %i[show summary], unless: :onboarding_show?
@@ -12,7 +15,7 @@ class ClientsController < ApplicationController
     assign_index_filter_params
     scope = Client.filtered_by_index_params(params)
     @account_has_clients = Client.exists?
-    @pagy, @clients = pagy(scope.order(:name), limit: 10)
+    @pagy, @clients = pagy(index_clients_order(scope), limit: 10)
   end
 
   def show
@@ -78,20 +81,52 @@ class ClientsController < ApplicationController
     end
   end
 
-  def destroy
-    if session[:current_client_id].to_i == @client.id
-      session.delete(:current_client_id)
-      Current.client = nil
-    end
-    @client.destroy!
+  def archive
+    authorize @client, :archive?
 
-    respond_to do |format|
-      format.html { redirect_to clients_path, notice: "Cliente excluído com sucesso.", status: :see_other }
-      format.json { head :no_content }
-    end
+    Clients::Archive.call(
+      client: @client,
+      user: current_user,
+      clear_session: method(:clear_current_client_session)
+    )
+
+    redirect_to clients_path(visibility: "archived"), notice: t("clients.archive.notice"), status: :see_other
+  end
+
+  def unarchive
+    authorize @client, :unarchive?
+
+    Clients::Unarchive.call(client: @client, user: current_user)
+
+    redirect_to @client, notice: t("clients.unarchive.notice"), status: :see_other
   end
 
   private
+
+  def ensure_client_writable!
+    return unless @client.archived?
+
+    redirect_to @client, alert: t("clients.archived.mutation_blocked"), status: :see_other
+  end
+
+  def ensure_client_kept!
+    return if @client.kept?
+
+    redirect_to @client, alert: t("clients.archived.already_archived"), status: :see_other
+  end
+
+  def ensure_client_archived!
+    return if @client.archived?
+
+    redirect_to @client, alert: t("clients.archived.not_archived"), status: :see_other
+  end
+
+  def clear_current_client_session(client)
+    return unless session[:current_client_id].to_i == client.id
+
+    session.delete(:current_client_id)
+    Current.client = nil
+  end
 
   def authorize_policy
     authorize(@client || Client)
@@ -191,9 +226,19 @@ class ClientsController < ApplicationController
   def assign_index_filter_params
     @search_query = params[:q].to_s.strip
     @selected_status = params[:status].to_s
-    @filter_name = params[:name].to_s.strip
-    @filter_tax_id = params[:tax_id].to_s.strip
-    @filter_email = params[:email].to_s.strip
+    visibility = params[:visibility].to_s
+    @selected_visibility = Client::VISIBILITIES.include?(visibility) ? visibility : "active"
+  end
+
+  def index_clients_order(scope)
+    case @selected_visibility
+    when "archived"
+      scope.order(archived_at: :desc)
+    when "all"
+      scope.order(Arel.sql("archived_at NULLS FIRST"), :name)
+    else
+      scope.order(:name)
+    end
   end
 
   def client_params

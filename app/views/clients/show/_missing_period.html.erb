@@ -17,11 +17,13 @@
       <% end %>
     </p>
   <% end %>
-  <div class="mt-6">
-    <%= button_to missing_period_cta_label(period_phase),
-          open_period_client_path(client),
-          method: :post,
-          params: { period: period_param, aba: active_tab },
-          class: "app-btn-primary" %>
-  </div>
+  <% unless client.archived? %>
+    <div class="mt-6">
+      <%= button_to missing_period_cta_label(period_phase),
+            open_period_client_path(client),
+            method: :post,
+            params: { period: period_param, aba: active_tab },
+            class: "app-btn-primary" %>
+    </div>
+  <% end %>
 </section>

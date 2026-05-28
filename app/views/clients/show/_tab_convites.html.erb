@@ -29,7 +29,7 @@
                     <span data-copy-link-target="label">Copiar link</span>
                   </button>
                   <span class="hidden text-xs font-medium text-emerald-700" data-copy-link-target="feedback" aria-live="polite"></span>
-                  <% if policy(invite.client).show? %>
+                  <% if !client.archived? && policy(invite.client).show? %>
                     <%= button_to revoke_upload_invite_path(invite),
                           method: :patch,
                           form_class: "inline-flex",

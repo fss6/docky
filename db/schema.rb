@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_26_200000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -156,8 +156,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_200000) do
     t.integer "monthly_deadline_day", default: 10, null: false
     t.string "status", default: "active", null: false
     t.string "onboarding_kind"
+    t.datetime "archived_at"
+    t.bigint "archived_by_user_id"
     t.index ["account_id", "tax_id"], name: "index_clients_on_account_id_and_tax_id", unique: true, where: "((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))"
     t.index ["account_id"], name: "index_clients_on_account_id"
+    t.index ["archived_at"], name: "index_clients_on_archived_at"
+    t.index ["archived_by_user_id"], name: "index_clients_on_archived_by_user_id"
     t.index ["status"], name: "index_clients_on_status"
   end
 
@@ -498,6 +502,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_200000) do
   add_foreign_key "client_checklist_items", "accounts"
   add_foreign_key "client_checklist_items", "clients"
   add_foreign_key "clients", "accounts"
+  add_foreign_key "clients", "users", column: "archived_by_user_id"
   add_foreign_key "competency_checklist_items", "client_checklist_items"
   add_foreign_key "competency_checklist_items", "competency_checklists"
   add_foreign_key "competency_checklist_items", "documents", column: "last_document_id"

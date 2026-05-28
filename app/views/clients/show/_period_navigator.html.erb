@@ -56,7 +56,7 @@
 
     <div class="flex-1"></div>
 
-    <% if period_record.present? && policy(period_record).close? %>
+    <% if !client.archived? && period_record.present? && policy(period_record).close? %>
       <% period_label = client_period_label(period) %>
       <% if period_record.open? %>
         <%= button_tag "Fechar competência",

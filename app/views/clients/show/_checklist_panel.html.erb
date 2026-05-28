@@ -6,7 +6,7 @@
 <% if checklist_items.empty? %>
   <div class="mt-6 rounded-lg border border-dashed border-zinc-300 bg-zinc-50/80 px-4 py-8 text-center sm:px-6">
     <p class="text-sm font-medium text-zinc-900">Nenhuma pendência configurada para <%= client_period_label(period) %></p>
-    <% if template_items_count.positive? %>
+    <% if template_items_count.positive? && !client.archived? %>
       <p class="mt-2 text-sm text-zinc-600">Use os documentos do mês para começar esta competência.</p>
       <div class="mt-5 flex justify-center">
         <%= button_to "Montar checklist deste mês",
@@ -15,7 +15,7 @@
               class: "app-btn-primary",
               form: { data: { turbo_stream: true, turbo_frame: "_top" } } %>
       </div>
-    <% else %>
+    <% elsif !client.archived? %>
       <p class="mt-2 text-sm text-zinc-600"><%= t("clients.configure_menu.checklist_empty_state.description") %></p>
       <div class="mt-5">
         <%= link_to t("clients.configure_menu.checklist_empty_state.cta"),
@@ -23,6 +23,8 @@
               class: "app-btn-primary no-underline",
               data: { turbo_frame: "_top" } %>
       </div>
+    <% else %>
+      <p class="mt-2 text-sm text-zinc-600">Nenhum item de checklist para esta competência.</p>
     <% end %>
   </div>
 <% else %>

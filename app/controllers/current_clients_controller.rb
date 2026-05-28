@@ -7,7 +7,7 @@ class CurrentClientsController < ApplicationController
     if params[:client_id].blank?
       session.delete(:current_client_id)
     else
-      client = Client.find_by(id: params[:client_id])
+      client = Client.kept.find_by(id: params[:client_id])
       if client
         session[:current_client_id] = client.id
       else

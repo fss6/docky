@@ -9,115 +9,50 @@
         Cadastro de empresas e pessoas atendidas pelo escritório. Escolha o cliente ativo no topo da tela para filtrar pastas, documentos e métricas do painel.
       </p>
     </div>
-    <%= link_to "Novo cliente", new_client_path, class: "app-btn-primary w-full shrink-0 sm:w-auto" %>
+    <%= link_to "Novo cliente", new_client_path, class: "app-btn-primary w-full shrink-0 text-center no-underline sm:w-auto" %>
   </header>
 
-  <% advanced_filters_count = %i[name tax_id email].count { |key| params[key].present? } %>
-
-  <%= form_with url: clients_path, method: :get, class: "space-y-3" do %>
-    <div class="app-card px-4 py-4 sm:px-5">
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="sm:col-span-2 lg:col-span-2">
-          <%= label_tag :q, "Busca", class: "app-label" %>
-          <%= text_field_tag :q, @search_query, class: "app-input", placeholder: "Buscar por nome, CNPJ/CPF ou e-mail…" %>
-        </div>
-        <div>
-          <%= label_tag :status, "Status", class: "app-label" %>
-          <%= select_tag :status,
-                options_for_select(
-                  [
-                    ["Todos", ""],
-                    ["Ativo", "active"],
-                    ["Em onboarding", "onboarding"]
-                  ],
-                  @selected_status
-                ),
-                class: "app-input" %>
-        </div>
-        <div class="flex flex-wrap items-end justify-end gap-2 sm:col-span-2 lg:col-span-1">
-          <%= link_to "Limpar", clients_path, class: "app-btn-secondary no-underline" %>
-          <%= submit_tag "Aplicar", class: "app-btn-primary cursor-pointer border-0" %>
-        </div>
+  <%= form_with url: clients_path, method: :get, class: "app-card px-4 py-4 sm:px-5" do %>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="sm:col-span-2">
+        <%= label_tag :q, "Busca", class: "app-label" %>
+        <%= text_field_tag :q, @search_query, class: "app-input", placeholder: "Buscar por nome, CNPJ/CPF ou e-mail…" %>
+      </div>
+      <div>
+        <%= label_tag :visibility, t("clients.index.visibility.label"), class: "app-label" %>
+        <%= select_tag :visibility,
+              options_for_select(
+                [
+                  [t("clients.index.visibility.active"), "active"],
+                  [t("clients.index.visibility.archived"), "archived"],
+                  [t("clients.index.visibility.all"), "all"]
+                ],
+                @selected_visibility
+              ),
+              class: "app-input" %>
+      </div>
+      <div>
+        <%= label_tag :status, "Status operacional", class: "app-label" %>
+        <%= select_tag :status,
+              options_for_select(
+                [
+                  ["Todos", ""],
+                  ["Ativo", "active"],
+                  ["Em onboarding", "onboarding"]
+                ],
+                @selected_status
+              ),
+              class: "app-input" %>
+      </div>
+      <div class="flex flex-wrap items-end justify-end gap-2 sm:col-span-2 lg:col-span-4">
+        <%= link_to "Limpar", clients_path, class: "app-btn-secondary no-underline" %>
+        <%= submit_tag "Aplicar", class: "app-btn-primary cursor-pointer border-0" %>
       </div>
     </div>
-
-    <details class="app-card group" <%= "open" if advanced_filters_count.positive? %>>
-      <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-left [&::-webkit-details-marker]:hidden">
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-semibold text-zinc-900">Filtros avançados</span>
-          <% if advanced_filters_count.positive? %>
-            <span class="inline-flex items-center rounded bg-accent/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-accent"><%= advanced_filters_count %> ativo(s)</span>
-          <% end %>
-        </div>
-        <svg class="h-4 w-4 shrink-0 text-zinc-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-        </svg>
-      </summary>
-      <div class="border-t border-zinc-100 px-4 py-4 sm:px-5">
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <%= label_tag :name, "Nome", class: "app-label" %>
-            <%= text_field_tag :name, @filter_name, class: "app-input", placeholder: "Nome do cliente" %>
-          </div>
-          <div>
-            <%= label_tag :tax_id, "CNPJ / CPF", class: "app-label" %>
-            <%= text_field_tag :tax_id, @filter_tax_id, class: "app-input", placeholder: "Somente números ou formatado" %>
-          </div>
-          <div>
-            <%= label_tag :email, "E-mail", class: "app-label" %>
-            <%= text_field_tag :email, @filter_email, class: "app-input", placeholder: "E-mail do cliente" %>
-          </div>
-        </div>
-        <div class="mt-3 flex items-center justify-end gap-2">
-          <%= link_to "Limpar", clients_path, class: "app-btn-secondary no-underline" %>
-          <%= submit_tag "Aplicar", class: "app-btn-primary cursor-pointer border-0" %>
-        </div>
-      </div>
-    </details>
   <% end %>
 
   <% if @clients.any? %>
-    <div class="app-card overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-              <th class="px-5 py-3 font-semibold sm:px-6">Nome</th>
-              <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">CNPJ / CPF</th>
-              <th class="hidden px-5 py-3 font-semibold md:table-cell md:px-6">E-mail</th>
-              <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
-              <th class="px-5 py-3 font-semibold sm:px-6"></th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-100">
-            <% @clients.each do |client| %>
-              <tr class="bg-white hover:bg-zinc-50/60">
-                <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
-                  <%= link_to client.name, client, class: "text-accent no-underline hover:underline" %>
-                </td>
-                <td class="hidden px-5 py-3 text-zinc-600 sm:table-cell sm:px-6"><%= client.tax_id.presence || "—" %></td>
-                <td class="hidden px-5 py-3 text-zinc-600 md:table-cell md:px-6"><%= client.email.presence || "—" %></td>
-                <td class="px-5 py-3 sm:px-6">
-                  <% if client.onboarding? %>
-                    <span class="<%= client_onboarding_badge_classes(stale: client_onboarding_stale?(client)) %>">Em onboarding</span>
-                  <% else %>
-                    <span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20">Ativo</span>
-                  <% end %>
-                </td>
-                <td class="px-5 py-3 text-right sm:px-6">
-                  <%= link_to "Editar", edit_client_path(client), class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-      <% if @pagy.pages > 1 %>
-        <div class="px-4 py-3">
-          <%== @pagy.series_nav %>
-        </div>
-      <% end %>
-    </div>
+    <%= render "clients/clients_table", clients: @clients, pagy: @pagy %>
   <% elsif !@account_has_clients %>
     <div class="app-card p-8 text-center text-sm text-zinc-600">
       <p>Nenhum cliente cadastrado ainda.</p>

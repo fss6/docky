@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class OnboardingUploadInvitesController < ApplicationController
+  class OnboardingUploadInvitesController < BaseController
     before_action :set_client
 
     def create

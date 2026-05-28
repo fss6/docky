@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class CompetencyChecklistItemsController < ApplicationController
+  class CompetencyChecklistItemsController < BaseController
     include RequiresPeriodRecord
 
     before_action :set_client

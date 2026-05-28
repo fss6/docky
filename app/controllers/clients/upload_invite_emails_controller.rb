@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class UploadInviteEmailsController < ApplicationController
+  class UploadInviteEmailsController < BaseController
     before_action :set_client
     before_action :set_invite
 

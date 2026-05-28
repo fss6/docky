@@ -1,0 +1,41 @@
+<div class="app-card overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-left text-sm">
+      <thead>
+        <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <th class="px-5 py-3 font-semibold sm:px-6">Nome</th>
+          <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">CNPJ / CPF</th>
+          <th class="hidden px-5 py-3 font-semibold md:table-cell md:px-6">E-mail</th>
+          <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
+          <th class="px-5 py-3 font-semibold sm:px-6"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-100">
+        <% clients.each do |client| %>
+          <tr class="bg-white hover:bg-zinc-50/60 <%= "opacity-75" if client.archived? %>">
+            <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
+              <%= link_to client.name, client, class: "text-accent no-underline hover:underline" %>
+            </td>
+            <td class="hidden px-5 py-3 text-zinc-600 sm:table-cell sm:px-6"><%= client.tax_id.presence || "—" %></td>
+            <td class="hidden px-5 py-3 text-zinc-600 md:table-cell md:px-6"><%= client.email.presence || "—" %></td>
+            <td class="px-5 py-3 sm:px-6">
+              <%= client_index_status_badge(client) %>
+            </td>
+            <td class="px-5 py-3 text-right sm:px-6">
+              <% if client.archived? %>
+                <%= link_to t("clients.index.view_client"), client, class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
+              <% else %>
+                <%= link_to "Editar", edit_client_path(client), class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if pagy.pages > 1 %>
+    <div class="px-4 py-3">
+      <%== pagy.series_nav %>
+    </div>
+  <% end %>
+</div>

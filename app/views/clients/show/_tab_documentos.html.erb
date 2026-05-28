@@ -16,10 +16,12 @@
           </button>
         <% end %>
       </div>
-      <button type="button" class="app-btn-secondary inline-flex items-center gap-2 self-start sm:self-auto" data-action="click->app-form-modal#open">
-        <%= heroicon "arrow-up-tray", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-        Adicionar documento
-      </button>
+      <% unless client.archived? %>
+        <button type="button" class="app-btn-secondary inline-flex items-center gap-2 self-start sm:self-auto" data-action="click->app-form-modal#open">
+          <%= heroicon "arrow-up-tray", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+          Adicionar documento
+        </button>
+      <% end %>
     </div>
 
     <% if documents.any? %>

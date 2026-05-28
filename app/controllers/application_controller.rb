@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
       return
     end
 
-    client = Client.find_by(id: cid)
+    client = Client.kept.find_by(id: cid)
     if client
       Current.client = client
     else
@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
 
     @nav_clients_json = (
       [{ id: "", name: "Todos os clientes" }] +
-      Client.order(:name).map { |c| { id: c.id, name: c.name } }
+      Client.kept.order(:name).map { |c| { id: c.id, name: c.name } }
     ).to_json
   end
 

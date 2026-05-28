@@ -2,15 +2,19 @@
 
 class ClientPolicy < ApplicationPolicy
   def index?
-    user.role_member? || user.role_owner?
+    member_or_owner?
+  end
+
+  def archived?
+    index?
   end
 
   def show?
-    user.role_member? || user.role_owner?
+    member_or_owner?
   end
 
   def create?
-    user.role_member? || user.role_owner?
+    member_or_owner?
   end
 
   def new?
@@ -18,33 +22,58 @@ class ClientPolicy < ApplicationPolicy
   end
 
   def update?
-    user.role_member? || user.role_owner?
+    member_or_owner? && record_kept?
   end
 
   def edit?
     update?
   end
 
+  def archive?
+    member_or_owner? && record_kept?
+  end
+
+  def unarchive?
+    member_or_owner? && record_archived?
+  end
+
   def destroy?
-    user.role_member? || user.role_owner?
+    false
   end
 
   def activate_onboarding?
-    show?
+    show? && record_kept?
   end
 
   def reopen_onboarding?
-    show?
+    show? && record_kept?
   end
 
   def start_onboarding?
-    show?
+    show? && record_kept?
   end
 
   def manage_onboarding_checklist?
-    show?
+    show? && record_kept?
   end
 
   class Scope < ApplicationPolicy::Scope
+    def resolve
+      scope.kept
+    end
+  end
+
+  private
+
+  def member_or_owner?
+    user.role_member? || user.role_owner?
+  end
+
+  def record_kept?
+    record.is_a?(Class) || !record.archived?
+  end
+
+  def record_archived?
+    !record.is_a?(Class) && record.archived?
   end
 end

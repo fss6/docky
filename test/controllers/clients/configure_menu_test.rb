@@ -54,10 +54,11 @@ module Clients
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.checklist_template.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_start.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_reopen.title"))}/
-        assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.delete_client.title"))}/
+        assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.archive_client.title"))}/
         assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.onboarding_start_confirm_modal.heading")
         assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.onboarding_reopen_confirm_modal.heading")
-        assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.delete_confirm_modal.heading")
+        assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.archive_confirm_modal.heading")
+        assert_select "*", text: /Excluir cliente/, count: 0
         assert_select "button[data-app-confirm-modal-item-label-param=?]", @active_client.name
         assert_select "a[href=?]", settings_path, count: 0
         assert_select "*", text: /Mensagens de compartilhamento/, count: 0
@@ -71,8 +72,8 @@ module Clients
       assert_select "[data-testid='client-configure-menu']" do
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_items.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.client_data.title"))}/
-        assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.delete_confirm_modal.heading")
-        assert_select "button[data-app-confirm-modal-item-label-param=?]", @onboarding_client.name
+        assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.archive_client.title"))}/
+        assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.archive_confirm_modal.heading")
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_start.title"))}/, count: 0
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_reopen.title"))}/, count: 0
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.checklist_template.title"))}/, count: 0

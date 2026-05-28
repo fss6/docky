@@ -247,6 +247,13 @@ pt-BR:
         body: O assunto e o corpo serão substituídos pelo padrão. Clique em Salvar para gravar as alterações.
 
   clients:
+    index:
+      visibility:
+        label: Situação
+        active: Ativos
+        archived: Arquivados
+        all: Todos
+      view_client: Ver
     configure_menu:
       trigger: Configurar
       groups:
@@ -272,9 +279,15 @@ pt-BR:
       client_data:
         title: Editar dados cadastrais
         description: Nome, CNPJ, e-mail e demais informações
-      delete_client:
-        title: Excluir cliente
-        description: Remove o cliente e o histórico associado
+      archive_client:
+        title: Arquivar cliente
+        description: Remove da lista ativa; histórico permanece para consulta
+      unarchive_client:
+        title: Desarquivar cliente
+        description: Volta o cliente para a lista ativa
+      client_data_readonly:
+        title: Dados cadastrais
+        description: Somente consulta — cliente arquivado
     onboarding_start_confirm_modal:
       heading: Iniciar checklist inicial?
       body_prefix: "O cliente "
@@ -285,11 +298,31 @@ pt-BR:
       body_prefix: "O cliente "
       body_suffix: " retornará ao modo de configuração para reenviar os documentos do onboarding."
       confirm: Voltar ao checklist inicial
-    delete_confirm_modal:
-      heading: Excluir cliente?
+    archive_confirm_modal:
+      heading: Arquivar cliente?
       body_prefix: "O cliente "
-      body_suffix: " e todo o histórico associado serão removidos permanentemente. Esta ação não pode ser desfeita."
-      confirm: Excluir cliente
+      body_suffix: " sairá da lista ativa. Documentos, competências e histórico permanecem disponíveis para consulta na listagem de clientes."
+      confirm: Arquivar cliente
+    unarchive_confirm_modal:
+      heading: Desarquivar cliente?
+      body_prefix: "O cliente "
+      body_suffix: " voltará à lista ativa e poderá receber novas configurações operacionais."
+      confirm: Desarquivar cliente
+    archive:
+      notice: Cliente arquivado com sucesso.
+    unarchive:
+      notice: Cliente desarquivado com sucesso.
+    archived:
+      mutation_blocked: Este cliente está arquivado. Apenas consulta é permitida.
+      already_archived: Este cliente já está arquivado.
+      not_archived: Este cliente não está arquivado.
+      public_upload_blocked: Este link não está mais disponível.
+      banner: "Cliente arquivado em %{date} — apenas consulta."
+      badge: Arquivado
+      index_link: Clientes arquivados
+      back_to_active: Voltar para clientes ativos
+      page_title: Clientes arquivados
+      page_description: Consulta de clientes que saíram da operação ativa. Dados e histórico foram preservados.
     share_modal:
       email_status_fallback: "Envio em andamento."
       email_error_fallback: "Não foi possível enviar o e-mail."

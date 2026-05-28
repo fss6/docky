@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class ChecklistItemsController < ApplicationController
+  class ChecklistItemsController < BaseController
     before_action :set_client
     before_action :authorize_client
 

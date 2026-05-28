@@ -4,49 +4,64 @@
     <%= t("clients.configure_menu.trigger") %>
   </summary>
   <div class="absolute right-0 z-20 mt-2 w-80 rounded-lg border border-zinc-200 bg-white py-2 shadow-lg" data-testid="client-configure-menu">
-    <% menu_variant = local_assigns.fetch(:variant, :active).to_sym %>
+    <% if client.archived? %>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.client") %>
+      <div class="px-4 py-3">
+        <span class="block text-sm font-medium text-zinc-900"><%= t("clients.configure_menu.client_data_readonly.title") %></span>
+        <span class="mt-0.5 block text-xs text-zinc-500"><%= t("clients.configure_menu.client_data_readonly.description") %></span>
+      </div>
 
-    <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.client") %>
-    <%= render "clients/show/configure_menu_item",
-          title: t("clients.configure_menu.client_data.title"),
-          description: t("clients.configure_menu.client_data.description"),
-          url: edit_client_path(client) %>
-
-    <% if menu_variant == :active %>
       <div class="my-1 border-t border-zinc-100" role="separator"></div>
-      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.checklist") %>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.danger") %>
       <%= render "clients/show/configure_menu_item",
-            title: t("clients.configure_menu.checklist_template.title"),
-            description: t("clients.configure_menu.checklist_template.description"),
-            url: client_checklist_items_path(client, period: period_param) %>
+            title: t("clients.configure_menu.unarchive_client.title"),
+            description: t("clients.configure_menu.unarchive_client.description"),
+            confirm_modal: client_unarchive_confirm_modal_data(client: client) %>
+    <% else %>
+      <% menu_variant = local_assigns.fetch(:variant, :active).to_sym %>
 
-      <% if client.active? %>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.client") %>
+      <%= render "clients/show/configure_menu_item",
+            title: t("clients.configure_menu.client_data.title"),
+            description: t("clients.configure_menu.client_data.description"),
+            url: edit_client_path(client) %>
+
+      <% if menu_variant == :active %>
+        <div class="my-1 border-t border-zinc-100" role="separator"></div>
+        <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.checklist") %>
+        <%= render "clients/show/configure_menu_item",
+              title: t("clients.configure_menu.checklist_template.title"),
+              description: t("clients.configure_menu.checklist_template.description"),
+              url: client_checklist_items_path(client, period: period_param) %>
+
+        <% if client.active? %>
+          <div class="my-1 border-t border-zinc-100" role="separator"></div>
+          <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
+          <%= render "clients/show/configure_menu_item",
+                title: t("clients.configure_menu.onboarding_start.title"),
+                description: t("clients.configure_menu.onboarding_start.description"),
+                confirm_modal: client_onboarding_start_confirm_modal_data(client: client) %>
+          <%= render "clients/show/configure_menu_item",
+                title: t("clients.configure_menu.onboarding_reopen.title"),
+                description: t("clients.configure_menu.onboarding_reopen.description"),
+                confirm_modal: client_onboarding_reopen_confirm_modal_data(client: client) %>
+        <% end %>
+      <% else %>
         <div class="my-1 border-t border-zinc-100" role="separator"></div>
         <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
         <%= render "clients/show/configure_menu_item",
-              title: t("clients.configure_menu.onboarding_start.title"),
-              description: t("clients.configure_menu.onboarding_start.description"),
-              confirm_modal: client_onboarding_start_confirm_modal_data(client: client) %>
-        <%= render "clients/show/configure_menu_item",
-              title: t("clients.configure_menu.onboarding_reopen.title"),
-              description: t("clients.configure_menu.onboarding_reopen.description"),
-              confirm_modal: client_onboarding_reopen_confirm_modal_data(client: client) %>
+              title: t("clients.configure_menu.onboarding_items.title"),
+              description: t("clients.configure_menu.onboarding_items.description"),
+              url: client_onboarding_checklist_items_path(client) %>
       <% end %>
-    <% else %>
-      <div class="my-1 border-t border-zinc-100" role="separator"></div>
-      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
-      <%= render "clients/show/configure_menu_item",
-            title: t("clients.configure_menu.onboarding_items.title"),
-            description: t("clients.configure_menu.onboarding_items.description"),
-            url: client_onboarding_checklist_items_path(client) %>
-    <% end %>
 
-    <div class="my-1 border-t border-zinc-100" role="separator"></div>
-    <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.danger") %>
-    <%= render "clients/show/configure_menu_item",
-          title: t("clients.configure_menu.delete_client.title"),
-          description: t("clients.configure_menu.delete_client.description"),
-          danger: true,
-          confirm_modal: client_delete_confirm_modal_data(client: client) %>
+      <div class="my-1 border-t border-zinc-100" role="separator"></div>
+      <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.danger") %>
+      <%= render "clients/show/configure_menu_item",
+            title: t("clients.configure_menu.archive_client.title"),
+            description: t("clients.configure_menu.archive_client.description"),
+            danger: true,
+            confirm_modal: client_archive_confirm_modal_data(client: client) %>
+    <% end %>
   </div>
 </details>

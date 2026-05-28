@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class OnboardingChecklistItemsController < ApplicationController
+  class OnboardingChecklistItemsController < BaseController
     before_action :set_client
     before_action :set_checklist
     before_action :set_item, only: %i[update destroy mark_received mark_pending]

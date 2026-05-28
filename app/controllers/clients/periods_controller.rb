@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
-  class PeriodsController < ApplicationController
+  class PeriodsController < BaseController
     before_action :set_client
     before_action :set_period_record, only: %i[close reopen]
     before_action :authorize_period, only: %i[close reopen]

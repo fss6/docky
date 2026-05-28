@@ -33,9 +33,11 @@ Rails.application.routes.draw do
       get :original
     end
   end
-  resources :clients do
+  resources :clients, except: [:destroy] do
     member do
       get :summary
+      post :archive
+      post :unarchive
       post :open_period, to: "clients/periods#create"
       patch :close_period, to: "clients/periods#close"
       patch :reopen_period, to: "clients/periods#reopen"

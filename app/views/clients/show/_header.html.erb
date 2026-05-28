@@ -1,7 +1,12 @@
 <header class="space-y-4">
-  <%= link_to clients_path, class: "inline-flex items-center gap-1 text-sm font-medium text-accent no-underline hover:text-accent-hover" do %>
+  <% back_path = client.archived? ? clients_path(visibility: "archived") : clients_path %>
+  <%= link_to back_path, class: "inline-flex items-center gap-1 text-sm font-medium text-accent no-underline hover:text-accent-hover" do %>
     <%= heroicon "arrow-left", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-    Voltar para clientes
+    <%= client.archived? ? t("clients.archived.back_to_active") : "Voltar para clientes" %>
+  <% end %>
+
+  <% if client.archived? %>
+    <%= render "clients/show/archived_banner", client: client %>
   <% end %>
 
   <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -19,7 +24,7 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-2">
-      <% if local_assigns.fetch(:period_open, period_record.present?) %>
+      <% if !client.archived? && local_assigns.fetch(:period_open, period_record.present?) %>
         <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->share-link-modal#open">
           <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
           Gerar link de upload
