@@ -25,11 +25,14 @@ export default class extends Controller {
     this.syncHasInviteFromDom()
     this.dialogTarget.showModal()
 
+    if (this.hasInviteValue && this.hasContent()) return
+
+    const isFirstGeneration = !this.hasInviteValue
+
     try {
       await this.ensureInvite()
       this.hasInviteValue = true
-      showSuccess(this.inviteSuccessMessage())
-      await this.autoCopy()
+      if (isFirstGeneration) showSuccess(this.inviteSuccessMessage())
     } catch (error) {
       console.error("[share-link-modal]", error)
       showError("Não foi possível gerar o link. Recarregue a página e tente novamente.")
@@ -146,40 +149,6 @@ export default class extends Controller {
   syncHasInviteFromDom() {
     const raw = this.element.getAttribute("data-share-link-modal-has-invite-value")
     this.hasInviteValue = raw === "true"
-  }
-
-  async autoCopy() {
-    await this.nextFrame()
-
-    const root = document.getElementById("share_link_modal_content")
-    if (!root) return
-
-    const text = root.querySelector("[data-copy-link-target='source']")?.textContent?.trim()
-    if (!text) return
-
-    await this.writeClipboard(text)
-    this.showAutoCopyFeedback(root)
-  }
-
-  async writeClipboard(text) {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text)
-      return
-    }
-
-    const input = document.createElement("textarea")
-    input.value = text
-    input.setAttribute("readonly", "")
-    input.style.position = "absolute"
-    input.style.left = "-9999px"
-    document.body.appendChild(input)
-    input.select()
-    document.execCommand("copy")
-    document.body.removeChild(input)
-  }
-
-  showAutoCopyFeedback(_root) {
-    showSuccess("Link copiado automaticamente.")
   }
 
   inviteSuccessMessage() {
