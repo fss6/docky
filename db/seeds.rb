@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "seeds/clients"
+
 # Dados mínimos só em desenvolvimento (idempotente).
 if Rails.env.development?
   plan = Plan.find_or_initialize_by(name: "Desenvolvimento")
@@ -39,4 +41,6 @@ if Rails.env.development?
     [seeds:dev] Utilizador: dev@dev.com / dev@dev.com (owner)
     [seeds:dev] Cliente: "Pão de Forma LTDA"
   MSG
+
+  Seeds::Clients.run!
 end
