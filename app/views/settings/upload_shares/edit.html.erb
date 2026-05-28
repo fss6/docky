@@ -1,6 +1,7 @@
 <% content_for :title, "Compartilhamento mensal · Dokivo" %>
+<% upload_defaults = Setting.upload_share_defaults %>
 
-<div class="space-y-6">
+<div class="space-y-6" data-controller="app-confirm-modal">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <p class="text-xs font-semibold uppercase tracking-wide text-accent">Configurações</p>
@@ -13,36 +14,54 @@
   <%= render "shared/record_errors_toast", record: @setting %>
 
   <%= form_with model: @setting, url: settings_upload_share_path, method: :patch, class: "space-y-6", data: { controller: "auto-resize-textarea" } do |form| %>
-    <section class="app-card p-5">
-      <header class="border-b border-zinc-100 pb-4">
-        <h2 class="text-lg font-semibold text-zinc-900">Mensagem de WhatsApp</h2>
-        <p class="mt-1 text-sm text-zinc-500">Obrigatório conter <code class="rounded bg-zinc-100 px-1">{{link}}</code>.</p>
-      </header>
+    <section class="app-card p-5"
+             data-controller="template-default-restore"
+             data-template-default-restore-texts-value="<%= [upload_defaults[:whatsapp]].to_json %>"
+             data-template-default-restore-confirm-heading-value="<%= t("settings.template_defaults.confirm_whatsapp.heading") %>"
+             data-template-default-restore-confirm-body-value="<%= t("settings.template_defaults.confirm_whatsapp.body") %>"
+             data-template-default-restore-confirm-text-value="<%= t("settings.template_defaults.confirm_modal.confirm") %>">
+      <%= render "settings/template_card_header",
+            title: "Mensagem de WhatsApp",
+            hint: "Obrigatório conter <code class=\"rounded bg-zinc-100 px-1\">{{link}}</code>.".html_safe %>
       <div class="mt-4">
         <%= form.label :upload_share_whatsapp_template, "Mensagem", class: "sr-only" %>
         <%= form.text_area :upload_share_whatsapp_template,
               rows: 1,
               class: "w-full resize-none rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-accent focus:ring-accent",
-              data: { auto_resize_textarea_target: "field", action: "input->auto-resize-textarea#resize" } %>
+              data: {
+                template_default_restore_target: "field",
+                auto_resize_textarea_target: "field",
+                action: "input->auto-resize-textarea#resize"
+              } %>
       </div>
     </section>
 
-    <section class="app-card p-5">
-      <header class="border-b border-zinc-100 pb-4">
-        <h2 class="text-lg font-semibold text-zinc-900">E-mail de convite</h2>
-        <p class="mt-1 text-sm text-zinc-500">Placeholders disponíveis: {{nome_cliente}}, {{competencia}}, {{link}}.</p>
-      </header>
+    <section class="app-card p-5"
+             data-controller="template-default-restore"
+             data-template-default-restore-texts-value="<%= [upload_defaults[:email_subject], upload_defaults[:email_body]].to_json %>"
+             data-template-default-restore-confirm-heading-value="<%= t("settings.template_defaults.confirm_email.heading") %>"
+             data-template-default-restore-confirm-body-value="<%= t("settings.template_defaults.confirm_email.body") %>"
+             data-template-default-restore-confirm-text-value="<%= t("settings.template_defaults.confirm_modal.confirm") %>">
+      <%= render "settings/template_card_header",
+            title: "E-mail de convite",
+            hint: "Placeholders disponíveis: {{nome_cliente}}, {{competencia}}, {{link}}. #{t("settings.template_defaults.email_layout_note")}" %>
       <div class="mt-4 space-y-4">
         <div>
           <%= form.label :upload_share_email_subject_template, "Assunto", class: "app-label" %>
-          <%= form.text_field :upload_share_email_subject_template, class: "app-input mt-1.5" %>
+          <%= form.text_field :upload_share_email_subject_template,
+                class: "app-input mt-1.5",
+                data: { template_default_restore_target: "field" } %>
         </div>
         <div>
           <%= form.label :upload_share_email_body_template, "Corpo da mensagem", class: "app-label" %>
           <%= form.text_area :upload_share_email_body_template,
                 rows: 1,
                 class: "app-input mt-1.5 resize-none",
-                data: { auto_resize_textarea_target: "field", action: "input->auto-resize-textarea#resize" } %>
+                data: {
+                  template_default_restore_target: "field",
+                  auto_resize_textarea_target: "field",
+                  action: "input->auto-resize-textarea#resize"
+                } %>
         </div>
       </div>
     </section>
@@ -52,4 +71,6 @@
       <%= form.submit "Salvar compartilhamento", class: "app-btn-primary cursor-pointer border-0" %>
     </div>
   <% end %>
+
+  <%= render "settings/template_restore_confirm_modal" %>
 </div>

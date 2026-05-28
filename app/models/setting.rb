@@ -41,6 +41,22 @@ class Setting < ApplicationRecord
   after_initialize :apply_upload_share_defaults, if: :new_record?
   after_initialize :apply_onboarding_share_defaults, if: :new_record?
 
+  def self.upload_share_defaults
+    {
+      whatsapp: DEFAULT_UPLOAD_SHARE_WHATSAPP_TEMPLATE,
+      email_subject: DEFAULT_UPLOAD_SHARE_EMAIL_SUBJECT_TEMPLATE,
+      email_body: DEFAULT_UPLOAD_SHARE_EMAIL_BODY_TEMPLATE
+    }
+  end
+
+  def self.onboarding_share_defaults
+    {
+      whatsapp: DEFAULT_ONBOARDING_SHARE_WHATSAPP_TEMPLATE,
+      email_subject: DEFAULT_ONBOARDING_SHARE_EMAIL_SUBJECT_TEMPLATE,
+      email_body: DEFAULT_ONBOARDING_SHARE_EMAIL_BODY_TEMPLATE
+    }
+  end
+
   private
 
   def apply_upload_share_defaults

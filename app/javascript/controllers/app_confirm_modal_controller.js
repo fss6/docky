@@ -9,10 +9,11 @@ const CONFIRM_BUTTON_PRIMARY =
 // Modal de confirmação reutilizável (ex.: desabilitar usuário, excluir pasta, excluir conversa).
 // Gatilho: data-action="click->app-confirm-modal#open" e parâmetros data-app-confirm-modal-* no botão.
 export default class extends Controller {
-  static targets = ["dialog", "itemLabel", "heading", "bodyPrefix", "bodySuffix", "form", "confirmButton"]
+  static targets = ["dialog", "itemLabel", "heading", "bodyPrefix", "bodySuffix", "form", "confirmButton", "confirmAction", "formWrapper"]
 
   connect() {
     this.captureDefaults()
+    this.useCallbackMode(false)
     if (this.hasFormTarget) {
       this._onSubmitEnd = (event) => this.submitEnd(event)
       this.formTarget.addEventListener("turbo:submit-end", this._onSubmitEnd)
@@ -89,7 +90,41 @@ export default class extends Controller {
       this.syncFormTurboMode(btn)
     }
 
+    this.useCallbackMode(false)
     if (this.hasDialogTarget) this.dialogTarget.showModal()
+  }
+
+  openForCallback({ heading, bodyPrefix = "", bodySuffix = "", itemLabel = "", confirmText, confirmVariant = "primary", onConfirm }) {
+    this._onConfirmCallback = onConfirm
+
+    if (this.hasHeadingTarget) this.headingTarget.textContent = heading || ""
+    if (this.hasBodyPrefixTarget) this.bodyPrefixTarget.textContent = bodyPrefix
+    if (this.hasBodySuffixTarget) this.bodySuffixTarget.textContent = bodySuffix
+    if (this.hasItemLabelTarget) {
+      this.itemLabelTarget.textContent = itemLabel
+      this.itemLabelTarget.classList.toggle("hidden", !itemLabel)
+    }
+
+    if (this.hasConfirmActionTarget) {
+      if (confirmText !== undefined) this.confirmActionTarget.textContent = confirmText
+      const variant = confirmVariant === "danger" ? CONFIRM_BUTTON_DANGER : CONFIRM_BUTTON_PRIMARY
+      this.confirmActionTarget.className = variant
+    }
+
+    this.useCallbackMode(true)
+    if (this.hasDialogTarget) this.dialogTarget.showModal()
+  }
+
+  confirmCallback(event) {
+    event.preventDefault()
+    if (typeof this._onConfirmCallback === "function") this._onConfirmCallback()
+    this._onConfirmCallback = null
+    this.close()
+  }
+
+  useCallbackMode(enabled) {
+    if (this.hasFormWrapperTarget) this.formWrapperTarget.hidden = enabled
+    if (this.hasConfirmActionTarget) this.confirmActionTarget.hidden = !enabled
   }
 
   syncFormTurboMode(btn) {
@@ -122,6 +157,8 @@ export default class extends Controller {
   }
 
   close() {
+    this._onConfirmCallback = null
+    this.useCallbackMode(false)
     if (this.hasDialogTarget) this.dialogTarget.close()
   }
 

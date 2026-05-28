@@ -16,6 +16,11 @@ class Settings::UploadSharesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", text: "Compartilhamento mensal"
+    assert_select "[data-action='template-default-restore#requestRestore']", count: 2
+    assert_select "[data-controller*='template-default-restore']", count: 2
+    assert_select "[data-template-default-restore-texts-value*='Precisamos receber']", count: 1
+    assert_select "dialog[data-app-confirm-modal-target='dialog']", count: 1
+    assert_select "[data-template-default-restore-confirm-heading-value]", count: 2
   end
 
   test "update persists upload share templates" do

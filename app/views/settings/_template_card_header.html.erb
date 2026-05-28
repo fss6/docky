@@ -1,0 +1,13 @@
+<header class="flex flex-col gap-3 border-b border-zinc-100 pb-4 sm:flex-row sm:items-start sm:justify-between">
+  <div class="min-w-0 flex-1">
+    <h2 class="text-lg font-semibold text-zinc-900"><%= title %></h2>
+    <% if local_assigns[:hint].present? %>
+      <div class="mt-1 text-sm text-zinc-500"><%= hint %></div>
+    <% end %>
+  </div>
+  <button type="button"
+          class="app-btn-secondary shrink-0 text-sm"
+          data-action="template-default-restore#requestRestore">
+    <%= t("settings.template_defaults.restore_button") %>
+  </button>
+</header>

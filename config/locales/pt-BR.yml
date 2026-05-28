@@ -233,6 +233,19 @@ pt-BR:
         one: "1 erro impediu salvar este %{resource}:"
         other: "%{count} erros impediram salvar este %{resource}:"
 
+  settings:
+    template_defaults:
+      restore_button: Restaurar padrão
+      email_layout_note: O layout do e-mail enviado (botão, link alternativo, assinatura e rodapé) é fixo na aplicação. Aqui você edita apenas o texto introdutório.
+      confirm_modal:
+        confirm: Restaurar padrão
+      confirm_whatsapp:
+        heading: Restaurar mensagem de WhatsApp?
+        body: O texto atual será substituído pelo padrão. Clique em Salvar para gravar as alterações.
+      confirm_email:
+        heading: Restaurar e-mail de convite?
+        body: O assunto e o corpo serão substituídos pelo padrão. Clique em Salvar para gravar as alterações.
+
   mailers:
     layout:
       tagline: Menos trabalho manual, mais produtividade
