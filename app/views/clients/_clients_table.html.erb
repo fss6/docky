@@ -7,26 +7,32 @@
           <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">CNPJ / CPF</th>
           <th class="hidden px-5 py-3 font-semibold md:table-cell md:px-6">E-mail</th>
           <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
-          <th class="px-5 py-3 font-semibold sm:px-6"></th>
+          <th class="w-10 px-3 py-3" aria-hidden="true"></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-zinc-100">
         <% clients.each do |client| %>
-          <tr class="bg-white hover:bg-zinc-50/60 <%= "opacity-75" if client.archived? %>">
-            <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
-              <%= link_to client.name, client, class: "text-accent no-underline hover:underline" %>
+          <tr
+            class="group cursor-pointer border-l-2 border-transparent bg-white transition-colors hover:border-l-accent hover:bg-zinc-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent <%= "opacity-75" if client.archived? %>"
+            data-controller="clickable-row"
+            data-clickable-row-url-value="<%= client_path(client) %>"
+            data-action="click->clickable-row#visit keydown.enter->clickable-row#visit keydown.space->clickable-row#visit"
+            tabindex="0"
+            role="link"
+            aria-label="<%= client.name %>">
+            <td class="px-5 py-3 sm:px-6">
+              <span class="block truncate font-semibold text-zinc-900 group-hover:text-accent"><%= client.name %></span>
             </td>
             <td class="hidden px-5 py-3 text-zinc-600 sm:table-cell sm:px-6"><%= client.tax_id.presence || "—" %></td>
             <td class="hidden px-5 py-3 text-zinc-600 md:table-cell md:px-6"><%= client.email.presence || "—" %></td>
             <td class="px-5 py-3 sm:px-6">
               <%= client_index_status_badge(client) %>
             </td>
-            <td class="px-5 py-3 text-right sm:px-6">
-              <% if client.archived? %>
-                <%= link_to t("clients.index.view_client"), client, class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
-              <% else %>
-                <%= link_to "Editar", edit_client_path(client), class: "text-sm font-medium text-zinc-600 no-underline hover:text-zinc-900" %>
-              <% end %>
+            <td class="px-3 py-3 text-right">
+              <%= heroicon "chevron-right", variant: :outline, options: {
+                class: "inline-block h-4 w-4 text-zinc-400 transition-colors group-hover:text-accent",
+                "aria-hidden": "true"
+              } %>
             </td>
           </tr>
         <% end %>

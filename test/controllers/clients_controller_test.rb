@@ -17,14 +17,16 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     get clients_url, params: { q: "Alpha" }
     assert_response :success
     assert_select "table tbody tr", count: 1
-    assert_select "table tbody a", text: "Cliente Alpha"
+    assert_select "tr[data-clickable-row-url-value=?]", client_path(clients(:alpha))
+    assert_match "Cliente Alpha", response.body
   end
 
   test "index filters by tax_id in unified search" do
     get clients_url, params: { q: "11.222.333/0001-81" }
     assert_response :success
     assert_select "table tbody tr", count: 1
-    assert_select "table tbody a", text: "Cliente Alpha"
+    assert_select "tr[data-clickable-row-url-value=?]", client_path(clients(:alpha))
+    assert_match "Cliente Alpha", response.body
   end
 
   test "index filters by status" do
@@ -36,7 +38,8 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     get clients_url, params: { status: "onboarding" }
     assert_response :success
     assert_select "table tbody tr", count: 1
-    assert_select "table tbody a", text: "Cliente Alpha"
+    assert_select "tr[data-clickable-row-url-value=?]", client_path(clients(:alpha))
+    assert_match "Cliente Alpha", response.body
   end
 
   test "index shows empty state when filters match nothing" do

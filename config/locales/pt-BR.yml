@@ -247,8 +247,6 @@ pt-BR:
         body: O assunto e o corpo serão substituídos pelo padrão. Clique em Salvar para gravar as alterações.
 
   clients:
-    index:
-      view_client: Ver
     configure_menu:
       trigger: Configurar
       groups:
