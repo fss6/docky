@@ -6,19 +6,13 @@ class LegacyFoldersRedirectController < ApplicationController
   before_action :authorize_folder, only: %i[show edit]
 
   def index
+    authorize Folder
     redirect_to clients_path, status: :see_other
   end
 
   def new
-    if current_client.present?
-      redirect_to client_path(
-        current_client,
-        aba: "pastas",
-        period: Date.current.strftime("%Y-%m")
-      ), status: :see_other
-    else
-      redirect_to clients_path, status: :see_other
-    end
+    authorize Folder
+    redirect_to clients_path, status: :see_other
   end
 
   def show
@@ -33,6 +27,6 @@ class LegacyFoldersRedirectController < ApplicationController
 
   def authorize_folder
     authorize Folder
-    @folder = Folder.for_nav_client(current_client).find(params.expect(:id))
+    @folder = Folder.find(params.expect(:id))
   end
 end

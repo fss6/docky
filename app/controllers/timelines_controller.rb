@@ -1,6 +1,6 @@
 class TimelinesController < ApplicationController
+  before_action :redirect_to_clients_index
   before_action :authorize_policy
-  before_action :require_current_client!
   before_action :set_period_from_params!
   before_action :set_collection_folder
   before_action :set_checklist

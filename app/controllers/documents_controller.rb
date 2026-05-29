@@ -1,4 +1,6 @@
 class DocumentsController < ApplicationController
+  include FoldersHelper
+
   before_action :set_folder, only: %i[index create]
   before_action :set_document, only: %i[show destroy move add_tag replace_tag remove_tag]
   before_action :authorize_policy
@@ -11,7 +13,7 @@ class DocumentsController < ApplicationController
   end
 
   def tags_search
-    @available_tags = documents_in_current_client_scope.pluck(:tags)
+    @available_tags = Document.all.pluck(:tags)
       .flatten
       .compact
       .map { |tag| tag.to_s.strip }
@@ -24,7 +26,7 @@ class DocumentsController < ApplicationController
       .reject(&:blank?)
       .uniq
 
-    @documents = documents_in_current_client_scope.includes(:user, :folder).with_attached_file.order(created_at: :desc)
+    @documents = Document.all.includes(:user, :folder).with_attached_file.order(created_at: :desc)
 
     if @selected_tags.any?
       @selected_tags.each do |tag|
@@ -41,7 +43,7 @@ class DocumentsController < ApplicationController
 
   def term_search
     @query = params[:q].to_s.strip
-    @documents = documents_in_current_client_scope.includes(:user, :folder).with_attached_file.order(created_at: :desc)
+    @documents = Document.all.includes(:user, :folder).with_attached_file.order(created_at: :desc)
 
     if @query.present?
       like = "%#{ActiveRecord::Base.sanitize_sql_like(@query)}%"
@@ -118,7 +120,7 @@ class DocumentsController < ApplicationController
   end
 
   def move
-    destination_folder = Folder.for_nav_client(current_client).find(params.expect(:folder_id))
+    destination_folder = Folder.find(params.expect(:folder_id))
     source_folder_id = @document.folder_id
     @document.update!(folder: destination_folder)
     record_audit_event(
@@ -188,11 +190,11 @@ class DocumentsController < ApplicationController
   end
 
   def set_folder
-    @folder = Folder.for_nav_client(current_client).find(params.expect(:folder_id))
+    @folder = Folder.find(params.expect(:folder_id))
   end
 
   def set_document
-    @document = documents_in_current_client_scope
+    @document = Document
       .includes(:account, :user, :folder, :embedding_records)
       .with_attached_file
       .find(params.expect(:id))

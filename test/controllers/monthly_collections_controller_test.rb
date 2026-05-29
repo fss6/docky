@@ -24,37 +24,42 @@ class MonthlyCollectionsControllerTest < ActionDispatch::IntegrationTest
     ActsAsTenant.with_tenant(@account) do
       @client = Client.create!(account: @account, name: "Cliente Alpha")
     end
+    @period = Date.new(2026, 4, 1)
   end
 
   setup do
     sign_in @user
-    patch current_client_url, params: { client_id: @client.id }
-    @period = Date.new(2026, 4, 1)
   end
 
-  test "should close competency" do
-    ActsAsTenant.with_tenant(@account) do
-      checklist = Period.create!(account: @account, client: @client, period: @period)
+  test "index redirects to clients index" do
+    get monthly_collections_url
 
-      patch close_monthly_collection_url(@period.strftime("%Y-%m"))
-
-      assert_redirected_to monthly_collection_path(@period.strftime("%Y-%m"))
-      assert checklist.reload.closed?
-    end
+    assert_redirected_to clients_path
   end
 
-  test "should remove competency and redirect to list" do
+  test "show redirects to clients index" do
+    get monthly_collection_url(@period.strftime("%Y-%m"))
+
+    assert_redirected_to clients_path
+  end
+
+  test "close redirects to clients index" do
     ActsAsTenant.with_tenant(@account) do
-      checklist = Period.create!(account: @account, client: @client, period: @period)
-
-      assert_difference -> { Period.where(id: checklist.id).count }, -1 do
-        delete monthly_collection_url(@period.strftime("%Y-%m"))
-      end
-
-      assert_redirected_to monthly_collections_path
-      follow_redirect!
-      assert_includes response.body, "Competência removida com sucesso."
-      assert_not Period.exists?(checklist.id)
+      Period.create!(account: @account, client: @client, period: @period)
     end
+
+    patch close_monthly_collection_url(@period.strftime("%Y-%m"))
+
+    assert_redirected_to clients_path
+  end
+
+  test "destroy redirects to clients index" do
+    ActsAsTenant.with_tenant(@account) do
+      Period.create!(account: @account, client: @client, period: @period)
+    end
+
+    delete monthly_collection_url(@period.strftime("%Y-%m"))
+
+    assert_redirected_to clients_path
   end
 end

@@ -128,11 +128,9 @@
                   <span class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold <%= status_badge_classes %>"><%= row[:status_label] %></span>
                 </td>
                 <td class="px-4 py-3 text-right sm:px-5">
-                  <%= form_with url: current_client_path, method: :patch, local: true, class: "inline-flex" do %>
-                    <%= hidden_field_tag :client_id, row[:client].id %>
-                    <%= hidden_field_tag :return_to, monthly_collection_path(@period_param) %>
-                    <button type="submit" class="app-btn-secondary text-xs">Abrir Coleta Mensal</button>
-                  <% end %>
+                  <%= link_to "Abrir Coleta Mensal",
+                        client_path(row[:client], period: @period_param),
+                        class: "app-btn-secondary text-xs no-underline" %>
                 </td>
               </tr>
             <% end %>

@@ -16,17 +16,7 @@ class LegacyFoldersRedirectControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to clients_path
   end
 
-  test "new redirects to client pastas when current client is set" do
-    patch current_client_url, params: { client_id: @client.id }
-
-    get new_folder_url
-
-    assert_redirected_to client_path(@client, aba: "pastas", period: @period_param)
-  end
-
-  test "new redirects to clients without current client" do
-    patch current_client_url, params: { client_id: "" }
-
+  test "new redirects to clients index" do
     get new_folder_url
 
     assert_redirected_to clients_path

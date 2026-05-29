@@ -15,9 +15,6 @@
         <% if policy(Institution).index? %>
           <%= link_to "Instituições", institutions_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <% end %>
-        <% if policy(BankStatement).index? %>
-          <%= link_to "Extratos", bank_statements_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
-        <% end %>
         <%= link_to "Chat", chat_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <%= link_to "Grupos", groups_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <%= link_to "Assinaturas", subscriptions_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
@@ -28,14 +25,11 @@
     </details>
 
     <% if current_user && policy(Client).index? && @nav_clients_json.present? %>
-      <%= form_with url: current_client_path, method: :patch, class: "relative flex min-w-0 max-w-full items-center gap-2 sm:gap-3" do %>
-        <%= label_tag :client_id_query, "", class: "hidden shrink-0 text-xs font-medium text-zinc-500 sm:inline" %>
+      <div class="relative flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
         <div
           class="relative min-w-0 max-w-[11rem] shrink sm:max-w-[18rem]"
           data-controller="client-autocomplete"
           data-client-autocomplete-clients-value="<%= ERB::Util.html_escape(@nav_clients_json) %>">
-          <%= hidden_field_tag :client_id, current_client&.id.to_s,
-                data: { client_autocomplete_target: "hidden" } %>
           <div class="relative flex min-w-0 w-full rounded-md border border-zinc-200 bg-white shadow-sm transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20">
             <span class="flex shrink-0 items-center pl-2 text-zinc-400 sm:pl-2.5" aria-hidden="true">
               <%= heroicon "building-office", variant: :outline, options: { class: "h-4 w-4" } %>
@@ -44,7 +38,7 @@
               type="text"
               id="client_id_query"
               class="min-w-0 flex-1 truncate border-0 bg-transparent py-1.5 pl-1 pr-2.5 text-sm text-zinc-900 outline-none ring-0 placeholder:text-zinc-400 focus:ring-0 sm:pr-3"
-              placeholder="Selecione ou pesquise…"
+              placeholder="Buscar cliente…"
               autocomplete="off"
               autocapitalize="off"
               spellcheck="false"
@@ -52,7 +46,7 @@
               aria-expanded="false"
               aria-autocomplete="list"
               aria-controls="client-autocomplete-list"
-              aria-label="Cliente ativo no sistema"
+              aria-label="Buscar cliente"
               data-client-autocomplete-target="query"
               data-action="focus->client-autocomplete#open input->client-autocomplete#search keydown->client-autocomplete#keydown blur->client-autocomplete#blur" />
             <button
@@ -75,7 +69,7 @@
             data-action="mousedown->client-autocomplete#pick">
           </ul>
         </div>
-      <% end %>
+      </div>
     <% end %>
   </div>
 

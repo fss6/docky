@@ -27,21 +27,21 @@ class DashboardController < ApplicationController
         label: "Duplicatas",
         description: "Lançamentos marcados como possível duplicata.",
         total: bank_statements.where(possible_duplicate: true).count,
-        path: bank_statements_path
+        path: clients_path
       },
       {
         key: :pending,
         label: "Pendências",
         description: "Documentos pendentes de processamento.",
         total: documents.where(status: :pending).count,
-        path: pending_documents_alert_path(documents)
+        path: clients_path
       },
       {
         key: :checklist_pending,
         label: "Checklist pendente",
         description: "Itens de checklist ainda pendentes.",
         total: checklist_items.pending.count,
-        path: timeline_path
+        path: clients_path
       }
     ]
 
@@ -56,24 +56,15 @@ class DashboardController < ApplicationController
   private
 
   def account_documents_for_context(account)
-    rel = account.documents
-    return rel unless current_client
-
-    rel.joins(:folder).where(folders: { client_id: current_client.id })
+    account.documents
   end
 
   def account_bank_statements_for_context(account)
-    rel = account.bank_statements
-    return rel unless current_client
-
-    rel.where(client_id: current_client.id)
+    account.bank_statements
   end
 
   def account_checklist_items_for_context(account)
-    rel = account.competency_checklist_items
-    return rel unless current_client
-
-    rel.joins(:competency_checklist).where(competency_checklists: { client_id: current_client.id })
+    account.competency_checklist_items
   end
 
   def authorize_policy
@@ -152,11 +143,5 @@ class DashboardController < ApplicationController
     }[page_type] || page_type.to_s.humanize
   end
 
-  def pending_documents_alert_path(_documents)
-    if current_client.present?
-      client_path(current_client, aba: "documentos", period: Date.current.strftime("%Y-%m"))
-    else
-      clients_path
-    end
   end
 end

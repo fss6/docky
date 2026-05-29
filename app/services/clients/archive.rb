@@ -2,15 +2,14 @@
 
 module Clients
   class Archive
-    def self.call(client:, user:, account: ActsAsTenant.current_tenant, clear_session: nil)
-      new(client: client, user: user, account: account, clear_session: clear_session).call
+    def self.call(client:, user:, account: ActsAsTenant.current_tenant)
+      new(client: client, user: user, account: account).call
     end
 
-    def initialize(client:, user:, account:, clear_session:)
+    def initialize(client:, user:, account:)
       @client = client
       @user = user
       @account = account
-      @clear_session = clear_session
     end
 
     def call
@@ -33,8 +32,6 @@ module Clients
         )
 
         @client
-      end.tap do
-        @clear_session&.call(@client)
       end
     end
 

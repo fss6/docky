@@ -26,7 +26,6 @@ Rails.application.routes.draw do
   patch "monthly-collections/:id/close", to: "monthly_collections#close", as: :close_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
   patch "monthly-collections/:id/reopen", to: "monthly_collections#reopen", as: :reopen_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
   get "monthly-collections/:id/document-statuses", to: "monthly_collections#document_statuses", as: :monthly_collection_document_statuses, constraints: { id: /\d{4}-\d{2}/ }
-  resource :current_client, only: [:update]
   resources :bank_statements, except: [:show]
   resources :bank_statement_imports, only: [:show] do
     member do

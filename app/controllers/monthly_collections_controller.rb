@@ -1,6 +1,6 @@
 class MonthlyCollectionsController < ApplicationController
+  before_action :redirect_to_clients_index
   before_action :authorize_policy
-  before_action :require_current_client!
   before_action :set_period_from_id!, only: %i[show document_statuses destroy close reopen]
   before_action :set_period_record, only: %i[show document_statuses close reopen]
   before_action :set_collection_folder, only: %i[show document_statuses]

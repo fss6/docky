@@ -74,7 +74,7 @@ class CompetencyChecklistsController < ApplicationController
   private
 
   def set_folder
-    @folder = Folder.for_nav_client(current_client).includes(:client).find(params.expect(:folder_id))
+    @folder = Folder.includes(:client).find(params.expect(:folder_id))
   end
 
   def require_folder_client!

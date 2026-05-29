@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BankStatementImportsController < ApplicationController
-  before_action :require_current_client!
+  before_action :redirect_to_clients_index
   before_action :set_import
   before_action :authorize_policy
 

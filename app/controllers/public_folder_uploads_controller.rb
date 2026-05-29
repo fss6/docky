@@ -3,7 +3,6 @@ class PublicFolderUploadsController < ApplicationController
 
   skip_before_action :authenticate_user!
   skip_before_action :find_current_tenant
-  skip_before_action :assign_current_client_from_session
   skip_before_action :set_nav_client_autocomplete_json
   skip_after_action :verify_authorized
 

@@ -86,8 +86,7 @@ class ClientsController < ApplicationController
 
     Clients::Archive.call(
       client: @client,
-      user: current_user,
-      clear_session: method(:clear_current_client_session)
+      user: current_user
     )
 
     redirect_to clients_path, notice: t("clients.archive.notice"), status: :see_other
@@ -119,13 +118,6 @@ class ClientsController < ApplicationController
     return if @client.archived?
 
     redirect_to @client, alert: t("clients.archived.not_archived"), status: :see_other
-  end
-
-  def clear_current_client_session(client)
-    return unless session[:current_client_id].to_i == client.id
-
-    session.delete(:current_client_id)
-    Current.client = nil
   end
 
   def authorize_policy

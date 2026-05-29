@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BankStatementsController < ApplicationController
-  before_action :require_current_client!
+  before_action :redirect_to_clients_index
   before_action :set_bank_statement, only: %i[edit update destroy]
   before_action :authorize_policy
 
