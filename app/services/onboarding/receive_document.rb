@@ -19,6 +19,11 @@ module Onboarding
 
       document = folder.documents.build
       document.file.attach(@file)
+      document.assign_attributes(
+        account_id: @account.id,
+        user_id: @upload_owner_user&.id,
+        status: :pending
+      )
       document.metadata = {
         "upload_source" => "onboarding_portal",
         "onboarding_item_id" => @item.id
@@ -32,7 +37,7 @@ module Onboarding
       )
 
       MarkItemReceived.call(item: @item, document: document, account: @account)
-      DocumentOcrJob.perform_later(document.id) if document.file.attached?
+      Documents::ProcessAfterUpload.call(document: document, file_io: @file)
 
       document
     end

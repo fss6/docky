@@ -23,7 +23,10 @@ module Clients
             user: current_user,
             ip: request.remote_ip
           )
-          DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
+          Documents::ProcessAfterUpload.call(
+            document: @document,
+            file_io: params.dig(:document, :file)
+          )
           load_folder_documents
           load_folders_for_pastas_tab
           flash.now[:notice] = "Arquivo enviado com sucesso."

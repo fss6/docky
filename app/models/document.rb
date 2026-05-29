@@ -5,6 +5,7 @@
 #  id                :bigint           not null, primary key
 #  collection_period :date
 #  content           :text
+#  content_sha256    :string(64)
 #  metadata          :jsonb
 #  status            :string
 #  summary           :text
@@ -19,14 +20,15 @@
 #
 # Indexes
 #
-#  index_documents_on_account_id                 (account_id)
-#  index_documents_on_client_collection_created  (client_id,collection_period,created_at)
-#  index_documents_on_client_id                  (client_id)
-#  index_documents_on_client_period_created      (client_id,period_id,created_at)
-#  index_documents_on_folder_id                  (folder_id)
-#  index_documents_on_period_id                  (period_id)
-#  index_documents_on_tags                       (tags) USING gin
-#  index_documents_on_user_id                    (user_id)
+#  index_documents_on_account_content_sha256_processed  (account_id,content_sha256) WHERE (((status)::text = 'processed'::text) AND (content_sha256 IS NOT NULL))
+#  index_documents_on_account_id                        (account_id)
+#  index_documents_on_client_collection_created         (client_id,collection_period,created_at)
+#  index_documents_on_client_id                         (client_id)
+#  index_documents_on_client_period_created             (client_id,period_id,created_at)
+#  index_documents_on_folder_id                         (folder_id)
+#  index_documents_on_period_id                         (period_id)
+#  index_documents_on_tags                              (tags) USING gin
+#  index_documents_on_user_id                           (user_id)
 #
 # Foreign Keys
 #
@@ -75,6 +77,7 @@ class Document < ApplicationRecord
   validate :folder_belongs_to_account
   validate :tags_are_strings
   validate :acceptable_file_type, if: -> { file.attached? && file.changed? }
+  validate :content_sha256_format, if: -> { content_sha256.present? }
   # validates :file, attached: true, on: :create
 
   def tags
@@ -121,6 +124,12 @@ class Document < ApplicationRecord
     return if Documents::AllowedUpload.allowed_blob?(file.blob)
 
     errors.add(:file, Documents::AllowedUpload.validation_error_message)
+  end
+
+  def content_sha256_format
+    return if content_sha256.match?(/\A[0-9a-f]{64}\z/)
+
+    errors.add(:content_sha256, "deve ser um SHA256 hexadecimal válido")
   end
 
   def user_belongs_to_account

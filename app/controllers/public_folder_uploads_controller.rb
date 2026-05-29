@@ -43,7 +43,10 @@ class PublicFolderUploadsController < ApplicationController
         document: @document,
         user: upload_owner_user
       )
-      DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
+      Documents::ProcessAfterUpload.call(
+        document: @document,
+        file_io: params.dig(:document, :file)
+      )
       redirect_to public_folder_upload_path(token: @upload_token),
                   notice: "Arquivo enviado com sucesso.",
                   status: :see_other
@@ -96,12 +99,18 @@ class PublicFolderUploadsController < ApplicationController
     folder = ensure_client_folder!
     document = folder.documents.build
     document.file.attach(file)
+    document.assign_attributes(
+      account_id: @account.id,
+      user_id: upload_owner_user&.id,
+      status: :pending
+    )
     document.metadata = {
       "upload_source" => "onboarding_extra",
       "uploaded_via_token" => true
     }
     document.save!
     AuditEvents::RecordDocumentReceived.call(document: document, user: upload_owner_user)
+    Documents::ProcessAfterUpload.call(document: document, file_io: file)
 
     redirect_to public_onboarding_upload_path(token: @upload_token),
                 notice: "Documento extra recebido. Sua contabilidade irá analisá-lo.",

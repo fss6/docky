@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_29_194406) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_29_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -202,6 +202,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_29_194406) do
     t.bigint "client_id"
     t.date "collection_period"
     t.bigint "period_id"
+    t.string "content_sha256", limit: 64
+    t.index ["account_id", "content_sha256"], name: "index_documents_on_account_content_sha256_processed", where: "(((status)::text = 'processed'::text) AND (content_sha256 IS NOT NULL))"
     t.index ["account_id"], name: "index_documents_on_account_id"
     t.index ["client_id", "collection_period", "created_at"], name: "index_documents_on_client_collection_created"
     t.index ["client_id", "period_id", "created_at"], name: "index_documents_on_client_period_created"

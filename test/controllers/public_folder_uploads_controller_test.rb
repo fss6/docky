@@ -106,4 +106,24 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_match "Formato não aceito", response.body
   end
+
+  test "onboarding extra upload enqueues OCR for new file content" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+    file = fixture_file_upload("minimal.pdf", "application/pdf")
+
+    assert_difference -> { Document.count }, 1 do
+      assert_enqueued_jobs 1, only: DocumentOcrJob do
+        post public_onboarding_extra_upload_path(token: invite.token), params: { document: { file: file } }
+      end
+    end
+
+    assert_redirected_to public_onboarding_upload_path(token: invite.token)
+    document = Document.order(:created_at).last
+    assert_equal "onboarding_extra", document.metadata["upload_source"]
+    assert document.content_sha256.present?
+    assert_equal "pending", document.status
+  end
 end

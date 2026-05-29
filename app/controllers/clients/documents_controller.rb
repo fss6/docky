@@ -45,7 +45,10 @@ module Clients
           user: current_user,
           ip: request.remote_ip
         )
-        DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
+        Documents::ProcessAfterUpload.call(
+          document: @document,
+          file_io: params.dig(:document, :file)
+        )
         flash.now[:notice] = "Documento adicionado com sucesso."
         load_checklist_link_context
         respond_to do |format|

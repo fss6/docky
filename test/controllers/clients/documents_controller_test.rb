@@ -57,6 +57,54 @@ module Clients
       assert_match "Documento adicionado com sucesso", response.body
     end
 
+    test "reuses processing when uploading duplicate file content" do
+      pdf_path = Rails.root.join("test/fixtures/files/minimal.pdf")
+      content_hash = Digest::SHA256.file(pdf_path).hexdigest
+      source = nil
+
+      ActsAsTenant.with_tenant(@account) do
+        folder = Folder.find_by!(client: @client, name: @period)
+        source = Document.create!(
+          account: @account,
+          user: @user,
+          folder: folder,
+          client: @client,
+          status: :processed,
+          content: "cached ocr",
+          content_sha256: content_hash,
+          metadata: { "mistral_ocr" => { "model" => "mistral-ocr-latest" } }
+        )
+        source.file.attach(
+          io: File.open(pdf_path),
+          filename: "minimal.pdf",
+          content_type: "application/pdf"
+        )
+        EmbeddingRecord.create!(
+          account: @account,
+          recordable: source,
+          document_id: source.id,
+          content: "cached chunk",
+          metadata: { "page" => 0, "source" => "ocr" }
+        )
+      end
+
+      file = Rack::Test::UploadedFile.new(pdf_path, "application/pdf")
+
+      assert_difference("Document.count", 1) do
+        assert_no_enqueued_jobs(only: DocumentOcrJob) do
+          post client_documents_path(@client, period: @period),
+               params: { document: { file: file } },
+               headers: { Accept: "text/vnd.turbo-stream.html" }
+        end
+      end
+
+      document = Document.order(:created_at).last
+      assert_equal "processed", document.status
+      assert_equal content_hash, document.content_sha256
+      assert_equal source.id, document.metadata["processing_copied_from_document_id"]
+      assert_equal 1, document.embedding_records.count
+    end
+
     test "rejects unsupported internal document upload" do
       file = Rack::Test::UploadedFile.new(
         Rails.root.join("test/fixtures/files/sample.txt"),
