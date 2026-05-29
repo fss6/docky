@@ -45,9 +45,4 @@ class ApplicationController < ActionController::Base
   rescue ArgumentError
     nil
   end
-
-  def redirect_to_clients_index
-    skip_authorization
-    redirect_to clients_path, status: :see_other
-  end
 end
