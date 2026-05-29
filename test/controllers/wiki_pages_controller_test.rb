@@ -8,6 +8,13 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
+  test "index loads successfully" do
+    get wiki_path
+
+    assert_response :success
+    assert_includes response.body, "Sobre a Base de Conhecimento"
+  end
+
   test "should remove wiki page by slug" do
     wiki_page = WikiPage.create!(
       account: @user.account,
