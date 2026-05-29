@@ -1,0 +1,19 @@
+<% content_for :title, "Envio indisponível · Dokivo" %>
+
+<section class="app-card mx-auto w-full max-w-xl overflow-hidden">
+  <% if @account_name.present? %>
+    <div class="border-b border-zinc-100 px-5 py-4 sm:px-6">
+      <%= render "public_folder_uploads/portal_header", account_name: @account_name %>
+    </div>
+  <% end %>
+
+  <div class="px-5 py-6 text-center sm:px-8 sm:py-8">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-500">Portal de envio</p>
+    <h1 class="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Envio indisponível no momento</h1>
+    <p class="mt-3 text-sm text-zinc-600">
+      <%= @blocked_message %>
+    </p>
+  </div>
+</section>
+
+<%= render "public_folder_uploads/secure_footer" %>

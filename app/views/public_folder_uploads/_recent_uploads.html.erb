@@ -1,0 +1,25 @@
+<% if recent_public_documents.any? %>
+  <section class="rounded-lg border border-zinc-200/60 bg-white/70">
+    <div class="border-b border-zinc-100 px-4 py-3">
+      <h2 class="text-xs font-medium text-zinc-500">Últimos arquivos enviados</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-xs">
+        <thead>
+          <tr class="border-b border-zinc-100 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+            <th class="px-4 py-2 font-semibold">Arquivo</th>
+            <th class="w-40 px-4 py-2 font-semibold">Enviado em</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-100">
+          <% recent_public_documents.each do |doc| %>
+            <tr>
+              <td class="px-4 py-2 font-medium text-zinc-700"><%= doc.file.filename.to_s %></td>
+              <td class="px-4 py-2 text-zinc-500 whitespace-nowrap"><%= doc.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+<% end %>

@@ -16,7 +16,7 @@ module Clients
         @folder.documents.destroy_all
       end
 
-      file = fixture_file_upload("sample.txt", "text/plain")
+      file = fixture_file_upload("minimal.pdf", "application/pdf")
 
       assert_difference("Document.count") do
         post client_folder_documents_url(@client, @folder),
@@ -28,7 +28,7 @@ module Clients
       assert_match "turbo-stream", response.media_type
       assert_match "folder_documents_frame", response.body
       assert_match 'target="client_pastas_frame"', response.body
-      assert_match "sample.txt", response.body
+      assert_match "minimal.pdf", response.body
     end
 
     test "should destroy document via turbo stream" do

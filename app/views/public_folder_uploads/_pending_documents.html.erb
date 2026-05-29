@@ -1,0 +1,12 @@
+<% if pending_checklist_items.any? %>
+  <section class="rounded-xl border border-zinc-200/80 bg-zinc-50 px-5 py-4 sm:px-6">
+    <h2 class="text-sm font-medium text-zinc-800">
+      Documentos pendentes para <%= period_label %>:
+    </h2>
+    <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-zinc-600">
+      <% pending_checklist_items.each do |item| %>
+        <li><%= item.name_snapshot %></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

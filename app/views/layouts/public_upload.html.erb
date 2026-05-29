@@ -26,10 +26,6 @@
         data-controller="flash-toast"
         data-toast-layout="minimal">
     <main class="mx-auto flex min-h-dvh w-full max-w-5xl flex-col justify-center px-4 py-8 sm:px-6 lg:px-8">
-      <div class="mx-auto mb-6 flex w-full max-w-3xl justify-center">
-        <%= image_tag "/brand/logo.svg", alt: "Dokivo", class: "h-10 w-10 sm:h-12 sm:w-12" %>
-      </div>
-
       <div class="mx-auto w-full max-w-3xl">
         <div id="flash_messages" class="hidden" aria-hidden="true">
           <%= render "shared/flash" %>

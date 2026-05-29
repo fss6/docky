@@ -34,8 +34,8 @@ module Clients
 
     test "should create internal document upload" do
       file = Rack::Test::UploadedFile.new(
-        Rails.root.join("test/fixtures/files/sample.txt"),
-        "text/plain"
+        Rails.root.join("test/fixtures/files/minimal.pdf"),
+        "application/pdf"
       )
 
       assert_difference("Document.count", 1) do
@@ -57,10 +57,26 @@ module Clients
       assert_match "Documento adicionado com sucesso", response.body
     end
 
-    test "should destroy document via turbo stream" do
+    test "rejects unsupported internal document upload" do
       file = Rack::Test::UploadedFile.new(
         Rails.root.join("test/fixtures/files/sample.txt"),
         "text/plain"
+      )
+
+      assert_no_difference("Document.count") do
+        post client_documents_path(@client, period: @period),
+             params: { document: { file: file } },
+             headers: { Accept: "text/vnd.turbo-stream.html" }
+      end
+
+      assert_response :unprocessable_entity
+      assert_match "Formato não aceito", response.body
+    end
+
+    test "should destroy document via turbo stream" do
+      file = Rack::Test::UploadedFile.new(
+        Rails.root.join("test/fixtures/files/minimal.pdf"),
+        "application/pdf"
       )
 
       post client_documents_path(@client, period: @period),

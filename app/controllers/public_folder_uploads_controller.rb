@@ -16,15 +16,16 @@ class PublicFolderUploadsController < ApplicationController
   before_action :track_invite_access, only: %i[show onboarding]
 
   def show
+    load_monthly_portal_context
     @document = @folder.documents.build
-    @recent_public_documents = recent_public_documents
   end
 
   def create
     guard = Periods::UploadGuard.call(period: @period_record)
     unless guard.allowed
-      flash.now[:alert] = guard.reason
-      @recent_public_documents = recent_public_documents
+      load_monthly_portal_context
+      flash.now[:alert] = public_upload_blocked_alert(guard)
+      @document = @folder.documents.build
       return render :show, status: :unprocessable_entity
     end
 
@@ -47,7 +48,7 @@ class PublicFolderUploadsController < ApplicationController
                   notice: "Arquivo enviado com sucesso.",
                   status: :see_other
     else
-      @recent_public_documents = recent_public_documents
+      load_monthly_portal_context
       flash.now[:alert] = @document.errors.full_messages.to_sentence
       render :show, status: :unprocessable_entity
     end
@@ -130,7 +131,8 @@ class PublicFolderUploadsController < ApplicationController
       monthly = Clients::EnsureMonthlyCollection.call(
         client: @client,
         period: @period,
-        account: @upload_invite.account
+        account: @upload_invite.account,
+        create_if_missing: false
       )
       @period_record = monthly.period_record
       @folder = monthly.folder_shim
@@ -190,13 +192,38 @@ class PublicFolderUploadsController < ApplicationController
 
   def ensure_period_allows_upload!
     return if performed?
-    return if @period_record.blank?
+
+    if @period_record.blank?
+      @blocked_message = PublicUploads::BlockedMessage.for(kind: :period_missing)
+      load_portal_account_name
+      return render :unavailable, status: :ok
+    end
 
     guard = Periods::UploadGuard.call(period: @period_record)
     return if guard.allowed
 
-    @upload_blocked_reason = guard.reason
-    render_expired_link(status: :gone)
+    @blocked_message = PublicUploads::BlockedMessage.for(kind: :period_closed, period: @period)
+    load_portal_account_name
+    render :unavailable, status: :ok
+  end
+
+  def load_portal_account_name
+    @account_name = @upload_invite&.account&.name || @folder&.account&.name
+  end
+
+  def load_monthly_portal_context
+    @period_label = PeriodFormatting.display_label(@period) if @period.present?
+    load_portal_account_name
+    @pending_checklist_items = @period_record&.items&.select(&:awaiting_receipt?) || []
+    @recent_public_documents = recent_public_documents
+  end
+
+  def public_upload_blocked_alert(guard)
+    if @period_record&.closed? || guard.reason.to_s.include?("encerrada")
+      PublicUploads::BlockedMessage.for(kind: :period_closed, period: @period)
+    else
+      guard.reason
+    end
   end
 
   def set_account_tenant
@@ -257,7 +284,6 @@ class PublicFolderUploadsController < ApplicationController
   end
 
   def render_expired_link(status:)
-    @expired_message = @upload_blocked_reason if @upload_blocked_reason.present?
     render :expired, status: status
   end
 

@@ -74,6 +74,7 @@ class Document < ApplicationRecord
   validate :user_belongs_to_account
   validate :folder_belongs_to_account
   validate :tags_are_strings
+  validate :acceptable_file_type, if: -> { file.attached? && file.changed? }
   # validates :file, attached: true, on: :create
 
   def tags
@@ -114,6 +115,12 @@ class Document < ApplicationRecord
       errors.add(:tags, "deve ser uma lista de textos")
       break
     end
+  end
+
+  def acceptable_file_type
+    return if Documents::AllowedUpload.allowed_blob?(file.blob)
+
+    errors.add(:file, Documents::AllowedUpload.validation_error_message)
   end
 
   def user_belongs_to_account
