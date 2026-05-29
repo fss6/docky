@@ -5,7 +5,7 @@ module Clients
     include PastasTabData
 
     before_action :set_client
-    before_action :set_folder, only: %i[show edit update destroy]
+    before_action :set_folder, only: %i[show update destroy]
     before_action :authorize_policy
 
     def index
@@ -29,13 +29,6 @@ module Clients
       render :drawer_empty, layout: false
     end
 
-    def new
-      @folder = @client.folders.build
-    end
-
-    def edit
-    end
-
     def create
       @folder = @client.folders.build(folder_params)
       @folder.visible = true
@@ -56,7 +49,11 @@ module Clients
           @period_param = pastas_period_param
           flash.now[:alert] = @folder.errors.full_messages.to_sentence
           format.turbo_stream { render :create, status: :unprocessable_entity }
-          format.html { render :new, status: :unprocessable_entity }
+          format.html do
+            redirect_to client_path(@client, aba: "pastas", period: @period_param),
+                        alert: @folder.errors.full_messages.to_sentence,
+                        status: :see_other
+          end
           format.json { render json: @folder.errors, status: :unprocessable_entity }
         end
       end
@@ -72,7 +69,7 @@ module Clients
           flash.now[:notice] = "Pasta atualizada com sucesso."
           format.turbo_stream { render :update }
           format.html do
-            redirect_to client_folder_path(@client, @folder, period: @period_param),
+            redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
                         notice: "Pasta atualizada com sucesso.",
                         status: :see_other
           end
@@ -80,7 +77,11 @@ module Clients
         else
           flash.now[:alert] = @folder.errors.full_messages.to_sentence
           format.turbo_stream { render :update, status: :unprocessable_entity }
-          format.html { render :edit, status: :unprocessable_entity }
+          format.html do
+            redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
+                        alert: @folder.errors.full_messages.to_sentence,
+                        status: :see_other
+          end
           format.json { render json: @folder.errors, status: :unprocessable_entity }
         end
       end
@@ -94,7 +95,7 @@ module Clients
         respond_to do |format|
           format.turbo_stream { render :destroy, status: :unprocessable_entity }
           format.html do
-            redirect_to client_folder_path(@client, @folder, period: @period_param),
+            redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
                         alert: t("folders.destroy_blocked_with_documents"),
                         status: :see_other
           end

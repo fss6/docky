@@ -29,7 +29,7 @@ module Clients
           flash.now[:notice] = "Arquivo enviado com sucesso."
           format.turbo_stream { render :create }
           format.html do
-            redirect_to client_folder_path(@client, @folder, period: @period_param),
+            redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
                         notice: "Arquivo enviado com sucesso.",
                         status: :see_other
           end
@@ -37,7 +37,7 @@ module Clients
           flash.now[:alert] = @document.errors.full_messages.to_sentence
           format.turbo_stream { render :create, status: :unprocessable_entity }
           format.html do
-            redirect_to client_folder_path(@client, @folder, period: @period_param),
+            redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
                         alert: @document.errors.full_messages.to_sentence,
                         status: :see_other
           end
@@ -56,7 +56,7 @@ module Clients
       respond_to do |format|
         format.turbo_stream { render :destroy }
         format.html do
-          redirect_to client_folder_path(@client, @folder, period: @period_param),
+          redirect_to client_path(@client, aba: "pastas", period: @period_param, folder_id: @folder.id),
                       notice: "Arquivo removido com sucesso.",
                       status: :see_other
         end

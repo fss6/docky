@@ -74,7 +74,7 @@ Rails.application.routes.draw do
         post :send_email, to: "clients/upload_invite_emails#create"
       end
     end
-    resources :folders, module: :clients do
+    resources :folders, only: %i[index show create update destroy], module: :clients do
       collection do
         get :drawer_empty
       end
@@ -104,12 +104,12 @@ Rails.application.routes.draw do
     resources :onboarding_templates, only: %i[index show edit update]
   end
 
-  resources :folders do
-    member do
-      post :generate_share_link
-      post :regenerate_share_link
-      post :expire_share_link
-    end
+  get "folders", to: "legacy_folders_redirect#index", as: :folders
+  get "folders/new", to: "legacy_folders_redirect#new", as: :new_folder
+  get "folders/:id", to: "legacy_folders_redirect#show", as: :folder, constraints: { id: /\d+/ }
+  get "folders/:id/edit", to: "legacy_folders_redirect#edit", as: :edit_folder, constraints: { id: /\d+/ }
+
+  resources :folders, only: [] do
     resources :documents, shallow: true, only: %i[index create show destroy]
     resource :competency_checklist, only: %i[show], controller: "competency_checklists" do
       post :create_template_item

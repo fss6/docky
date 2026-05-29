@@ -23,7 +23,6 @@
         title: "Documentos",
         items: [
           { key: :timeline, label: "Timeline", path: timeline_path, icon: :queue_list, disabled: current_client.blank?, policy_ok: policy(Folder).index? },
-          { key: :folders, label: "Pastas", path: folders_path, icon: :folder, policy_ok: policy(Folder).index? },
           { key: :bank_statements, label: "Extratos", path: bank_statements_nav_path, icon: :document, policy_ok: policy(BankStatement).index? },
           { key: :conversations, label: "Chat IA", path: nav_chat_path, icon: :conversations, policy_ok: policy(Conversation).index? }
         ]
@@ -53,7 +52,6 @@
                        (item[:key] == :wallet && request.path.start_with?("/wallet")) ||
                        (item[:key] == :clients && request.path.start_with?("/clients")) ||
                        (item[:key] == :institutions && request.path.start_with?("/institutions")) ||
-                       (item[:key] == :folders && request.path.start_with?("/folders")) ||
                        (item[:key] == :timeline && request.path.start_with?("/timeline")) ||
                        (item[:key] == :bank_statements && (request.path.start_with?("/bank_statements") || request.path.match?(%r{\A/bank_statement_imports/\d+}))) ||
                        (item[:key] == :conversations && request.path.match?(%r{\A/accounts/\d+/conversations})) ||

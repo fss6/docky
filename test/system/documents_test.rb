@@ -11,16 +11,6 @@ class DocumentsTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Documentos"
   end
 
-  test "upload from folder show" do
-    visit folder_url(@folder)
-
-    find('input[name="document[file]"]', visible: :all).attach_file(
-      Rails.root.join("test/fixtures/files/sample.txt")
-    )
-
-    assert_text "Arquivo enviado com sucesso", wait: 5
-  end
-
   test "upload from documents list" do
     visit folder_documents_url(@folder)
 

@@ -128,7 +128,7 @@ class DocumentsController < ApplicationController
     )
     respond_to do |format|
       format.html do
-        redirect_back fallback_location: folders_path(folder_id: destination_folder.id),
+        redirect_back fallback_location: folder_destination_path(destination_folder),
                       notice: "Arquivo movido com sucesso."
       end
       format.json { render json: { ok: true, folder_id: destination_folder.id } }
@@ -252,7 +252,7 @@ class DocumentsController < ApplicationController
   def after_upload_path
     return monthly_collection_path(upload_period.strftime("%Y-%m")) if monthly_collection_upload?
     return folder_competency_checklist_path(@folder, period: upload_period.strftime("%Y-%m")) if competency_checklist_upload?
-    return folder_path(@folder) if params[:upload_context].to_s == "folder"
+    return folder_destination_path(@folder) if params[:upload_context].to_s == "folder"
 
     folder_documents_path(@folder)
   end

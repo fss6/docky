@@ -34,7 +34,7 @@ class DashboardController < ApplicationController
         label: "Pendências",
         description: "Documentos pendentes de processamento.",
         total: documents.where(status: :pending).count,
-        path: "/folders"
+        path: pending_documents_alert_path(documents)
       },
       {
         key: :checklist_pending,
@@ -150,5 +150,13 @@ class DashboardController < ApplicationController
       "entity" => "Entidades",
       "synthesis" => "Sinteses"
     }[page_type] || page_type.to_s.humanize
+  end
+
+  def pending_documents_alert_path(_documents)
+    if current_client.present?
+      client_path(current_client, aba: "documentos", period: Date.current.strftime("%Y-%m"))
+    else
+      clients_path
+    end
   end
 end

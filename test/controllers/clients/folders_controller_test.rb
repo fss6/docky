@@ -17,12 +17,6 @@ module Clients
       assert_redirected_to client_path(@client, aba: "pastas", period: @period_param)
     end
 
-    test "should get new" do
-      get new_client_folder_url(@client)
-
-      assert_response :success
-    end
-
     test "should create folder" do
       assert_difference("Folder.count") do
         post client_folders_url(@client),
@@ -97,12 +91,6 @@ module Clients
       assert_match 'target="folder_drawer"', response.body
       assert_match 'target="client_pastas_frame"', response.body
       assert_no_match 'turbo-stream action="redirect"', response.body
-    end
-
-    test "should get edit" do
-      get edit_client_folder_url(@client, @folder)
-
-      assert_response :success
     end
 
     test "should update folder via turbo stream" do

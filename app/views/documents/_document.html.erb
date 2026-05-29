@@ -47,7 +47,7 @@
       <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pasta</p>
       <p class="mt-1 text-sm font-medium text-zinc-900">
         <% if document.folder %>
-          <%= link_to document.folder.name, folder_path(document.folder), class: "text-accent no-underline hover:text-teal-700" %>
+          <%= link_to document.folder.name, folder_destination_path(document.folder), class: "text-accent no-underline hover:text-teal-700" %>
         <% else %>
           —
         <% end %>

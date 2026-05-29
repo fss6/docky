@@ -30,7 +30,7 @@
     </td>
     <td class="hidden px-4 py-3 md:table-cell">
       <% if document.folder %>
-        <%= link_to document.folder.name, folder_path(document.folder), class: "text-sm text-zinc-600 no-underline hover:text-accent" %>
+        <%= link_to document.folder.name, folder_destination_path(document.folder), class: "text-sm text-zinc-600 no-underline hover:text-accent" %>
       <% else %>
         —
       <% end %>

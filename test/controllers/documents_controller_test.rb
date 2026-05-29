@@ -38,7 +38,12 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    assert_redirected_to folder_url(@folder)
+    assert_redirected_to client_path(
+      @folder.client,
+      aba: "pastas",
+      period: Date.current.strftime("%Y-%m"),
+      folder_id: @folder.id
+    )
   end
 
   test "should show document" do

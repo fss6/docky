@@ -10,7 +10,7 @@
         (<%= link_to @folder.account.name, account_path(@folder.account), class: "text-accent no-underline hover:text-teal-700" %>).
       </p>
     </div>
-    <%= link_to "Voltar à pasta", folder_path(@folder), class: "app-btn-secondary w-full shrink-0 text-center sm:w-auto" %>
+    <%= link_to "Voltar à pasta", folder_destination_path(@folder), class: "app-btn-secondary w-full shrink-0 text-center sm:w-auto" %>
   </header>
 
   <%= render "upload", folder: @folder, upload_context: "list" %>

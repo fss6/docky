@@ -5,9 +5,17 @@
     <div>
       <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
         <ol class="flex items-center gap-1.5">
-          <li><%= link_to "Pastas", folders_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li>
+            <% if @document.folder.visible? %>
+              <%= link_to "Pastas", folder_pastas_hub_path(@document.folder), class: "text-zinc-500 no-underline hover:text-accent" %>
+            <% elsif @document.folder.client_id.present? %>
+              <%= link_to @document.folder.client.name, client_path(@document.folder.client), class: "text-zinc-500 no-underline hover:text-accent" %>
+            <% else %>
+              <%= link_to "Clientes", clients_path, class: "text-zinc-500 no-underline hover:text-accent" %>
+            <% end %>
+          </li>
           <li aria-hidden="true">/</li>
-          <li><%= link_to @document.folder.name, folder_path(@document.folder), class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li><%= link_to @document.folder.name, folder_destination_path(@document.folder), class: "text-zinc-500 no-underline hover:text-accent" %></li>
           <li aria-hidden="true">/</li>
           <li class="text-zinc-700">Documento</li>
         </ol>
@@ -17,7 +25,7 @@
       </h1>
       <p class="mt-1 text-sm text-zinc-500">Em <%= @document.folder.name %></p>
       <div class="mt-2 flex flex-wrap items-center gap-3 text-sm">
-        <%= link_to folder_path(@document.folder),
+        <%= link_to folder_destination_path(@document.folder),
               class: "inline-flex items-center gap-1.5 font-medium text-accent no-underline hover:text-teal-700" do %>
           <%= heroicon "folder", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
           <span>Abrir pasta</span>
