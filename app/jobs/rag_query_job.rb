@@ -70,8 +70,7 @@ class RagQueryJob < ApplicationJob
 
     wiki_chunks = wiki_result[:wiki_chunks]
     doc_chunks  = wiki_result[:doc_chunks]
-    statement_chunks = Array(wiki_result[:statement_chunks])
-    all_records = wiki_chunks + doc_chunks + statement_chunks
+    all_records = wiki_chunks + doc_chunks
 
     if all_records.blank?
       finish_with_text(
@@ -82,7 +81,7 @@ class RagQueryJob < ApplicationJob
       return
     end
 
-    context = { wiki_chunks: wiki_chunks, doc_chunks: doc_chunks, statement_chunks: statement_chunks }
+    context = { wiki_chunks: wiki_chunks, doc_chunks: doc_chunks }
     stream_llm_reply(ai_message, conversation, user_message, context, all_records)
   end
 
@@ -146,7 +145,7 @@ class RagQueryJob < ApplicationJob
     # Com foco num documento, não contam extratos/wiki como “indexado geral”
     return false if fid.present?
 
-    EmbeddingRecord.where(account_id: account_id, recordable_type: %w[WikiPage BankStatementImport]).where.not(embedding: nil).exists?
+    EmbeddingRecord.where(account_id: account_id, recordable_type: "WikiPage").where.not(embedding: nil).exists?
   end
 
   def finish_with_text(ai_message, conversation, text)

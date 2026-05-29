@@ -39,14 +39,6 @@ class Folder < ApplicationRecord
       .group("folders.id")
   }
 
-  scope :for_nav_client, ->(client) {
-    if client
-      where(client_id: client.id)
-    else
-      all
-    end
-  }
-
   validates :public_upload_token, uniqueness: true, allow_nil: true
 
   before_destroy :prevent_destroy_when_visible_and_has_documents, prepend: true

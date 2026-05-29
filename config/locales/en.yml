@@ -40,13 +40,6 @@ en:
         delimiter: "."
         precision: 2
 
-  activerecord:
-    enums:
-      bank_statement:
-        transaction_type:
-          credit: Credit
-          debit: Debit
-
   dokivo:
     signup:
       disabled: "Public sign-up is disabled. Sign in with an existing account."

@@ -4,34 +4,30 @@
 #
 # Table name: wiki_pages
 #
-#  id                              :bigint           not null, primary key
-#  content                         :text
-#  page_type                       :string           not null
-#  slug                            :string           not null
-#  title                           :string           not null
-#  created_at                      :datetime         not null
-#  updated_at                      :datetime         not null
-#  account_id                      :bigint           not null
-#  source_bank_statement_import_id :bigint
-#  source_document_id              :integer
+#  id                 :bigint           not null, primary key
+#  content            :text
+#  page_type          :string           not null
+#  slug               :string           not null
+#  title              :string           not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  account_id         :bigint           not null
+#  source_document_id :integer
 #
 # Indexes
 #
-#  index_wiki_pages_on_account_id                       (account_id)
-#  index_wiki_pages_on_account_id_and_slug              (account_id,slug) UNIQUE
-#  index_wiki_pages_on_page_type                        (page_type)
-#  index_wiki_pages_on_source_bank_statement_import_id  (source_bank_statement_import_id)
+#  index_wiki_pages_on_account_id           (account_id)
+#  index_wiki_pages_on_account_id_and_slug  (account_id,slug) UNIQUE
+#  index_wiki_pages_on_page_type            (page_type)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (account_id => accounts.id)
-#  fk_rails_...  (source_bank_statement_import_id => bank_statement_imports.id)
 #
 class WikiPage < ApplicationRecord
   acts_as_tenant(:account)
 
   belongs_to :account
-  belongs_to :source_bank_statement_import, class_name: "BankStatementImport", optional: true, inverse_of: :wiki_pages
   has_many :embedding_records, as: :recordable, dependent: :destroy
   has_many :outgoing_links, class_name: "WikiLink", foreign_key: :source_page_id, dependent: :destroy
   has_many :incoming_links, class_name: "WikiLink", foreign_key: :target_page_id, dependent: :destroy

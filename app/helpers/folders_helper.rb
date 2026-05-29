@@ -7,7 +7,7 @@ module FoldersHelper
     if folder.visible? && folder.client_id.present?
       client_path(folder.client, aba: "pastas", period: period_param, folder_id: folder.id)
     elsif folder.client_id.present?
-      folder_documents_path(folder)
+      client_path(folder.client, aba: "documentos", period: period_param)
     else
       clients_path
     end

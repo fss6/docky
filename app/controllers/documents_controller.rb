@@ -1,13 +1,8 @@
 class DocumentsController < ApplicationController
   include FoldersHelper
 
-  before_action :set_folder, only: %i[index create]
   before_action :set_document, only: %i[show destroy move add_tag replace_tag remove_tag]
   before_action :authorize_policy
-
-  def index
-    @documents = @folder.documents.includes(:account, :user, :folder, :embedding_records).with_attached_file.order(created_at: :desc)
-  end
 
   def show
   end
@@ -58,63 +53,13 @@ class DocumentsController < ApplicationController
     @documents = @documents.limit(50)
   end
 
-  def create
-    if monthly_collection_bank_statement_upload? && selected_statement_institution.blank?
-      redirect_back fallback_location: after_upload_path,
-                    alert: "Selecione a instituição do extrato.",
-                    status: :see_other
-      return
-    end
-
-    period_record = resolve_period_record_for_upload
-    if period_record
-      guard = Periods::UploadGuard.call(period: period_record)
-      unless guard.allowed
-        redirect_back fallback_location: after_upload_path, alert: guard.reason, status: :see_other
-        return
-      end
-    end
-
-    @document = @folder.documents.build
-    assign_defaults_for_upload!(@document, period_record: period_record)
-    @document.assign_attributes(upload_params)
-
-    respond_to do |format|
-      if @document.save
-        if @document.client_id.present?
-          AuditEvents::RecordDocumentReceived.call(
-            document: @document,
-            user: current_user,
-            ip: request.remote_ip
-          )
-        end
-        DocumentOcrJob.perform_later(@document.id) if @document.file.attached?
-        enqueue_bank_statement_import! if monthly_collection_bank_statement_upload?
-
-        format.html do
-          redirect_back fallback_location: after_upload_path,
-                        notice: "Arquivo enviado com sucesso.",
-                        status: :see_other
-        end
-        format.json { render :show, status: :created, location: @document }
-      else
-        format.html do
-          redirect_back fallback_location: after_upload_path,
-                        alert: @document.errors.full_messages.to_sentence,
-                        status: :see_other
-        end
-        format.json { render json: @document.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
   def destroy
     folder = @document.folder
     Wiki::CleanupDocumentService.new(account: @document.account, document_id: @document.id).call
     @document.destroy!
 
     respond_to do |format|
-      format.html { redirect_to folder_documents_path(folder), notice: "Documento excluído com sucesso.", status: :see_other }
+      format.html { redirect_to folder_destination_path(folder), notice: "Documento excluído com sucesso.", status: :see_other }
       format.json { head :no_content }
     end
   end
@@ -189,117 +134,10 @@ class DocumentsController < ApplicationController
     authorize record
   end
 
-  def set_folder
-    @folder = Folder.find(params.expect(:folder_id))
-  end
-
   def set_document
     @document = Document
       .includes(:account, :user, :folder, :embedding_records)
       .with_attached_file
       .find(params.expect(:id))
   end
-
-  # Preenchimento automático: conta da pasta, usuário logado, status pendente.
-  def assign_defaults_for_upload!(doc, period_record: nil)
-    if period_record && @folder.client_id.present?
-      Documents::AssignToPeriod.call(
-        document: doc,
-        period_record: period_record,
-        folder: @folder,
-        user_id: current_user.id,
-        metadata: { "upload_source" => "account_upload" }
-      )
-      return
-    end
-
-    account = @folder.account
-    period = collection_period_for_folder
-
-    doc.assign_attributes(
-      account_id: account&.id,
-      user_id: current_user.id,
-      status: :pending,
-      client_id: @folder.client_id,
-      collection_period: period
-    )
-
-    meta = (doc.metadata || {}).dup
-    meta["upload_source"] ||= "account_upload"
-    doc.metadata = meta
-  end
-
-  def resolve_period_record_for_upload
-    period_date = collection_period_for_folder
-    return nil if period_date.blank? || @folder.client_id.blank?
-
-    Periods::FindOrOpen.call(
-      account: @folder.account,
-      client: @folder.client,
-      period: period_date
-    )
-  end
-
-  def collection_period_for_folder
-    return parse_period_param(params[:period]) if params[:period].present?
-    return Date.strptime(@folder.name, "%Y-%m").beginning_of_month if @folder.name.to_s.match?(/\A\d{4}-\d{2}\z/)
-
-    nil
-  end
-
-  def upload_params
-    params.expect(document: [:file])
-  end
-
-  def after_upload_path
-    return monthly_collection_path(upload_period.strftime("%Y-%m")) if monthly_collection_upload?
-    return folder_competency_checklist_path(@folder, period: upload_period.strftime("%Y-%m")) if competency_checklist_upload?
-    return folder_destination_path(@folder) if params[:upload_context].to_s == "folder"
-
-    folder_documents_path(@folder)
-  end
-
-  def competency_checklist_upload?
-    params[:upload_context].to_s == "competency_checklist"
-  end
-
-  def monthly_collection_upload?
-    params[:upload_context].to_s == "monthly_collection"
-  end
-
-  def monthly_collection_bank_statement_upload?
-    monthly_collection_upload? && params[:document_kind].to_s == "bank_statement"
-  end
-
-  def upload_period
-    parse_period_param(params[:period]) || Date.current.beginning_of_month
-  end
-
-  def enqueue_bank_statement_import!
-    return unless @folder.client
-    return unless @document.file.attached?
-    return if selected_statement_institution.blank?
-
-    import = current_user.account.bank_statement_imports.create(
-      client: @folder.client,
-      institution: selected_statement_institution,
-      metadata: { source_document_id: @document.id }
-    )
-    return unless import.persisted?
-
-    import.file.attach(@document.file.blob)
-    ProcessBankStatementImportJob.perform_later(import.id)
-    record_audit_event(
-      event_type: "bank_statement_import.enqueued",
-      subject: import,
-      metadata: { source_document_id: @document.id, institution_id: import.institution_id }
-    )
-  end
-
-  def selected_statement_institution
-    return @selected_statement_institution if defined?(@selected_statement_institution)
-
-    @selected_statement_institution = current_user.account.institutions.find_by(id: params[:institution_id])
-  end
-
 end

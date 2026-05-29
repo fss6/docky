@@ -44,7 +44,7 @@ class LegacyFoldersRedirectControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
-  test "show redirects monthly shim to folder documents" do
+  test "show redirects monthly shim to client documentos" do
     shim = nil
     ActsAsTenant.with_tenant(accounts(:one)) do
       shim = Folder.create!(
@@ -57,6 +57,6 @@ class LegacyFoldersRedirectControllerTest < ActionDispatch::IntegrationTest
 
     get folder_url(shim)
 
-    assert_redirected_to folder_documents_path(shim)
+    assert_redirected_to client_path(@client, aba: "documentos", period: @period_param)
   end
 end

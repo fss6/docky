@@ -24,9 +24,6 @@
 class Institution < ApplicationRecord
   acts_as_tenant(:account)
 
-  has_many :bank_statement_imports, dependent: :restrict_with_exception
-  has_many :bank_statements, dependent: :restrict_with_exception
-
   validates :name, presence: true, uniqueness: { scope: :account_id }
 
   scope :alphabetical, -> { order(:name) }

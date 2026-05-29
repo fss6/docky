@@ -2,7 +2,7 @@
 
 ## Escopo inicial
 
-- Auditoria de dados com `audited` nos modelos `Folder`, `BankStatement` e `BankStatementImport`.
+- Auditoria de dados com `audited` no modelo `Folder`.
 - Auditoria de eventos de negócio em `audit_events` para ações sem CRUD direto.
 
 ## Consultas recomendadas
@@ -21,4 +21,3 @@
 ## Campos sensíveis
 
 - Não registrar conteúdos volumosos/sensíveis em trilha de alteração sem necessidade.
-- `BankStatementImport` ignora `ocr_text` para reduzir exposição e volume.

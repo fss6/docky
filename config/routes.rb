@@ -17,21 +17,6 @@ Rails.application.routes.draw do
   get "privacidade", to: "landing#privacy", as: :privacy
   get "dashboard", to: "dashboard#index", as: :dashboard
   get "wallet", to: "wallets#index", as: :wallet
-  get "timeline", to: "timelines#show", as: :timeline
-  get "timeline/:id", to: "timelines#show", as: :timeline_period, constraints: { id: /\d{4}-\d{2}/ }
-  get "monthly-collections", to: "monthly_collections#index", as: :monthly_collections
-  post "monthly-collections", to: "monthly_collections#create"
-  get "monthly-collections/:id", to: "monthly_collections#show", as: :monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
-  delete "monthly-collections/:id", to: "monthly_collections#destroy", constraints: { id: /\d{4}-\d{2}/ }
-  patch "monthly-collections/:id/close", to: "monthly_collections#close", as: :close_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
-  patch "monthly-collections/:id/reopen", to: "monthly_collections#reopen", as: :reopen_monthly_collection, constraints: { id: /\d{4}-\d{2}/ }
-  get "monthly-collections/:id/document-statuses", to: "monthly_collections#document_statuses", as: :monthly_collection_document_statuses, constraints: { id: /\d{4}-\d{2}/ }
-  resources :bank_statements, except: [:show]
-  resources :bank_statement_imports, only: [:show] do
-    member do
-      get :original
-    end
-  end
   resources :clients, except: [:destroy] do
     member do
       get :summary
@@ -108,24 +93,7 @@ Rails.application.routes.draw do
   get "folders/:id", to: "legacy_folders_redirect#show", as: :folder, constraints: { id: /\d+/ }
   get "folders/:id/edit", to: "legacy_folders_redirect#edit", as: :edit_folder, constraints: { id: /\d+/ }
 
-  resources :folders, only: [] do
-    resources :documents, shallow: true, only: %i[index create show destroy]
-    resource :competency_checklist, only: %i[show], controller: "competency_checklists" do
-      post :create_template_item
-      delete :remove_item
-      patch :attach_document
-      patch :detach_document
-      patch :refresh_receipts
-      patch :mark_validated
-      patch :mark_pending
-    end
-  end
-  get "public/folders/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
-  post "public/folders/:token/upload", to: "public_folder_uploads#create"
-  get "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
-  post "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
-  post "public/folders/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
-  resources :documents, only: [] do
+  resources :documents, only: %i[show destroy] do
     member do
       patch :move
       patch :add_tag
@@ -133,6 +101,11 @@ Rails.application.routes.draw do
       delete :remove_tag
     end
   end
+  get "public/folders/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
+  post "public/folders/:token/upload", to: "public_folder_uploads#create"
+  get "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
+  post "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
+  post "public/folders/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
   resources :groups do
     resources :memberships, controller: "group_memberships", only: %i[create destroy]
   end

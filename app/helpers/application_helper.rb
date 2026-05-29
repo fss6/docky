@@ -1,32 +1,6 @@
 module ApplicationHelper
   include AppConfirmModalHelper
 
-  def bank_statement_amount_currency(amount)
-    number_to_currency(amount, locale: :"pt-BR")
-  end
-
-  def bank_statement_transaction_type_label(transaction_type)
-    I18n.t(
-      "activerecord.enums.bank_statement.transaction_type.#{transaction_type}",
-      default: transaction_type.to_s.titleize
-    )
-  end
-
-  # Cor do valor nas tabelas de extrato: negativo vermelho, positivo verde.
-  # Usa o tipo (crédito/débito) quando a quantia vem sempre positiva na BD.
-  def bank_statement_amount_text_class(statement)
-    amt = statement.amount.to_d
-    signed = statement.credit? ? amt : -amt.abs
-
-    if signed.negative?
-      "text-red-600"
-    elsif signed.positive?
-      "text-emerald-700"
-    else
-      "text-zinc-900"
-    end
-  end
-
   def signup_disabled?
     Dokivo.signup_disabled?
   end

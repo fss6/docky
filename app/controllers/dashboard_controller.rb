@@ -3,9 +3,8 @@ class DashboardController < ApplicationController
 
   def index
     account = current_user.account
-    documents = account_documents_for_context(account)
-    bank_statements = account_bank_statements_for_context(account)
-    checklist_items = account_checklist_items_for_context(account)
+    documents = account.documents
+    checklist_items = account.competency_checklist_items
     ordered_documents = documents.order("documents.created_at DESC")
     @documents_last_30_days = documents_last_30_days_series(documents)
 
@@ -22,13 +21,6 @@ class DashboardController < ApplicationController
 
     @total_tags, @recent_tags = tags_metrics(documents: documents, recent_documents: ordered_documents.includes(:folder).limit(100))
     @alerts = [
-      {
-        key: :duplicates,
-        label: "Duplicatas",
-        description: "Lançamentos marcados como possível duplicata.",
-        total: bank_statements.where(possible_duplicate: true).count,
-        path: clients_path
-      },
       {
         key: :pending,
         label: "Pendências",
@@ -54,18 +46,6 @@ class DashboardController < ApplicationController
   end
 
   private
-
-  def account_documents_for_context(account)
-    account.documents
-  end
-
-  def account_bank_statements_for_context(account)
-    account.bank_statements
-  end
-
-  def account_checklist_items_for_context(account)
-    account.competency_checklist_items
-  end
 
   def authorize_policy
     authorize :dashboard, :index?

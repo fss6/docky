@@ -54,8 +54,6 @@ class Client < ApplicationRecord
   end
   has_many :upload_invites, dependent: :destroy
   has_many :collection_documents, class_name: "Document", dependent: :nullify
-  has_many :bank_statement_imports, dependent: :destroy
-  has_many :bank_statements, dependent: :destroy
 
   normalizes :tax_id, with: ->(v) { v.to_s.strip.presence }
   normalizes :name, with: ->(v) { v.to_s.strip }

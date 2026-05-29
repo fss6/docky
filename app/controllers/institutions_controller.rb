@@ -45,13 +45,6 @@ class InstitutionsController < ApplicationController
   end
 
   def destroy
-    if @institution.bank_statement_imports.exists? || @institution.bank_statements.exists?
-      redirect_to @institution,
-                  alert: "Esta instituição está em uso em importações e não pode ser excluída.",
-                  status: :see_other
-      return
-    end
-
     @institution.destroy!
 
     respond_to do |format|

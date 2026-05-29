@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Busca unificada em embedding_records: Document, WikiPage e extratos (BankStatementImport).
+# Busca unificada em embedding_records: Document e WikiPage.
 class RagSearchService
   MODES = %i[unified wiki_only docs_only].freeze
   DEFAULT_LIMIT = 10
@@ -38,7 +38,7 @@ class RagSearchService
     case @mode
     when :wiki_only  then scope.where(recordable_type: "WikiPage")
     when :docs_only
-      scope.where(recordable_type: %w[Document BankStatementImport])
+      scope.where(recordable_type: "Document")
     else scope
     end
   end

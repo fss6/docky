@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_29_162510) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -92,41 +92,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
-  end
-
-  create_table "bank_statement_imports", force: :cascade do |t|
-    t.bigint "account_id", null: false
-    t.bigint "client_id", null: false
-    t.string "status", default: "pending", null: false
-    t.jsonb "metadata", default: {}, null: false
-    t.text "ocr_text"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "institution_id", null: false
-    t.index ["account_id"], name: "index_bank_statement_imports_on_account_id"
-    t.index ["client_id", "created_at"], name: "index_bank_statement_imports_on_client_id_and_created_at"
-    t.index ["client_id"], name: "index_bank_statement_imports_on_client_id"
-    t.index ["institution_id"], name: "index_bank_statement_imports_on_institution_id"
-    t.index ["status"], name: "index_bank_statement_imports_on_status"
-  end
-
-  create_table "bank_statements", force: :cascade do |t|
-    t.bigint "account_id", null: false
-    t.bigint "client_id", null: false
-    t.bigint "bank_statement_import_id", null: false
-    t.date "occurred_on", null: false
-    t.decimal "amount", precision: 16, scale: 2, null: false
-    t.string "transaction_type", null: false
-    t.bigint "institution_id", null: false
-    t.text "description", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "possible_duplicate", default: false, null: false
-    t.index ["account_id"], name: "index_bank_statements_on_account_id"
-    t.index ["bank_statement_import_id"], name: "index_bank_statements_on_bank_statement_import_id"
-    t.index ["client_id", "occurred_on"], name: "index_bank_statements_on_client_id_and_occurred_on"
-    t.index ["client_id"], name: "index_bank_statements_on_client_id"
-    t.index ["institution_id"], name: "index_bank_statements_on_institution_id"
   end
 
   create_table "client_checklist_items", force: :cascade do |t|
@@ -471,11 +436,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
     t.integer "source_document_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "source_bank_statement_import_id"
     t.index ["account_id", "slug"], name: "index_wiki_pages_on_account_id_and_slug", unique: true
     t.index ["account_id"], name: "index_wiki_pages_on_account_id"
     t.index ["page_type"], name: "index_wiki_pages_on_page_type"
-    t.index ["source_bank_statement_import_id"], name: "index_wiki_pages_on_source_bank_statement_import_id"
   end
 
   create_table "wiki_schemas", force: :cascade do |t|
@@ -492,13 +455,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
   add_foreign_key "audit_events", "accounts"
   add_foreign_key "audit_events", "users"
   add_foreign_key "audits", "accounts"
-  add_foreign_key "bank_statement_imports", "accounts"
-  add_foreign_key "bank_statement_imports", "clients"
-  add_foreign_key "bank_statement_imports", "institutions"
-  add_foreign_key "bank_statements", "accounts"
-  add_foreign_key "bank_statements", "bank_statement_imports"
-  add_foreign_key "bank_statements", "clients"
-  add_foreign_key "bank_statements", "institutions"
   add_foreign_key "client_checklist_items", "accounts"
   add_foreign_key "client_checklist_items", "clients"
   add_foreign_key "clients", "accounts"
@@ -543,6 +499,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_28_120000) do
   add_foreign_key "wiki_links", "wiki_pages", column: "target_page_id"
   add_foreign_key "wiki_logs", "accounts"
   add_foreign_key "wiki_pages", "accounts"
-  add_foreign_key "wiki_pages", "bank_statement_imports", column: "source_bank_statement_import_id"
   add_foreign_key "wiki_schemas", "accounts"
 end

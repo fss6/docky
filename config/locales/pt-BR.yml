@@ -126,10 +126,6 @@ pt-BR:
           member: Membro
           owner: Administrador da conta
           administrator: Administrador do sistema
-      bank_statement:
-        transaction_type:
-          credit: Crédito
-          debit: Débito
     errors:
       messages:
         blank: não pode ficar em branco

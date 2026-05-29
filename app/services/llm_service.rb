@@ -5,7 +5,6 @@ class LlmService
   USER_CONTENT_MAX_CHARS = 12_000
   WIKI_MAX_CHARS         = 6_000
   DOCS_MAX_CHARS         = 6_000
-  STATEMENT_MAX_CHARS    = 6_000
 
   def self.stream(context:, history:, user_content:, &block)
     user_text    = user_content.to_s.strip.truncate(USER_CONTENT_MAX_CHARS, omission: "…")
@@ -19,7 +18,7 @@ class LlmService
     Openai::Chat.stream(messages: messages, &block)
   end
 
-  # context pode ser uma String simples (legado) ou um Hash { wiki_chunks:, doc_chunks:, statement_chunks: }
+  # context pode ser uma String simples (legado) ou um Hash { wiki_chunks:, doc_chunks: }
   def self.system_prompt(context)
     if context.is_a?(Hash)
       build_wiki_system_prompt(context)
@@ -43,10 +42,9 @@ class LlmService
   end
 
   private_class_method def self.build_wiki_system_prompt(context)
-    wiki_chunks       = Array(context[:wiki_chunks])
-    doc_chunks        = Array(context[:doc_chunks])
-    statement_chunks  = Array(context[:statement_chunks])
-    if wiki_chunks.empty? && doc_chunks.empty? && statement_chunks.empty?
+    wiki_chunks = Array(context[:wiki_chunks])
+    doc_chunks  = Array(context[:doc_chunks])
+    if wiki_chunks.empty? && doc_chunks.empty?
       return smalltalk_system_prompt
     end
 
@@ -56,15 +54,9 @@ class LlmService
       "--- Trecho #{i + 1} (#{info['file']} · p. #{info['page'] || '?'}) ---\n#{r.content}"
     end.join("\n\n").truncate(DOCS_MAX_CHARS)
 
-    statement_text = statement_chunks.map.with_index do |r, i|
-      info = r.source_info
-      "--- Trecho #{i + 1} (Extrato: #{info['file']} · parte #{info['page'] || '?'}) ---\n#{r.content}"
-    end.join("\n\n").truncate(STATEMENT_MAX_CHARS)
-
     wiki_section = wiki_text.present? ? "=== CONHECIMENTO ACUMULADO (Wiki) ===\n#{wiki_text}" : ""
     docs_section = docs_text.present? ? "=== TRECHOS DOS DOCUMENTOS ORIGINAIS ===\n#{docs_text}" : ""
-    stmt_section = statement_text.present? ? "=== TRECHOS DE EXTRATOS BANCÁRIOS (OCR) ===\n#{statement_text}" : ""
-    full_context = [wiki_section, docs_section, stmt_section].reject(&:blank?).join("\n\n")
+    full_context = [wiki_section, docs_section].reject(&:blank?).join("\n\n")
 
     <<~PROMPT
       Você é um assistente especializado em análise de documentos.
@@ -74,9 +66,9 @@ class LlmService
       histórico como fonte de fatos sobre os documentos.
 
       Trate o CONHECIMENTO ACUMULADO (Wiki) como informação já validada e consolidada.
-      Trate os TRECHOS DOS DOCUMENTOS ORIGINAIS e os EXTRATOS BANCÁRIOS como evidência bruta de suporte.
+      Trate os TRECHOS DOS DOCUMENTOS ORIGINAIS como evidência bruta de suporte.
       Se a resposta não estiver no contexto, diga explicitamente que não encontrou.
-      Sempre cite a fonte: página do wiki (slug), ou nome do arquivo e página, ou extrato e parte/trecho.
+      Sempre cite a fonte: página do wiki (slug), ou nome do arquivo e página.
 
       #{full_context}
     PROMPT

@@ -37,8 +37,6 @@ class Account < ApplicationRecord
     competency_checklists
   end
   has_many :competency_checklist_items, through: :competency_checklists, source: :items
-  has_many :bank_statement_imports, dependent: :destroy
-  has_many :bank_statements, dependent: :destroy
   has_many :institutions, dependent: :destroy
   has_many :audit_events, dependent: :destroy
   has_many :onboarding_templates, dependent: :destroy

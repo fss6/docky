@@ -31,7 +31,7 @@
           <span>Abrir pasta</span>
         <% end %>
         <span class="text-zinc-300">|</span>
-        <%= link_to folder_documents_path(@document.folder),
+        <%= link_to folder_destination_path(@document.folder),
               class: "inline-flex items-center gap-1.5 font-medium text-accent no-underline hover:text-teal-700" do %>
           <%= heroicon "document-text", variant: :outline, options: { class: "h-4 w-4 shrink-0", "aria-hidden": "true" } %>
           <span>Ver documentos da pasta</span>

@@ -59,26 +59,12 @@ class EmbeddingRecord < ApplicationRecord
     recordable_type == "WikiPage"
   end
 
-  def bank_statement_import?
-    recordable_type == "BankStatementImport"
-  end
-
   def source_info
     if wiki_page?
       {
         "wiki_slug"  => metadata&.dig("slug"),
         "wiki_title" => metadata&.dig("title"),
         "page_type"  => metadata&.dig("page_type")
-      }
-    elsif bank_statement_import?
-      fname = metadata&.dig("filename").presence || "Extrato bancário"
-      part = metadata&.dig("chunk_index")
-      part_label = part.nil? ? "?" : (part.to_i + 1).to_s
-      {
-        "file" => fname,
-        "page" => part_label,
-        "chunk_id" => id,
-        "bank_statement_import_id" => recordable_id
       }
     else
       fname = document&.file&.attached? ? document.file.filename.to_s : "documento"
