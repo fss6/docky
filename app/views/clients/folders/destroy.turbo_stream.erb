@@ -1,0 +1,23 @@
+<% if @folder.destroyed? %>
+  <%= turbo_stream.replace "folder_drawer" do %>
+    <%= turbo_frame_tag "folder_drawer" %>
+  <% end %>
+  <%= turbo_stream.replace "folder_drawer_shell" do %>
+    <%= render "clients/show/folder_drawer_overlay",
+          client: @client,
+          open_folder: nil,
+          open_folder_documents: [],
+          period_param: @period_param %>
+  <% end %>
+  <%= render "clients/turbo_streams/refresh_pastas_frame",
+        client: @client,
+        folders: @folders,
+        period_param: @period_param %>
+  <%= turbo_stream.update "flash_messages" do %>
+    <%= render "shared/flash" %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.update "flash_messages" do %>
+    <%= render "shared/flash" %>
+  <% end %>
+<% end %>

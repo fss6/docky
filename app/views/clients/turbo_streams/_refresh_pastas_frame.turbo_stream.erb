@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "client_pastas_frame" do %>
+  <%= render "clients/show/tab_pastas_frame",
+        client: client,
+        folders: folders,
+        period_param: period_param %>
+<% end %>

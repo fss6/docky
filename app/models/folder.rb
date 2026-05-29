@@ -31,6 +31,14 @@ class Folder < ApplicationRecord
 
   has_many :documents, dependent: :destroy
 
+  scope :visible, -> { where(visible: true) }
+
+  scope :with_documents_count, -> {
+    left_joins(:documents)
+      .select("folders.*, COUNT(documents.id) AS documents_count")
+      .group("folders.id")
+  }
+
   scope :for_nav_client, ->(client) {
     if client
       where(client_id: client.id)
@@ -40,6 +48,12 @@ class Folder < ApplicationRecord
   }
 
   validates :public_upload_token, uniqueness: true, allow_nil: true
+
+  before_destroy :prevent_destroy_when_visible_and_has_documents, prepend: true
+
+  def empty_for_destroy?
+    !Document.unscoped.where(folder_id: id).exists?
+  end
 
   def ensure_public_upload_token!
     return public_upload_token if public_upload_token.present?
@@ -69,5 +83,15 @@ class Folder < ApplicationRecord
 
   def public_upload_enabled?
     public_upload_token.present? && !public_upload_token_expired?
+  end
+
+  private
+
+  def prevent_destroy_when_visible_and_has_documents
+    return unless visible?
+    return unless Document.unscoped.where(folder_id: id).exists?
+
+    errors.add(:base, I18n.t("folders.destroy_blocked_with_documents"))
+    throw(:abort)
   end
 end

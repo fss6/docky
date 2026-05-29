@@ -2,8 +2,11 @@
 
 one:
   account: one
-  name: MyString
+  client: alpha
+  name: Documentos societarios
+  visible: true
 
 two:
   account: two
   name: MyString
+  visible: true

@@ -1,0 +1,37 @@
+<% period_param = local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+<% open_folder = local_assigns[:open_folder] %>
+<% open_folder_documents = local_assigns.fetch(:open_folder_documents) { [] } %>
+<% drawer_open = open_folder.present? %>
+<% shell_hidden = !drawer_open %>
+<% backdrop_open = drawer_open %>
+<% panel_open = drawer_open %>
+
+<div id="folder_drawer_shell"
+     data-folder-drawer-target="shell"
+     class="fixed inset-0 z-40 <%= shell_hidden ? "pointer-events-none hidden" : "" %>"
+     aria-hidden="<%= drawer_open ? "false" : "true" %>">
+  <div data-folder-drawer-target="backdrop"
+       class="absolute inset-0 bg-black/30 transition-opacity duration-300 ease-out motion-reduce:transition-none <%= backdrop_open ? "opacity-100" : "opacity-0" %>"
+       data-action="click->folder-drawer#backdropClick"
+       aria-hidden="true"></div>
+  <aside data-folder-drawer-target="panel"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="folder_drawer_title"
+         class="absolute inset-y-0 right-0 flex w-full max-w-lg transform flex-col border-l border-zinc-200 bg-white shadow-xl transition-transform duration-300 ease-out motion-reduce:transition-none <%= panel_open ? "translate-x-0" : "translate-x-full" %>">
+    <%= turbo_frame_tag "folder_drawer",
+          class: "flex min-h-0 flex-1 flex-col",
+          data: {
+            folder_drawer_target: "frame",
+            action: "turbo:frame-load->folder-drawer#frameLoaded"
+          } do %>
+      <% if open_folder %>
+        <%= render "clients/folders/panel",
+              client: client,
+              folder: open_folder,
+              documents: open_folder_documents,
+              period_param: period_param %>
+      <% end %>
+    <% end %>
+  </aside>
+</div>

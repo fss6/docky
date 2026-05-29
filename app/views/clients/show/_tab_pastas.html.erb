@@ -1,0 +1,36 @@
+<% period_param = local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+<% open_folder = local_assigns[:open_folder] %>
+<% open_folder_documents = local_assigns.fetch(:open_folder_documents) { [] } %>
+
+<div data-controller="folder-drawer"
+     data-folder-drawer-empty-url-value="<%= drawer_empty_client_folders_path(client, period: period_param) %>"
+     data-folder-drawer-client-url-value="<%= client_path(client, aba: "pastas", period: period_param) %>">
+<section class="app-card overflow-hidden p-4 sm:p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pastas</p>
+      <p class="mt-1 text-sm text-zinc-600"><%= t("folders.tab_description") %></p>
+    </div>
+    <% unless client.archived? %>
+      <button type="button"
+              class="app-btn-secondary inline-flex items-center gap-2 self-start sm:self-auto"
+              data-action="click->app-form-modal#open">
+        <%= heroicon "plus", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        Nova pasta
+      </button>
+    <% end %>
+  </div>
+
+  <%= render "clients/show/tab_pastas_frame", client: client, folders: folders, period_param: period_param %>
+
+  <% unless client.archived? %>
+    <%= render "clients/show/new_folder_modal", client: client, folder: Folder.new, period_param: period_param %>
+  <% end %>
+</section>
+
+<%= render "clients/show/folder_drawer_overlay",
+      client: client,
+      open_folder: open_folder,
+      open_folder_documents: open_folder_documents,
+      period_param: period_param %>
+</div>

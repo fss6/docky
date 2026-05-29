@@ -1,0 +1,61 @@
+<% if local_assigns.fetch(:drawer, false) %>
+  <%= render "clients/folders/drawer_header",
+        client: client,
+        folder: folder,
+        documents: documents,
+        period_param: local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+<% else %>
+  <% period_param = local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+  <% documents_count = documents.size %>
+  <% pastas_path = client_path(client, aba: "pastas", period: period_param) %>
+
+  <header id="folder_show_header" class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div class="min-w-0 flex-1">
+      <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-1.5">
+          <li><%= link_to client.name, pastas_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li><%= link_to "Pastas", pastas_path, class: "text-zinc-500 no-underline hover:text-accent" %></li>
+          <li aria-hidden="true">/</li>
+          <li class="text-zinc-700"><%= folder.name %></li>
+        </ol>
+      </nav>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 lg:text-3xl"><%= folder.name %></h1>
+      <p class="mt-1 text-sm text-zinc-500">
+        <%= t("folders.documents_count", count: documents_count) %> · <%= client.name %>
+      </p>
+    </div>
+    <% unless client.archived? %>
+      <div class="flex flex-wrap gap-2 self-start">
+        <button type="button" class="app-btn-primary inline-flex items-center gap-2" data-action="click->app-form-modal#open" data-app-form-modal-dialog-param="attach">
+          <%= heroicon "arrow-up-tray", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+          <%= t("folders.attach_document") %>
+        </button>
+        <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->app-form-modal#open" data-app-form-modal-dialog-param="edit">
+          <%= heroicon "pencil-square", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+          Editar nome
+        </button>
+        <% if folder.empty_for_destroy? %>
+          <button type="button"
+                  class="app-btn-danger inline-flex items-center gap-2"
+                  data-action="click->app-confirm-modal#open"
+                  data-app-confirm-modal-url-param="<%= client_folder_path(client, folder, period: period_param) %>"
+                  data-app-confirm-modal-item-label-param="<%= folder.name %>"
+                  data-app-confirm-modal-heading-param="<%= t("folders.delete_folder_confirm.heading") %>"
+                  data-app-confirm-modal-body-prefix-param="<%= t("folders.delete_folder_confirm.body_prefix") %>"
+                  data-app-confirm-modal-body-suffix-param="<%= t("folders.delete_folder_confirm.body_suffix") %>"
+                  data-app-confirm-modal-confirm-text-param="<%= t("folders.delete_folder_confirm.confirm") %>"
+                  data-app-confirm-modal-turbo-stream-param="true">
+            <%= heroicon "trash", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+            Excluir pasta
+          </button>
+        <% else %>
+          <span class="inline-flex cursor-not-allowed items-center gap-2 rounded-md border border-zinc-200 bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-400" title="<%= t("folders.delete_folder_blocked") %>">
+            <%= heroicon "trash", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+            Excluir pasta
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </header>
+<% end %>

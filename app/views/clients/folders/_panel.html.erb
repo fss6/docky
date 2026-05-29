@@ -1,0 +1,38 @@
+<% period_param = local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+
+<div class="flex h-full min-h-0 flex-col bg-white"
+     data-folder-id="<%= folder.id %>"
+     data-controller="app-form-modal app-confirm-modal">
+  <%= render "clients/folders/show_header",
+        client: client,
+        folder: folder,
+        documents: documents,
+        period_param: period_param,
+        drawer: true %>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+    <%= render "clients/folders/documents_list",
+          client: client,
+          folder: folder,
+          documents: documents,
+          period_param: period_param,
+          drawer: true %>
+  </div>
+
+  <% unless client.archived? %>
+    <%= render "clients/folders/attach_document_modal",
+          client: client,
+          folder: folder,
+          period_param: period_param %>
+    <%= render "clients/folders/edit_folder_modal",
+          client: client,
+          folder: folder,
+          period_param: period_param %>
+  <% end %>
+
+  <%= render "shared/confirm_modal",
+        heading: t("documents.confirm_modal.heading"),
+        body_prefix: t("documents.confirm_modal.body_prefix"),
+        body_suffix: t("documents.confirm_modal.body_suffix"),
+        confirm_text: t("documents.confirm_modal.confirm") %>
+</div>

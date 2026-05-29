@@ -9,6 +9,10 @@ class FolderPolicy < ApplicationPolicy
     user.role_member? || user.role_owner?
   end
 
+  def drawer_empty?
+    index?
+  end
+
   def show?
     user.role_member? || user.role_owner?
   end

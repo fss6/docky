@@ -1,0 +1,75 @@
+<% if local_assigns.fetch(:drawer, false) %>
+  <%= render "clients/folders/documents_list_drawer",
+        client: client,
+        folder: folder,
+        documents: documents,
+        period_param: local_assigns.fetch(:period_param) { Date.current.strftime("%Y-%m") } %>
+<% else %>
+<%= turbo_frame_tag "folder_documents_frame" do %>
+  <section class="app-card overflow-hidden" aria-labelledby="folder-docs-heading">
+    <div class="border-b border-zinc-100 px-5 py-4 sm:px-6">
+      <h2 id="folder-docs-heading" class="text-sm font-semibold text-zinc-900">Arquivos</h2>
+    </div>
+    <% if documents.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-zinc-100 bg-zinc-50/80 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <th class="px-5 py-3 font-semibold sm:px-6">Arquivo</th>
+              <th class="hidden px-5 py-3 font-semibold sm:table-cell sm:px-6">Enviado</th>
+              <th class="px-5 py-3 font-semibold sm:px-6">Status</th>
+              <th class="px-5 py-3 text-right font-semibold sm:px-6">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            <% documents.each do |doc| %>
+              <tr class="transition-colors hover:bg-zinc-50/60">
+                <td class="px-5 py-3 font-medium text-zinc-900 sm:px-6">
+                  <%= link_to document_file_label(doc), doc, class: "text-zinc-900 no-underline hover:text-accent", data: { turbo_frame: "_top" } %>
+                </td>
+                <td class="hidden px-5 py-3 tabular-nums text-zinc-600 sm:table-cell sm:px-6">
+                  <%= l(doc.created_at, format: :short) %>
+                </td>
+                <td class="px-5 py-3 sm:px-6">
+                  <span class="inline-flex rounded-md px-2 py-0.5 text-xs font-medium <%= document_status_badge_classes(doc.status) %>">
+                    <%= document_status_label(doc.status) %>
+                  </span>
+                </td>
+                <td class="px-5 py-3 text-right sm:px-6">
+                  <div class="flex flex-wrap items-center justify-end gap-2">
+                    <%= link_to "Abrir", doc, class: "text-xs font-medium text-accent no-underline hover:text-teal-700", data: { turbo_frame: "_top" } %>
+                    <% unless client.archived? %>
+                      <button type="button"
+                              class="text-xs font-medium text-red-600 hover:text-red-700"
+                              data-action="click->app-confirm-modal#open"
+                              data-app-confirm-modal-url-param="<%= client_folder_document_path(client, folder, doc, period: period_param) %>"
+                              data-app-confirm-modal-item-label-param="<%= document_file_label(doc) %>"
+                              data-app-confirm-modal-heading-param="<%= t("documents.confirm_modal.heading") %>"
+                              data-app-confirm-modal-body-prefix-param="<%= t("documents.confirm_modal.body_prefix") %>"
+                              data-app-confirm-modal-body-suffix-param="<%= t("documents.confirm_modal.body_suffix") %>"
+                              data-app-confirm-modal-confirm-text-param="<%= t("documents.confirm_modal.confirm") %>"
+                              data-app-confirm-modal-turbo-stream-param="true">
+                        Remover
+                      </button>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="px-5 py-12 text-center sm:px-6">
+        <p class="text-sm font-medium text-zinc-900"><%= t("folders.empty_documents") %></p>
+        <p class="mt-1 text-sm text-zinc-500"><%= t("folders.empty_documents_hint") %></p>
+        <% unless client.archived? %>
+          <button type="button" class="app-btn-primary mt-4 inline-flex" data-action="click->app-form-modal#open" data-app-form-modal-dialog-param="attach">
+            <%= t("folders.attach_document") %>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
+<% end %>

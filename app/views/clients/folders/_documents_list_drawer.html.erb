@@ -1,0 +1,58 @@
+<%= turbo_frame_tag "folder_documents_frame" do %>
+  <section class="pt-3" aria-labelledby="folder-docs-heading">
+    <h2 id="folder-docs-heading" class="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+      Arquivos
+    </h2>
+    <% if documents.any? %>
+      <ul class="mt-2 divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+        <% documents.each do |doc| %>
+          <li class="flex items-center gap-2 px-3 py-3 transition-colors hover:bg-zinc-50/80">
+            <div class="min-w-0 flex-1">
+              <% if doc.file.attached? %>
+                <%= link_to document_file_label(doc),
+                      rails_blob_path(doc.file, disposition: "inline"),
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      class: "block truncate text-sm font-medium text-accent no-underline hover:text-teal-700" %>
+              <% else %>
+                <%= link_to document_file_label(doc),
+                      doc,
+                      class: "block truncate text-sm font-medium text-accent no-underline hover:text-teal-700",
+                      data: { turbo_frame: "_top" } %>
+              <% end %>
+              <div class="mt-1 flex flex-wrap items-center gap-2">
+                <span class="text-xs tabular-nums text-zinc-500">
+                  <%= l(doc.created_at, format: :short) %>
+                </span>
+                <span class="inline-flex rounded-md px-1.5 py-0.5 text-xs font-medium <%= document_status_badge_classes(doc.status) %>">
+                  <%= document_status_label(doc.status) %>
+                </span>
+              </div>
+            </div>
+            <% unless client.archived? %>
+              <button type="button"
+                      class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 hover:bg-red-50 hover:text-red-600"
+                      title="<%= t("folders.remove_document") %>"
+                      aria-label="<%= t("folders.remove_document") %>"
+                      data-action="click->app-confirm-modal#open"
+                      data-app-confirm-modal-url-param="<%= client_folder_document_path(client, folder, doc, period: period_param) %>"
+                      data-app-confirm-modal-item-label-param="<%= document_file_label(doc) %>"
+                      data-app-confirm-modal-heading-param="<%= t("documents.confirm_modal.heading") %>"
+                      data-app-confirm-modal-body-prefix-param="<%= t("documents.confirm_modal.body_prefix") %>"
+                      data-app-confirm-modal-body-suffix-param="<%= t("documents.confirm_modal.body_suffix") %>"
+                      data-app-confirm-modal-confirm-text-param="<%= t("documents.confirm_modal.confirm") %>"
+                      data-app-confirm-modal-turbo-stream-param="true">
+                <%= heroicon "trash", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+              </button>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="mt-3 rounded-lg border border-dashed border-zinc-200 bg-zinc-50/50 px-4 py-10 text-center">
+        <p class="text-sm font-medium text-zinc-900"><%= t("folders.empty_documents") %></p>
+        <p class="mt-1 text-sm text-zinc-500"><%= t("folders.empty_documents_hint") %></p>
+      </div>
+    <% end %>
+  </section>
+<% end %>

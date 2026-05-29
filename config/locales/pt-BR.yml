@@ -336,6 +336,24 @@ pt-BR:
       platform_footer: "Este e-mail foi enviado automaticamente pela plataforma Dokivo."
 
   folders:
+    tab_description: Organize documentos permanentes do cliente em pastas — contratos, certidões e arquivos que não pertencem a um mês específico.
+    drawer:
+      close: Fechar pasta
+      more_actions: Mais ações da pasta
+    destroy_blocked_with_documents: Não é possível excluir uma pasta que ainda contém arquivos. Remova os arquivos antes de excluir a pasta.
+    delete_folder_confirm:
+      heading: Excluir pasta?
+      body_prefix: "A pasta "
+      body_suffix: " será removida permanentemente. Esta ação não pode ser desfeita."
+      confirm: Excluir pasta
+    delete_folder_blocked: Remova todos os arquivos antes de excluir esta pasta.
+    attach_document: Anexar arquivo
+    remove_document: Remover arquivo
+    empty_documents: Nenhum arquivo nesta pasta ainda.
+    empty_documents_hint: Use o botão acima para anexar documentos ao arquivo permanente do cliente.
+    documents_count:
+      one: "%{count} arquivo"
+      other: "%{count} arquivos"
     confirm_modal:
       heading: Excluir pasta?
       body_prefix: "A pasta "

@@ -3,7 +3,7 @@
 module ClientsHelper
   include AppConfirmModalHelper
 
-  VALID_TABS = %w[documentos checklist convites historico].freeze
+  VALID_TABS = %w[documentos checklist convites pastas historico].freeze
 
   def client_archived_badge_classes
     "inline-flex rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-700 ring-1 ring-inset ring-zinc-300"
@@ -37,10 +37,13 @@ module ClientsHelper
     end
   end
 
-  def client_show_path(client, aba: nil, period: nil)
+  def client_show_path(client, aba: nil, period: nil, folder_id: nil)
     params = {}
     params[:aba] = aba if aba.present?
-    params[:period] = period.strftime("%Y-%m") if period.present?
+    if period.present?
+      params[:period] = period.respond_to?(:strftime) ? period.strftime("%Y-%m") : period.to_s
+    end
+    params[:folder_id] = folder_id if folder_id.present?
     client_path(client, params)
   end
 
@@ -139,6 +142,7 @@ module ClientsHelper
     "documentos" => "Documentos",
     "checklist" => "Pendências do mês",
     "convites" => "Convites & Links",
+    "pastas" => "Pastas",
     "historico" => "Histórico"
   }.freeze
 

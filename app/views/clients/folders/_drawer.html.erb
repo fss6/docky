@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "folder_drawer", class: "flex min-h-0 flex-1 flex-col" do %>
+  <%= render "clients/folders/panel",
+        client: @client,
+        folder: @folder,
+        documents: @documents,
+        period_param: @period_param %>
+<% end %>

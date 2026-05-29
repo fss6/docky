@@ -182,14 +182,31 @@ class ClientsController < ApplicationController
   end
 
   def load_tab_content
-    return if @period_record.blank?
-
     case @active_tab
-    when "documentos"
-      load_documents_tab
-    when "historico"
-      load_history_tab
+    when "pastas"
+      load_pastas_tab
+    else
+      return if @period_record.blank?
+
+      case @active_tab
+      when "documentos"
+        load_documents_tab
+      when "historico"
+        load_history_tab
+      end
     end
+  end
+
+  def load_pastas_tab
+    @folders = @client.folders.visible.with_documents_count.order(:name)
+    load_open_folder if params[:folder_id].present?
+  end
+
+  def load_open_folder
+    @open_folder = @client.folders.visible.find_by(id: params[:folder_id])
+    return if @open_folder.blank?
+
+    @open_folder_documents = @open_folder.documents.with_attached_file.includes(:user).order(created_at: :desc).limit(100)
   end
 
   def load_documents_tab

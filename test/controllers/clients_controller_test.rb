@@ -88,6 +88,38 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Documentos", response.body
   end
 
+  test "should show client pastas tab" do
+    get client_url(@client, aba: "pastas", period: Date.current.strftime("%Y-%m"))
+
+    assert_response :success
+    assert_match "Pastas", response.body
+    assert_match folders(:one).name, response.body
+    assert_select "button[data-action*='app-form-modal#open']", text: /Nova pasta/
+    assert_select "#client_new_folder_modal dialog"
+  end
+
+  test "pastas tab works without open period" do
+    get client_url(@client, aba: "pastas", period: Date.current.strftime("%Y-%m"))
+
+    assert_response :success
+    assert_match folders(:one).name, response.body
+    assert_select "a[data-turbo-frame='folder_drawer'][href=?]",
+                  client_folder_path(@client, folders(:one), period: Date.current.strftime("%Y-%m"))
+  end
+
+  test "pastas tab with folder_id renders drawer overlay" do
+    folder = folders(:one)
+    period_param = Date.current.strftime("%Y-%m")
+
+    get client_url(@client, aba: "pastas", period: period_param, folder_id: folder.id)
+
+    assert_response :success
+    assert_select "#folder_drawer_shell"
+    assert_select "turbo-frame#folder_drawer"
+    assert_match folder.name, response.body
+    assert_select "[data-folder-id='#{folder.id}']"
+  end
+
   test "should get edit" do
     get edit_client_url(@client)
     assert_response :success

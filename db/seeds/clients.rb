@@ -142,7 +142,6 @@ module Seeds
         folder.visible = true if folder.new_record?
         folders_created += 1 if folder.new_record?
         folder.save!
-        folder.ensure_public_upload_token!
       end
 
       folders_created

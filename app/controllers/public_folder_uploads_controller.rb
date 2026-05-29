@@ -140,6 +140,11 @@ class PublicFolderUploadsController < ApplicationController
 
     @folder = Folder.includes(:account, :client).find_by(public_upload_token: params[:token])
     if @folder.present?
+      if @folder.visible?
+        @expired_message = "Este link não está mais disponível."
+        return render_expired_link(status: :gone)
+      end
+
       @upload_token = @folder.public_upload_token
       @client = @folder.client
       @period = Date.strptime(@folder.name, "%Y-%m").beginning_of_month if @folder.name.to_s.match?(/\A\d{4}-\d{2}\z/)

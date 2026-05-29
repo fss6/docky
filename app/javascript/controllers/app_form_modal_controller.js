@@ -5,14 +5,28 @@ export default class extends Controller {
 
   open(event) {
     event.preventDefault()
-    if (this.hasDialogTarget) this.dialogTarget.showModal()
+    const dialogKey = event.params.dialog
+    const dialog = dialogKey
+      ? this.dialogTargets.find((el) => el.dataset.modalKey === dialogKey)
+      : this.dialogTarget
+    if (dialog) dialog.showModal()
   }
 
   close() {
-    if (this.hasDialogTarget) this.dialogTarget.close()
+    this.closeOpenDialog()
   }
 
   backdropClick(event) {
-    if (event.target === this.dialogTarget) this.close()
+    if (this.dialogTargets.includes(event.target)) this.close()
+  }
+
+  closeOnSuccess(event) {
+    if (event.detail.success) this.closeOpenDialog()
+  }
+
+  closeOpenDialog() {
+    this.dialogTargets.forEach((dialog) => {
+      if (dialog.open) dialog.close()
+    })
   }
 }

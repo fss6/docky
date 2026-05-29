@@ -1,0 +1,18 @@
+<% if @folder.errors.any? %>
+  <%= turbo_stream.replace "client_new_folder_modal" do %>
+    <%= render "clients/show/new_folder_modal", client: @client, folder: @folder, period_param: @period_param %>
+  <% end %>
+<% else %>
+  <%= render "clients/turbo_streams/refresh_pastas_frame",
+        client: @client,
+        folders: @folders,
+        period_param: @period_param %>
+
+  <%= turbo_stream.replace "client_new_folder_modal" do %>
+    <%= render "clients/show/new_folder_modal", client: @client, folder: Folder.new, period_param: @period_param %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.update "flash_messages" do %>
+  <%= render "shared/flash" %>
+<% end %>

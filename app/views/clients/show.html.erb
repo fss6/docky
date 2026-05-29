@@ -2,6 +2,7 @@
 <% period_param = @period.strftime("%Y-%m") %>
 <% period_open = @period_record.present? %>
 <% period_writable = period_open && !@client.archived? %>
+<% show_client_tabs = period_open || @active_tab == "pastas" %>
 <% stimulus_controllers = ["app-form-modal", "app-confirm-modal"] %>
 <% stimulus_controllers.unshift("share-link-modal", "client-documents-channel") if period_writable %>
 
@@ -24,7 +25,7 @@
         active_upload_invite: @active_upload_invite,
         period_open: period_writable %>
 
-  <% if period_open %>
+  <% if show_client_tabs %>
     <nav class="border-b border-zinc-200" aria-label="Abas do cliente">
       <ul class="flex flex-wrap gap-x-6 gap-y-1">
         <% ClientsHelper::VALID_TABS.each do |tab| %>
@@ -39,6 +40,8 @@
                 <%= heroicon "clipboard-document-check", variant: :outline, options: { class: "h-4 w-4 text-emerald-600", "aria-hidden": "true" } %>
               <% elsif tab == "convites" %>
                 <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+              <% elsif tab == "pastas" %>
+                <%= heroicon "folder", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
               <% else %>
                 <%= heroicon "archive-box", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
               <% end %>
@@ -51,26 +54,71 @@
 
     <div id="client_tab_content">
       <% case @active_tab %>
-      <% when "documentos" %>
-        <%= render "clients/show/tab_documentos", client: @client, documents: @documents, pagy: @pagy, checklist: @checklist, linked_items_by_document_id: @linked_items_by_document_id, pending_link_items: @pending_link_items, category_counts: @category_counts, period_param: period_param %>
-      <% when "checklist" %>
-        <%= render "clients/show/tab_checklist",
+      <% when "pastas" %>
+        <%= render "clients/show/tab_pastas",
               client: @client,
-              checklist_items: @checklist_items,
-              period: @period,
+              folders: @folders,
               period_param: period_param,
-              summary: @summary,
-              template_items_count: @template_items_count %>
+              open_folder: @open_folder,
+              open_folder_documents: @open_folder_documents %>
+      <% when "documentos" %>
+        <% if period_open %>
+          <%= render "clients/show/tab_documentos", client: @client, documents: @documents, pagy: @pagy, checklist: @checklist, linked_items_by_document_id: @linked_items_by_document_id, pending_link_items: @pending_link_items, category_counts: @category_counts, period_param: period_param %>
+        <% else %>
+          <%= render "clients/show/missing_period",
+                client: @client,
+                period: @period,
+                period_param: period_param,
+                period_phase: @period_phase,
+                active_tab: @active_tab %>
+        <% end %>
+      <% when "checklist" %>
+        <% if period_open %>
+          <%= render "clients/show/tab_checklist",
+                client: @client,
+                checklist_items: @checklist_items,
+                period: @period,
+                period_param: period_param,
+                summary: @summary,
+                template_items_count: @template_items_count %>
+        <% else %>
+          <%= render "clients/show/missing_period",
+                client: @client,
+                period: @period,
+                period_param: period_param,
+                period_phase: @period_phase,
+                active_tab: @active_tab %>
+        <% end %>
       <% when "convites" %>
-        <%= render "clients/show/tab_convites", client: @client, upload_invites: @upload_invites, period_param: period_param, active_upload_invite: @active_upload_invite %>
+        <% if period_open %>
+          <%= render "clients/show/tab_convites", client: @client, upload_invites: @upload_invites, period_param: period_param, active_upload_invite: @active_upload_invite %>
+        <% else %>
+          <%= render "clients/show/missing_period",
+                client: @client,
+                period: @period,
+                period_param: period_param,
+                period_phase: @period_phase,
+                active_tab: @active_tab %>
+        <% end %>
       <% when "historico" %>
-        <%= render "clients/show/tab_historico",
-              period_activity: @period_activity,
-              period: @period %>
+        <% if period_open %>
+          <%= render "clients/show/tab_historico",
+                period_activity: @period_activity,
+                period: @period %>
+        <% else %>
+          <%= render "clients/show/missing_period",
+                client: @client,
+                period: @period,
+                period_param: period_param,
+                period_phase: @period_phase,
+                active_tab: @active_tab %>
+        <% end %>
       <% end %>
     </div>
 
-    <%= render "clients/show/share_link_modal", client: @client, period_param: period_param, active_upload_invite: @active_upload_invite %>
+    <% if period_writable %>
+      <%= render "clients/show/share_link_modal", client: @client, period_param: period_param, active_upload_invite: @active_upload_invite %>
+    <% end %>
   <% else %>
     <%= render "clients/show/missing_period",
           client: @client,

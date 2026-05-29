@@ -74,6 +74,12 @@ Rails.application.routes.draw do
         post :send_email, to: "clients/upload_invite_emails#create"
       end
     end
+    resources :folders, module: :clients do
+      collection do
+        get :drawer_empty
+      end
+      resources :documents, only: %i[create destroy], controller: "folder_documents"
+    end
   end
   resources :upload_invites, only: [] do
     member do
