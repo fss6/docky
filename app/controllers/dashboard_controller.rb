@@ -142,6 +142,4 @@ class DashboardController < ApplicationController
       "synthesis" => "Sinteses"
     }[page_type] || page_type.to_s.humanize
   end
-
-  end
 end
