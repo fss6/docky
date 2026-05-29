@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class WikiPagePolicy < ApplicationPolicy
   def index?
-    user.role_member? || user.role_owner?
+    allow_capability?("wiki.read")
   end
 
   def show?
-    user.role_member? || user.role_owner?
+    allow_capability?("wiki.read")
   end
 
   def log?

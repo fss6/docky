@@ -20,6 +20,7 @@ three:
   name: Outro usuário
   role: member
   active: true
+  encrypted_password: "$2a$04$LllVvLaS.23FmYh5cq//vub3L4uhhol1S20bxqR2F/2CjxP2iiily"
 
 owner:
   account: one
@@ -27,6 +28,7 @@ owner:
   name: Owner
   role: owner
   active: true
+  founding_user: true
   encrypted_password: "$2a$04$LllVvLaS.23FmYh5cq//vub3L4uhhol1S20bxqR2F/2CjxP2iiily"
 
 administrator:

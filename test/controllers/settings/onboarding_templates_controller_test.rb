@@ -22,6 +22,29 @@ module Settings
       assert_match "Editar", response.body
     end
 
+    test "member can index and show but not edit or update" do
+      sign_out :user
+      sign_in users(:three)
+
+      get settings_onboarding_templates_url
+      assert_response :success
+      assert_no_match(/Editar/, response.body)
+
+      get settings_onboarding_template_url(@template)
+      assert_response :success
+      assert_no_match(/Editar/, response.body)
+
+      get edit_settings_onboarding_template_url(@template)
+      assert_redirected_to authenticated_root_path
+      assert_equal I18n.t("errors.not_authorized"), flash[:alert]
+
+      patch settings_onboarding_template_url(@template), params: {
+        onboarding_template: { name: "Tentativa não autorizada" }
+      }
+      assert_redirected_to authenticated_root_path
+      assert_not_equal "Tentativa não autorizada", @template.reload.name
+    end
+
     test "show renders template items" do
       item = @template.items.ordered.first
 

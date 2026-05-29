@@ -9,7 +9,9 @@
         <%= t("users.index.subtitle") %>
       </p>
     </div>
-    <%= link_to t("users.index.new_user"), new_user_path, class: "app-btn-primary w-full shrink-0 sm:w-auto" %>
+    <% if policy(User).create? %>
+      <%= link_to t("users.index.new_user"), new_user_path, class: "app-btn-primary w-full shrink-0 sm:w-auto" %>
+    <% end %>
   </header>
 
   <% if @users.any? %>
@@ -21,7 +23,6 @@
               <th class="px-4 py-3 font-semibold"><%= User.human_attribute_name(:name) %></th>
               <th class="hidden px-4 py-3 font-semibold md:table-cell"><%= User.human_attribute_name(:email) %></th>
               <th class="hidden px-4 py-3 font-semibold sm:table-cell"><%= User.human_attribute_name(:role) %></th>
-              <th class="hidden px-4 py-3 font-semibold lg:table-cell"><%= Account.model_name.human %></th>
               <th class="px-4 py-3 font-semibold"><%= t("users.index.table.status") %></th>
               <th class="px-4 py-3 text-right font-semibold"><%= t("users.index.table.actions") %></th>
             </tr>
@@ -36,7 +37,9 @@
     <div class="app-card px-6 py-16 text-center">
       <p class="text-sm font-medium text-zinc-900"><%= t("users.index.empty_title") %></p>
       <p class="mt-1 text-sm text-zinc-500"><%= t("users.index.empty_subtitle") %></p>
-      <%= link_to t("users.index.new_user"), new_user_path, class: "app-btn-primary mt-6 inline-flex" %>
+      <% if policy(User).create? %>
+        <%= link_to t("users.index.new_user"), new_user_path, class: "app-btn-primary mt-6 inline-flex" %>
+      <% end %>
     </div>
   <% end %>
 

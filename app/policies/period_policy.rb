@@ -2,7 +2,7 @@
 
 class PeriodPolicy < ApplicationPolicy
   def close?
-    user.role_member? || user.role_owner?
+    allow_capability?("clients.write")
   end
 
   def reopen?
@@ -10,6 +10,6 @@ class PeriodPolicy < ApplicationPolicy
   end
 
   def show?
-    close?
+    allow_capability?("clients.read")
   end
 end

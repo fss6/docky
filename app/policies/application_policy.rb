@@ -36,6 +36,10 @@ class ApplicationPolicy
     false
   end
 
+  def allow_capability?(key)
+    Permissions.allow?(user, key)
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

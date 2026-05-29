@@ -39,6 +39,8 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1 or /users/1.json
   def update
+    @user.updated_by = current_user
+
     respond_to do |format|
       if @user.update(user_params)
         format.html { redirect_to @user, notice: t("users.flashes.updated"), status: :see_other }
@@ -95,6 +97,7 @@ class UsersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def user_params
       permitted_params = params.require(:user).permit(:email, :name, :active, :role)
+
       return permitted_params if permitted_params[:role].blank?
 
       permitted_roles.include?(permitted_params[:role]) ? permitted_params : permitted_params.except(:role)

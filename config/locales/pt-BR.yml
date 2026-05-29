@@ -127,6 +127,17 @@ pt-BR:
           owner: Administrador da conta
           administrator: Administrador do sistema
     errors:
+      models:
+        user:
+          attributes:
+            role:
+              founding_owner: não pode ser alterada — usuário fundador da conta
+              founding_must_be_owner: deve ser administrador da conta
+              account_requires_active_owner: a conta precisa de pelo menos um administrador ativo
+              cannot_change_own_role: você não pode alterar sua própria função
+            active:
+              founding_owner: não pode ser desativado — usuário fundador da conta
+              account_requires_active_owner: a conta precisa de pelo menos um administrador ativo
       messages:
         blank: não pode ficar em branco
         taken: já está em uso
@@ -211,6 +222,12 @@ pt-BR:
         one: "1 erro impediu salvar este usuário:"
         other: "%{count} erros impediram salvar este usuário:"
       cancel: Cancelar
+      cannot_change_own_role: Você não pode alterar sua própria função.
+      cannot_change_own_active: Você não pode desativar seu próprio usuário aqui.
+      founding_owner_role_locked: Usuário fundador da conta; a função não pode ser alterada.
+      founding_owner_active_locked: Usuário fundador da conta; não pode ser desativado.
+      last_active_owner_role_locked: Único administrador ativo da conta; a função não pode ser alterada.
+      last_active_owner_active_locked: Único administrador ativo da conta; não pode ser desativado aqui.
     links:
       back_to_index: ← Voltar aos usuários
 
@@ -224,12 +241,85 @@ pt-BR:
       password_placeholder: Sua senha
 
   errors:
+    not_authorized: Você não tem permissão para realizar esta ação.
     messages:
       not_saved:
         one: "1 erro impediu salvar este %{resource}:"
         other: "%{count} erros impediram salvar este %{resource}:"
 
   settings:
+    permissions:
+      title: Permissões da equipe
+      eyebrow: Acesso
+      heading: Permissões da equipe
+      subtitle: Defina o que membros da conta podem ver e fazer. Administradores da conta (owners) sempre têm acesso total.
+      back: Voltar às configurações
+      cancel: Cancelar
+      submit: Salvar permissões
+      member_toggle: Membros
+      flashes:
+        updated: Permissões atualizadas com sucesso.
+      hub:
+        eyebrow: Equipe
+        title: Permissões da equipe
+        description: Controle o que usuários com função membro podem acessar no sistema.
+        action: Gerenciar permissões
+      groups:
+        clients: Clientes
+        documents: Documentos
+        institutions: Instituições
+        groups: Grupos
+        users: Usuários
+        settings: Configurações
+        conversations: Chat IA
+        wiki: Wiki
+        audit: Auditoria
+      capabilities:
+        clients_read:
+          label: Ver clientes
+          hint: Lista, detalhes e navegação na carteira de clientes.
+        clients_write:
+          label: Gerenciar clientes
+          hint: Criar, editar, arquivar e operações de competência/onboarding.
+        documents_read:
+          label: Ver documentos
+          hint: Visualizar e buscar documentos.
+        documents_write:
+          label: Editar documentos
+          hint: Enviar, mover e alterar tags de documentos.
+        documents_destroy:
+          label: Excluir documentos
+          hint: Remover documentos permanentemente.
+        institutions_read:
+          label: Ver instituições
+          hint: Consultar instituições financeiras da conta.
+        institutions_manage:
+          label: Gerenciar instituições
+          hint: Criar, editar e excluir instituições personalizadas.
+        groups_read:
+          label: Ver grupos
+          hint: Listar grupos e membros.
+        groups_manage:
+          label: Gerenciar grupos
+          hint: Criar, editar e excluir grupos.
+        users_manage:
+          label: Gerenciar usuários
+          hint: Convidar, editar e ativar/desativar usuários da conta.
+        settings_read:
+          label: Ver configurações
+          hint: Acessar o hub de configurações e templates (somente leitura).
+        settings_manage:
+          label: Editar configurações
+          hint: Alterar IA, mensagens de compartilhamento e templates.
+        conversations_use:
+          label: Usar chat IA
+          hint: Acessar conversas e enviar mensagens.
+        wiki_read:
+          label: Ver wiki
+          hint: Consultar páginas da wiki interna.
+        audit_read:
+          label: Ver auditoria
+          hint: Acessar o registro de eventos da conta.
     template_defaults:
       restore_button: Restaurar padrão
       email_layout_note: O layout do e-mail enviado (botão, link alternativo, assinatura e rodapé) é fixo na aplicação. Aqui você edita apenas o texto introdutório.

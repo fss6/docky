@@ -1,19 +1,16 @@
+# frozen_string_literal: true
+
 class UserPolicy < ApplicationPolicy
-  # NOTE: Up to Pundit v2.3.1, the inheritance was declared as
-  # `Scope < Scope` rather than `Scope < ApplicationPolicy::Scope`.
-  # In most cases the behavior will be identical, but if updating existing
-  # code, beware of possible changes to the ancestors:
-  # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
   def index?
-    user.role_administrator? || user.role_owner?
+    manage_users?
   end
 
   def show?
-    user.role_administrator? || user.role_owner?
+    manage_users?
   end
 
   def create?
-    user.role_administrator? || user.role_owner?
+    manage_users?
   end
 
   def new?
@@ -21,31 +18,43 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.role_administrator? || user.role_owner?
+    manage_users?
   end
 
   def edit?
     update?
   end
 
-  def destroy?
-    return false unless user.role_administrator? || user.role_owner?
-    return false if disabling_self?
+  def edit_role?
+    manage_users? && !editing_self? && !founding_user_record?
+  end
 
-    true
+  def edit_active?
+    manage_users? && !editing_self? && !founding_user_record? && !would_remove_last_active_owner_record?
+  end
+
+  def destroy?
+    return false unless manage_users?
+    return false if disabling_self?
+    return false if founding_user_record?
+
+    !would_remove_last_active_owner_record?
   end
 
   def enable?
-    return false unless user.role_administrator? || user.role_owner?
+    return false unless manage_users?
     return false if enabling_self?
 
     true
   end
 
   class Scope < ApplicationPolicy::Scope
-    # NOTE: Be explicit about which records you allow access to!
     def resolve
-      user.role_administrator? ? all_users : scope.all
+      if user.role_administrator?
+        all_users
+      else
+        scope.all
+      end
     end
 
     private
@@ -59,11 +68,27 @@ class UserPolicy < ApplicationPolicy
 
   private
 
-  def disabling_self?
+  def manage_users?
+    user.role_administrator? || allow_capability?("users.manage")
+  end
+
+  def editing_self?
     record.is_a?(User) && record.persisted? && record.id == user.id
   end
 
+  def disabling_self?
+    editing_self?
+  end
+
   def enabling_self?
-    disabling_self?
+    editing_self?
+  end
+
+  def founding_user_record?
+    record.is_a?(User) && record.founding_user?
+  end
+
+  def would_remove_last_active_owner_record?
+    record.is_a?(User) && record.would_remove_last_active_owner?
   end
 end

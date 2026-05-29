@@ -1,16 +1,12 @@
+# frozen_string_literal: true
+
 class DocumentPolicy < ApplicationPolicy
-  # NOTE: Up to Pundit v2.3.1, the inheritance was declared as
-  # `Scope < Scope` rather than `Scope < ApplicationPolicy::Scope`.
-  # In most cases the behavior will be identical, but if updating existing
-  # code, beware of possible changes to the ancestors:
-  # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
-  
   def index?
-    user.role_member? || user.role_owner?
+    allow_capability?("documents.read")
   end
 
   def show?
-    user.role_member? || user.role_owner?
+    allow_capability?("documents.read")
   end
 
   def tags_search?
@@ -38,7 +34,7 @@ class DocumentPolicy < ApplicationPolicy
   end
 
   def create?
-    user.role_member? || user.role_owner?
+    allow_capability?("documents.write")
   end
 
   def new?
@@ -46,7 +42,7 @@ class DocumentPolicy < ApplicationPolicy
   end
 
   def update?
-    user.role_member? || user.role_owner?
+    allow_capability?("documents.write")
   end
 
   def edit?
@@ -54,13 +50,9 @@ class DocumentPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.role_member? || user.role_owner?
+    allow_capability?("documents.destroy")
   end
 
   class Scope < ApplicationPolicy::Scope
-    # NOTE: Be explicit about which records you allow access to!
-    # def resolve
-    #   scope.all
-    # end
   end
 end

@@ -40,8 +40,10 @@ class Account < ApplicationRecord
   has_many :institutions, dependent: :destroy
   has_many :audit_events, dependent: :destroy
   has_many :onboarding_templates, dependent: :destroy
+  has_many :permission_grants, class_name: "AccountPermissionGrant", dependent: :destroy
 
   after_create :create_default_setting!
+  after_create :seed_default_permission_grants!
   after_create :seed_default_institutions!
   after_create :seed_onboarding_templates!, unless: :skip_onboarding_template_seed?
 
@@ -53,6 +55,10 @@ class Account < ApplicationRecord
 
   def create_default_setting!
     create_setting! unless setting
+  end
+
+  def seed_default_permission_grants!
+    Permissions::SeedDefaults.call(account: self)
   end
 
   def seed_default_institutions!

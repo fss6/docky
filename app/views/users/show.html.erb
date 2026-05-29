@@ -8,14 +8,16 @@
       <p class="mt-1 text-sm text-zinc-500"><%= @user.account.name %></p>
     </div>
     <div class="flex flex-wrap gap-2">
-      <%= link_to t("users.show.edit"), edit_user_path(@user), class: "app-btn-primary" %>
+      <% if policy(@user).edit? %>
+        <%= link_to t("users.show.edit"), edit_user_path(@user), class: "app-btn-primary" %>
+      <% end %>
       <%= link_to t("users.show.back"), users_path, class: "app-btn-secondary" %>
     </div>
   </header>
 
   <%= render @user %>
 
-  <% if @user.enabled? && @user != current_user %>
+  <% if @user.enabled? && policy(@user).destroy? %>
     <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
       <p class="text-sm font-medium text-zinc-800"><%= t("users.show.risk_zone") %></p>
       <p class="mt-1 text-sm text-zinc-600"><%= t("users.show.risk_disable_hint") %></p>
@@ -23,7 +25,7 @@
             class: "app-btn-danger mt-4 cursor-pointer",
             data: user_disable_modal_data(@user) %>
     </div>
-  <% elsif !@user.enabled? && @user != current_user %>
+  <% elsif !@user.enabled? && policy(@user).enable? %>
     <div class="app-card border-teal-100 bg-teal-50/30 p-4 sm:p-5">
       <p class="text-sm font-medium text-zinc-800"><%= t("users.show.risk_zone") %></p>
       <p class="mt-1 text-sm text-zinc-600"><%= t("users.show.risk_enable_hint") %></p>

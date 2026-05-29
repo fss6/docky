@@ -1,0 +1,43 @@
+<% content_for :title, t("settings.permissions.title") + " · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent"><%= t("settings.permissions.eyebrow") %></p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= t("settings.permissions.heading") %></h1>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600"><%= t("settings.permissions.subtitle") %></p>
+    </div>
+    <%= link_to t("settings.permissions.back"), settings_path, class: "app-btn-secondary shrink-0" %>
+  </header>
+
+  <%= form_with url: settings_permissions_path, method: :patch, class: "space-y-6" do |form| %>
+    <% @grouped_keys.each do |group, keys| %>
+      <section class="app-card p-5 sm:p-6">
+        <h2 class="text-sm font-semibold text-zinc-900"><%= t("settings.permissions.groups.#{group}") %></h2>
+        <ul class="mt-4 divide-y divide-zinc-100">
+          <% keys.each do |capability_key| %>
+            <% grant = @grants_by_key[capability_key] %>
+            <li class="flex flex-col gap-2 py-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-zinc-900"><%= t("settings.permissions.capabilities.#{capability_key.tr('.', '_')}.label") %></p>
+                <p class="mt-0.5 text-sm text-zinc-500"><%= t("settings.permissions.capabilities.#{capability_key.tr('.', '_')}.hint") %></p>
+              </div>
+              <label class="flex shrink-0 cursor-pointer items-center gap-3">
+                <span class="text-sm text-zinc-600"><%= t("settings.permissions.member_toggle") %></span>
+                <%= check_box_tag "grants[#{capability_key.tr('.', '_')}]",
+                      "1",
+                      grant&.granted?,
+                      class: "h-4 w-4 rounded border-zinc-300 text-accent focus:ring-2 focus:ring-accent/25" %>
+              </label>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
+    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <%= link_to t("settings.permissions.cancel"), settings_path, class: "app-btn-secondary text-center" %>
+      <%= form.submit t("settings.permissions.submit"), class: "app-btn-primary cursor-pointer border-0" %>
+    </div>
+  <% end %>
+</div>

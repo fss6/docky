@@ -1,9 +1,15 @@
+# frozen_string_literal: true
+
 class SettingPolicy < ApplicationPolicy
   def show?
-    user.role_member? || user.role_owner? || user.role_administrator?
+    allow_capability?("settings.read")
   end
 
   def update?
-    show?
+    allow_capability?("settings.manage")
+  end
+
+  def edit?
+    update?
   end
 end

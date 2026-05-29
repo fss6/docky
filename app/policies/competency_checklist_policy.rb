@@ -1,33 +1,35 @@
+# frozen_string_literal: true
+
 class CompetencyChecklistPolicy < ApplicationPolicy
   def show?
-    user.role_member? || user.role_owner?
+    allow_capability?("clients.read")
   end
 
   def refresh_receipts?
-    show?
+    allow_capability?("clients.write")
   end
 
   def create_template_item?
-    show?
+    allow_capability?("clients.write")
   end
 
   def mark_validated?
-    show?
+    allow_capability?("clients.write")
   end
 
   def mark_pending?
-    show?
+    allow_capability?("clients.write")
   end
 
   def remove_item?
-    show?
+    allow_capability?("clients.write")
   end
 
   def attach_document?
-    show?
+    allow_capability?("clients.write")
   end
 
   def detach_document?
-    show?
+    allow_capability?("clients.write")
   end
 end

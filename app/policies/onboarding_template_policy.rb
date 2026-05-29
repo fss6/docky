@@ -2,15 +2,19 @@
 
 class OnboardingTemplatePolicy < ApplicationPolicy
   def index?
-    user.role_member? || user.role_owner? || user.role_administrator?
+    allow_capability?("settings.read")
   end
 
   def show?
     index?
   end
 
+  def edit?
+    update?
+  end
+
   def update?
-    index?
+    allow_capability?("settings.manage")
   end
 
   def create?

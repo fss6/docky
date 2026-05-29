@@ -2,15 +2,15 @@
 
 class ClientPolicy < ApplicationPolicy
   def index?
-    member_or_owner?
+    allow_capability?("clients.read")
   end
 
   def show?
-    member_or_owner?
+    allow_capability?("clients.read")
   end
 
   def create?
-    member_or_owner?
+    allow_capability?("clients.write")
   end
 
   def new?
@@ -18,7 +18,7 @@ class ClientPolicy < ApplicationPolicy
   end
 
   def update?
-    member_or_owner? && record_kept?
+    allow_capability?("clients.write") && record_kept?
   end
 
   def edit?
@@ -26,11 +26,11 @@ class ClientPolicy < ApplicationPolicy
   end
 
   def archive?
-    member_or_owner? && record_kept?
+    allow_capability?("clients.write") && record_kept?
   end
 
   def unarchive?
-    member_or_owner? && record_archived?
+    allow_capability?("clients.write") && record_archived?
   end
 
   def destroy?
@@ -60,10 +60,6 @@ class ClientPolicy < ApplicationPolicy
   end
 
   private
-
-  def member_or_owner?
-    user.role_member? || user.role_owner?
-  end
 
   def record_kept?
     record.is_a?(Class) || !record.archived?

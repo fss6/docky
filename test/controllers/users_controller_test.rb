@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
@@ -42,10 +44,107 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to user_url(@user)
   end
 
+  test "cannot demote founding user even with another active owner" do
+    owner = users(:owner)
+    assert owner.founding_user?
+
+    User.create!(
+      account: owner.account,
+      name: "Co-owner",
+      email: "co-owner-#{SecureRandom.hex(4)}@example.com",
+      role: :owner,
+      active: true,
+      founding_user: false,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    patch user_url(owner), params: {
+      user: { name: owner.name, email: owner.email, active: true, role: "member" }
+    }
+
+    assert_response :unprocessable_entity
+    assert owner.reload.role_owner?
+  end
+
+  test "can demote non-founding co-owner when founding owner remains active" do
+    founding = users(:owner)
+    co_owner = User.create!(
+      account: founding.account,
+      name: "Co-owner",
+      email: "co-owner-#{SecureRandom.hex(4)}@example.com",
+      role: :owner,
+      active: true,
+      founding_user: false,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    patch user_url(co_owner), params: {
+      user: { name: co_owner.name, email: co_owner.email, active: true, role: "member" }
+    }
+
+    assert_redirected_to user_url(co_owner)
+    assert founding.reload.role_owner?
+    assert co_owner.reload.role_member?
+  end
+
+  test "owner cannot demote self via update" do
+    owner = users(:owner)
+
+    patch user_url(owner), params: {
+      user: { name: owner.name, email: owner.email, active: true, role: "member" }
+    }
+
+    assert_response :unprocessable_entity
+    assert owner.reload.role_owner?
+  end
+
   test "cannot disable own user" do
-    assert_raises(Pundit::NotAuthorizedError) do
+    assert_no_changes -> { users(:owner).reload.active? } do
       delete user_url(users(:owner))
     end
+    assert_redirected_to authenticated_root_path
+    assert_equal I18n.t("errors.not_authorized"), flash[:alert]
+  end
+
+  test "cannot disable founding user as administrator" do
+    sign_in users(:administrator)
+
+    assert_no_changes -> { users(:owner).reload.active? } do
+      delete user_url(users(:owner))
+    end
+    assert_redirected_to authenticated_root_path
+  end
+
+  test "can disable co-owner when founding owner remains active" do
+    founding = users(:owner)
+    co_owner = User.create!(
+      account: founding.account,
+      name: "Co-owner",
+      email: "co-owner-#{SecureRandom.hex(4)}@example.com",
+      role: :owner,
+      active: true,
+      founding_user: false,
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    delete user_url(co_owner)
+
+    assert_response :redirect
+    assert_not co_owner.reload.active?
+    assert founding.reload.active?
+    assert founding.role_owner?
+  end
+
+  test "member cannot access users index" do
+    sign_out :user
+    sign_in users(:three)
+
+    get users_url
+    assert_redirected_to authenticated_root_path
+    assert_equal I18n.t("errors.not_authorized"), flash[:alert]
   end
 
   test "should disable user from index returns to index" do

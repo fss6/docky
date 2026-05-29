@@ -2,6 +2,6 @@
 
 class AuditPolicy < ApplicationPolicy
   def index?
-    user.role_owner? || user.role_administrator?
+    user.role_administrator? || allow_capability?("audit.read")
   end
 end

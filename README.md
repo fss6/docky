@@ -109,3 +109,120 @@ O job mensal `Periods::OpenMonthJob` roda via **sidekiq-cron** no worker.
 
 - Subir `web` e `worker` com o mesmo `REDIS_URL` e as mesmas vars SMTP.
 - Se migrou de Solid Queue, esvaziar jobs pendentes em `solid_queue_jobs` antes de depender só do Sidekiq.
+
+---
+
+## Permissões da equipe (ACL)
+
+O que **members** podem fazer em cada conta é configurável pelo **owner**. A autorização em runtime passa por **Pundit** → `Permissions.allow?` → tabela `account_permission_grants`. O catálogo de capabilities é **fixo no código** (não é cadastro dinâmico pelo usuário).
+
+### Papéis (`User#role`)
+
+| Papel | Comportamento |
+|-------|----------------|
+| `owner` | Bypass da matriz para recursos do tenant; gerencia usuários e permissões |
+| `member` | Obedece os grants em `account_permission_grants` (role `member`) |
+| `administrator` | Operações de **plataforma** (`Account`, `Plan`, `Subscription`) via policy; fora da matriz por conta e sem UI dedicada de SaaS |
+
+### Onde editar na UI
+
+| O quê | Caminho | Quem acessa |
+|-------|---------|-------------|
+| **Permissões da equipe** (toggles por capability) | **Configurações** → card **Permissões da equipe** → `/settings/permissions` | Somente `owner` |
+| **Usuários** (criar/editar pessoas, role, ativo) | Menu **Usuários** → `/users` | `owner` ou member com `users.manage` |
+
+Owners sempre têm acesso total; a tela de permissões define o que **members** podem fazer.
+
+### Fluxo técnico
+
+```text
+Permissions::Catalog (DEFINITIONS + GROUPS)   ← fonte da verdade no código
+        ↓
+/settings/permissions (view gera toggles por grupo)
+        ↓
+account_permission_grants (por account_id, role member)
+        ↓
+Permissions.allow?(user, capability_key)
+        ↓
+ApplicationPolicy#allow_capability?  →  policies e menu (policy(...).action?)
+```
+
+Arquivos principais:
+
+- Catálogo: [`app/lib/permissions/catalog.rb`](app/lib/permissions/catalog.rb)
+- Serviço: [`app/services/permissions.rb`](app/services/permissions.rb)
+- Seed por conta: [`app/services/permissions/seed_defaults.rb`](app/services/permissions/seed_defaults.rb)
+- Atualização na UI: [`app/services/permissions/update_grants.rb`](app/services/permissions/update_grants.rb)
+- Policy da tela: [`app/policies/account_permissions_policy.rb`](app/policies/account_permissions_policy.rb)
+
+### Adicionar um módulo novo
+
+Ao introduzir uma área nova (ex.: Relatórios), a rota `/settings/permissions` **não precisa mudar** — novos toggles aparecem quando o catálogo e as traduções existirem.
+
+1. **Catálogo** — em `Permissions::Catalog::DEFINITIONS`, incluir keys no padrão `modulo.acao` (ex.: `reports.read`, `reports.manage`) com `default_member:` e `group:`. Se for área nova, acrescentar o grupo em `GROUPS`.
+2. **Pundit** — na policy do recurso, usar `allow_capability?("reports.read")` (e não duplicar `role_member?` / `role_owner?` manualmente).
+3. **Menu / views** — gates com `policy(Recurso).index?` (ou action equivalente).
+4. **i18n** — em `config/locales/pt-BR.yml`, sob `settings.permissions.groups.*` e `settings.permissions.capabilities.*` (na chave i18n, `.` vira `_`, ex.: `reports.read` → `reports_read`).
+5. **Contas já existentes** — `Permissions::SeedDefaults.call(account: account)` cria linhas só para keys **novas** (não altera grants antigos). Rode em data migration/rake após deploy, ou ao salvar em `/settings/permissions` (`UpdateGrants` chama `SeedDefaults` antes do PATCH). Contas novas recebem seed no `after_create` de `Account`.
+
+Convenção: poucas capabilities por domínio (`read`, `write`, `manage`, `use`), agrupadas por produto — não um toggle por cada método do Pundit.
+
+### Limitações (v1)
+
+- Catálogo versionado com o app (deploy para novas capabilities).
+- Grants apenas para role `member` (sem matriz por grupo ou por usuário).
+- `administrator` e recursos de plataforma ficam fora de `account_permission_grants`.
+- `DashboardPolicy` e políticas de `Account` / `Plan` / `Subscription` não usam a matriz.
+
+### Usuário fundador (`founding_user`)
+
+Cada conta tem **exatamente um** usuário marcado como fundador na coluna `users.founding_user` (índice único parcial por `account_id`). Isso é independente do papel `role`: o fundador é sempre o **primeiro usuário** da conta, identificado de forma estável no banco (não depende só de `created_at` na UI).
+
+| Aspecto | Detalhe |
+|---------|---------|
+| Coluna | `founding_user` (`boolean`, default `false`, `NOT NULL`) |
+| Índice | Único: uma linha `founding_user = true` por conta |
+| Atribuição no create | `User#assign_founding_user` — `true` se ainda não existir outro usuário na conta |
+| Defaults no create | `enforce_founding_user_defaults` força `role: owner` e `active: true` |
+| Backfill (deploy) | Migration [`db/migrate/20260529194406_add_founding_user_to_users.rb`](db/migrate/20260529194406_add_founding_user_to_users.rb): menor `(created_at, id)` por conta vira fundador, `owner` e ativo |
+
+```text
+Conta nova                    Conta existente (após migrate)
+     │                              │
+     ▼                              ▼
+Primeiro User#create          backfill founding_user
+founding_user = true          no usuário mais antigo
+role = owner                  da conta
+active = true
+```
+
+### Regras de usuários (owners e fundador)
+
+Regras aplicadas em [`app/models/user.rb`](app/models/user.rb), [`app/policies/user_policy.rb`](app/policies/user_policy.rb) e formulário em [`app/views/users/_form.html.erb`](app/views/users/_form.html.erb).
+
+| Regra | Comportamento |
+|-------|----------------|
+| Fundador | `founding_user?` → não pode sair de `owner`, não pode ser desativado; função e ativo travados na UI |
+| Conta com owner ativo | Sempre ≥ 1 usuário com `role: owner` e `active: true` (`account_owner_invariants`) |
+| Último owner ativo | Não pode rebaixar (`owner` → `member`) nem desativar se for o único owner ativo restante (`would_remove_last_active_owner?`) |
+| Editar a si mesmo | Não pode mudar a própria função (`updated_by` + `updater_cannot_change_own_role`; `UserPolicy#edit_role?` false para self) |
+| Desativar (DELETE /users) | Bloqueado para self, fundador e último owner ativo (`UserPolicy#destroy?`) |
+| Outros owners | Podem ser rebaixados ou desativados se outro `owner` ativo permanecer (em geral o fundador) |
+
+Tentativas inválidas via PATCH em `/users/:id` retornam **422** com erros de validação (não há alteração silenciosa de `role`/`active` no controller).
+
+Métodos úteis no model:
+
+- `User#founding_user?` — coluna persistida
+- `User#would_remove_last_active_owner?` — este registro é owner ativo e não há outro owner ativo na conta
+- `User#locked_role?` / `User#locked_active?` — usados indiretamente pela policy/UI
+
+### Papéis vs fundador
+
+| Conceito | O que é |
+|----------|---------|
+| `role: owner` | Administrador da conta; pode haver vários; bypass da matriz de permissões |
+| `founding_user: true` | Primeiro usuário da conta; no máximo um; imutável como owner ativo |
+| `role: member` + grants | Acesso configurável em `/settings/permissions` |
+
+Um usuário pode ser `owner` sem ser fundador (co-admin convidado depois). O fundador é sempre `owner`, mas nem todo `owner` é fundador.

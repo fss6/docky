@@ -10,7 +10,9 @@
       </p>
     </div>
     <div class="flex flex-wrap gap-2">
-      <%= link_to "Editar", edit_settings_onboarding_template_path(@template), class: "app-btn-primary" %>
+      <% if policy(@template).edit? %>
+        <%= link_to "Editar", edit_settings_onboarding_template_path(@template), class: "app-btn-primary" %>
+      <% end %>
       <%= link_to "Voltar", settings_onboarding_templates_path, class: "app-btn-secondary" %>
     </div>
   </header>

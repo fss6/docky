@@ -2,7 +2,7 @@
 
 class InstitutionPolicy < ApplicationPolicy
   def index?
-    user.role_member? || user.role_owner?
+    allow_capability?("institutions.read")
   end
 
   def show?
@@ -10,7 +10,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def create?
-    user.role_owner?
+    allow_capability?("institutions.manage")
   end
 
   def new?
@@ -18,7 +18,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def update?
-    user.role_owner?
+    allow_capability?("institutions.manage")
   end
 
   def edit?
@@ -26,7 +26,7 @@ class InstitutionPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.role_owner? && !record.system?
+    allow_capability?("institutions.manage") && !record.system?
   end
 
   class Scope < ApplicationPolicy::Scope

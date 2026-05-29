@@ -6,7 +6,11 @@
       <p class="text-xs font-semibold uppercase tracking-wide text-accent">Configurações</p>
       <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Templates de onboarding</h1>
       <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
-        Edite os nomes, a ordem e os itens usados no onboarding por tipo de cliente. Essas mudanças passam a valer para novos onboardings da conta.
+        <% if policy(OnboardingTemplate).update? %>
+          Edite os nomes, a ordem e os itens usados no onboarding por tipo de cliente. Essas mudanças passam a valer para novos onboardings da conta.
+        <% else %>
+          Consulte os templates e itens usados no onboarding por tipo de cliente.
+        <% end %>
       </p>
     </div>
     <%= link_to "Voltar para configurações",
@@ -18,7 +22,11 @@
     <div class="border-b border-zinc-100 bg-zinc-50/80 px-5 py-4 sm:px-6">
       <h2 class="text-sm font-semibold text-zinc-900">Templates da conta</h2>
       <p class="mt-1 text-sm text-zinc-600">
-        Selecione um template para visualizar ou editar seus itens de onboarding.
+        <% if policy(OnboardingTemplate).update? %>
+          Selecione um template para visualizar ou editar seus itens de onboarding.
+        <% else %>
+          Selecione um template para visualizar seus itens de onboarding.
+        <% end %>
       </p>
     </div>
 
@@ -45,9 +53,11 @@
                   <%= link_to "Ver",
                         settings_onboarding_template_path(template),
                         class: "app-btn-secondary px-3 py-1.5 text-xs" %>
-                  <%= link_to "Editar",
-                        edit_settings_onboarding_template_path(template),
-                        class: "app-btn-primary px-3 py-1.5 text-xs" %>
+                  <% if policy(template).edit? %>
+                    <%= link_to "Editar",
+                          edit_settings_onboarding_template_path(template),
+                          class: "app-btn-primary px-3 py-1.5 text-xs" %>
+                  <% end %>
                 </div>
               </td>
             </tr>

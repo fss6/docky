@@ -4,13 +4,6 @@
   </td>
   <td class="hidden px-4 py-3 text-sm text-zinc-600 md:table-cell"><%= user.email %></td>
   <td class="hidden px-4 py-3 text-sm text-zinc-600 sm:table-cell"><%= user.role_label %></td>
-  <td class="hidden px-4 py-3 text-sm text-zinc-600 lg:table-cell">
-    <% if user.account %>
-      <%= link_to user.account.name, account_path(user.account), class: "text-zinc-600 no-underline hover:text-accent" %>
-    <% else %>
-      —
-    <% end %>
-  </td>
   <td class="px-4 py-3">
     <% if user.enabled? %>
       <span class="inline-flex rounded-md bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-800"><%= t("users.status.active") %></span>
@@ -21,12 +14,14 @@
   <td class="px-4 py-3 text-right">
     <div class="flex flex-wrap items-center justify-end gap-2">
       <%= link_to t("users.row.view"), user, class: "app-btn-secondary px-3 py-1.5 text-xs" %>
-      <%= link_to t("users.row.edit"), edit_user_path(user), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
-      <% if user.enabled? && user != current_user %>
+      <% if policy(user).edit? %>
+        <%= link_to t("users.row.edit"), edit_user_path(user), class: "app-btn-secondary px-3 py-1.5 text-xs" %>
+      <% end %>
+      <% if user.enabled? && policy(user).destroy? %>
         <%= button_tag t("users.row.disable"), type: "button",
               class: "app-btn-danger cursor-pointer px-3 py-1.5 text-xs",
               data: user_disable_modal_data(user) %>
-      <% elsif !user.enabled? && user != current_user %>
+      <% elsif !user.enabled? && policy(user).enable? %>
         <%= button_tag t("users.row.enable"), type: "button",
               class: "app-btn-primary cursor-pointer px-3 py-1.5 text-xs",
               data: user_enable_modal_data(user) %>

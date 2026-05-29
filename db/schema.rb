@@ -10,10 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_29_162510) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_29_194406) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
+
+  create_table "account_permission_grants", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "capability_key", null: false
+    t.string "role", default: "member", null: false
+    t.boolean "granted", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "capability_key", "role"], name: "index_account_permission_grants_unique", unique: true
+    t.index ["account_id"], name: "index_account_permission_grants_on_account_id"
+  end
 
   create_table "accounts", force: :cascade do |t|
     t.string "name"
@@ -398,6 +409,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_29_162510) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
+    t.boolean "founding_user", default: false, null: false
+    t.index ["account_id", "founding_user"], name: "index_users_on_account_id_founding_user", unique: true, where: "(founding_user = true)"
     t.index ["account_id"], name: "index_users_on_account_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -449,6 +462,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_29_162510) do
     t.index ["account_id"], name: "index_wiki_schemas_on_account_id"
   end
 
+  add_foreign_key "account_permission_grants", "accounts"
   add_foreign_key "accounts", "plans"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
