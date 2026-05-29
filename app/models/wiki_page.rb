@@ -1,5 +1,32 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: wiki_pages
+#
+#  id                              :bigint           not null, primary key
+#  content                         :text
+#  page_type                       :string           not null
+#  slug                            :string           not null
+#  title                           :string           not null
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  account_id                      :bigint           not null
+#  source_bank_statement_import_id :bigint
+#  source_document_id              :integer
+#
+# Indexes
+#
+#  index_wiki_pages_on_account_id                       (account_id)
+#  index_wiki_pages_on_account_id_and_slug              (account_id,slug) UNIQUE
+#  index_wiki_pages_on_page_type                        (page_type)
+#  index_wiki_pages_on_source_bank_statement_import_id  (source_bank_statement_import_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (source_bank_statement_import_id => bank_statement_imports.id)
+#
 class WikiPage < ApplicationRecord
   acts_as_tenant(:account)
 

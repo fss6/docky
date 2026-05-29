@@ -1,5 +1,29 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: settings
+#
+#  id                                      :bigint           not null, primary key
+#  generate_tags_automatically             :boolean          default(TRUE), not null
+#  onboarding_share_email_body_template    :text
+#  onboarding_share_email_subject_template :string
+#  onboarding_share_whatsapp_template      :text
+#  upload_share_email_body_template        :text             not null
+#  upload_share_email_subject_template     :string           not null
+#  upload_share_whatsapp_template          :text             not null
+#  created_at                              :datetime         not null
+#  updated_at                              :datetime         not null
+#  account_id                              :bigint           not null
+#
+# Indexes
+#
+#  index_settings_on_account_id  (account_id) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
 class Setting < ApplicationRecord
   LINK_PLACEHOLDER = "{{link}}"
 

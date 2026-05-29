@@ -1,5 +1,26 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: onboarding_templates
+#
+#  id         :bigint           not null, primary key
+#  kind       :string           not null
+#  name       :string           not null
+#  position   :integer          default(0), not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  account_id :bigint           not null
+#
+# Indexes
+#
+#  index_onboarding_templates_on_account_id           (account_id)
+#  index_onboarding_templates_on_account_id_and_kind  (account_id,kind) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
 class OnboardingTemplate < ApplicationRecord
   acts_as_tenant(:account)
 

@@ -1,5 +1,37 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: bank_statements
+#
+#  id                       :bigint           not null, primary key
+#  amount                   :decimal(16, 2)   not null
+#  description              :text             not null
+#  occurred_on              :date             not null
+#  possible_duplicate       :boolean          default(FALSE), not null
+#  transaction_type         :string           not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  account_id               :bigint           not null
+#  bank_statement_import_id :bigint           not null
+#  client_id                :bigint           not null
+#  institution_id           :bigint           not null
+#
+# Indexes
+#
+#  index_bank_statements_on_account_id                 (account_id)
+#  index_bank_statements_on_bank_statement_import_id   (bank_statement_import_id)
+#  index_bank_statements_on_client_id                  (client_id)
+#  index_bank_statements_on_client_id_and_occurred_on  (client_id,occurred_on)
+#  index_bank_statements_on_institution_id             (institution_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (bank_statement_import_id => bank_statement_imports.id)
+#  fk_rails_...  (client_id => clients.id)
+#  fk_rails_...  (institution_id => institutions.id)
+#
 class BankStatement < ApplicationRecord
   acts_as_tenant(:account)
   audited on: %i[create update destroy], except: %i[created_at updated_at possible_duplicate]

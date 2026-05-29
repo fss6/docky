@@ -1,5 +1,23 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: wiki_schemas
+#
+#  id           :bigint           not null, primary key
+#  instructions :text
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  account_id   :bigint           not null
+#
+# Indexes
+#
+#  index_wiki_schemas_on_account_id  (account_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
 class WikiSchema < ApplicationRecord
   belongs_to :account
 

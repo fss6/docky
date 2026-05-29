@@ -1,5 +1,32 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: embedding_records
+#
+#  id              :bigint           not null, primary key
+#  content         :text
+#  embedding       :vector(1536)
+#  metadata        :jsonb
+#  recordable_type :string
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  account_id      :bigint           not null
+#  document_id     :integer
+#  recordable_id   :bigint
+#
+# Indexes
+#
+#  index_embedding_records_on_account_id                  (account_id)
+#  index_embedding_records_on_account_id_and_document_id  (account_id,document_id)
+#  index_embedding_records_on_embedding                   (embedding) USING ivfflat
+#  index_embedding_records_on_recordable                  (recordable_type,recordable_id)
+#  index_embedding_records_on_wiki_page_unique            (recordable_type,recordable_id) UNIQUE WHERE ((recordable_type)::text = 'WikiPage'::text)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
 class EmbeddingRecord < ApplicationRecord
   has_neighbors :embedding
 

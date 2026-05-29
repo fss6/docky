@@ -1,5 +1,29 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: onboarding_checklists
+#
+#  id              :bigint           not null, primary key
+#  completed_at    :datetime
+#  onboarding_kind :string           not null
+#  started_at      :datetime         not null
+#  status          :string           default("in_progress"), not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  account_id      :bigint           not null
+#  client_id       :bigint           not null
+#
+# Indexes
+#
+#  index_onboarding_checklists_on_account_id  (account_id)
+#  index_onboarding_checklists_on_client_id   (client_id) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (client_id => clients.id)
+#
 class OnboardingChecklist < ApplicationRecord
   acts_as_tenant(:account)
 

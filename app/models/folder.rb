@@ -1,3 +1,28 @@
+# == Schema Information
+#
+# Table name: folders
+#
+#  id                             :bigint           not null, primary key
+#  name                           :string
+#  public_upload_token            :string
+#  public_upload_token_expires_at :datetime
+#  visible                        :boolean          default(FALSE), not null
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  account_id                     :bigint           not null
+#  client_id                      :bigint
+#
+# Indexes
+#
+#  index_folders_on_account_id           (account_id)
+#  index_folders_on_client_id            (client_id)
+#  index_folders_on_public_upload_token  (public_upload_token) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (client_id => clients.id)
+#
 class Folder < ApplicationRecord
   acts_as_tenant(:account)
   audited on: %i[create update destroy], except: %i[created_at updated_at public_upload_token public_upload_token_expires_at]

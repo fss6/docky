@@ -1,3 +1,41 @@
+# == Schema Information
+#
+# Table name: documents
+#
+#  id                :bigint           not null, primary key
+#  collection_period :date
+#  content           :text
+#  metadata          :jsonb
+#  status            :string
+#  summary           :text
+#  tags              :jsonb            not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  account_id        :bigint           not null
+#  client_id         :bigint
+#  folder_id         :bigint           not null
+#  period_id         :bigint
+#  user_id           :bigint           not null
+#
+# Indexes
+#
+#  index_documents_on_account_id                 (account_id)
+#  index_documents_on_client_collection_created  (client_id,collection_period,created_at)
+#  index_documents_on_client_id                  (client_id)
+#  index_documents_on_client_period_created      (client_id,period_id,created_at)
+#  index_documents_on_folder_id                  (folder_id)
+#  index_documents_on_period_id                  (period_id)
+#  index_documents_on_tags                       (tags) USING gin
+#  index_documents_on_user_id                    (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (client_id => clients.id)
+#  fk_rails_...  (folder_id => folders.id)
+#  fk_rails_...  (period_id => competency_checklists.id)
+#  fk_rails_...  (user_id => users.id)
+#
 class Document < ApplicationRecord
   acts_as_tenant(:account)
   belongs_to :user

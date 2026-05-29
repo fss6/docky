@@ -1,5 +1,33 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: bank_statement_imports
+#
+#  id             :bigint           not null, primary key
+#  metadata       :jsonb            not null
+#  ocr_text       :text
+#  status         :string           default("pending"), not null
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  account_id     :bigint           not null
+#  client_id      :bigint           not null
+#  institution_id :bigint           not null
+#
+# Indexes
+#
+#  index_bank_statement_imports_on_account_id                (account_id)
+#  index_bank_statement_imports_on_client_id                 (client_id)
+#  index_bank_statement_imports_on_client_id_and_created_at  (client_id,created_at)
+#  index_bank_statement_imports_on_institution_id            (institution_id)
+#  index_bank_statement_imports_on_status                    (status)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (client_id => clients.id)
+#  fk_rails_...  (institution_id => institutions.id)
+#
 class BankStatementImport < ApplicationRecord
   acts_as_tenant(:account)
   audited on: %i[create update destroy], except: %i[created_at updated_at ocr_text]

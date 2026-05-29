@@ -1,5 +1,37 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: upload_invites
+#
+#  id                 :bigint           not null, primary key
+#  access_count       :integer          default(0), not null
+#  expires_at         :datetime
+#  period             :date
+#  purpose            :string           default("monthly"), not null
+#  revoked_at         :datetime
+#  token              :string           not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  account_id         :bigint           not null
+#  client_id          :bigint           not null
+#  created_by_user_id :bigint
+#
+# Indexes
+#
+#  index_upload_invites_on_account_id             (account_id)
+#  index_upload_invites_on_client_id              (client_id)
+#  index_upload_invites_on_client_period_created  (client_id,period,created_at)
+#  index_upload_invites_on_client_purpose_active  (client_id,purpose) WHERE (revoked_at IS NULL)
+#  index_upload_invites_on_created_by_user_id     (created_by_user_id)
+#  index_upload_invites_on_token                  (token) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (client_id => clients.id)
+#  fk_rails_...  (created_by_user_id => users.id)
+#
 class UploadInvite < ApplicationRecord
   acts_as_tenant(:account)
 

@@ -1,5 +1,37 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: clients
+#
+#  id                   :bigint           not null, primary key
+#  archived_at          :datetime
+#  email                :string
+#  monthly_deadline_day :integer          default(10), not null
+#  name                 :string           not null
+#  notes                :text
+#  onboarding_kind      :string
+#  phone                :string
+#  status               :string           default("active"), not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  account_id           :bigint           not null
+#  archived_by_user_id  :bigint
+#  tax_id               :string
+#
+# Indexes
+#
+#  index_clients_on_account_id             (account_id)
+#  index_clients_on_account_id_and_tax_id  (account_id,tax_id) UNIQUE WHERE ((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))
+#  index_clients_on_archived_at            (archived_at)
+#  index_clients_on_archived_by_user_id    (archived_by_user_id)
+#  index_clients_on_status                 (status)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#  fk_rails_...  (archived_by_user_id => users.id)
+#
 class Client < ApplicationRecord
   acts_as_tenant(:account)
 

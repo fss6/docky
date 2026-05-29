@@ -76,6 +76,9 @@ GEM
       rails (>= 6.0)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
+    annotaterb (4.22.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     ast (2.4.3)
     audited (5.8.0)
       activerecord (>= 5.2, < 8.2)
@@ -448,6 +451,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts_as_tenant (~> 1.0, >= 1.0.1)
+  annotaterb
   audited (~> 5.8)
   aws-sdk-s3
   bootsnap

@@ -1,6 +1,26 @@
 # frozen_string_literal: true
 
 # Lista inicial (SEED_NAMES) deve coincidir com db/migrate/20260416140000_create_institutions_and_relate_bank_statements.rb
+# == Schema Information
+#
+# Table name: institutions
+#
+#  id         :bigint           not null, primary key
+#  name       :string           not null
+#  system     :boolean          default(FALSE), not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  account_id :bigint           not null
+#
+# Indexes
+#
+#  index_institutions_on_account_id           (account_id)
+#  index_institutions_on_account_id_and_name  (account_id,name) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (account_id => accounts.id)
+#
 class Institution < ApplicationRecord
   acts_as_tenant(:account)
 
