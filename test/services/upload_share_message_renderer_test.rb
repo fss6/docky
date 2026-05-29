@@ -10,7 +10,7 @@ class UploadShareMessageRendererTest < ActiveSupport::TestCase
       @client = clients(:alpha)
     end
     @period = Date.new(2026, 5, 1)
-    @url = "https://app.example.com/public/folders/abc/upload"
+    @url = "https://app.example.com/portal/abc/upload"
   end
 
   test "interpolates placeholders" do

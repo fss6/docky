@@ -20,7 +20,36 @@ A entrega de e-mail é controlada por [`config/initializers/action_mailer_delive
 | `MAILER_FROM` | Não | Remetente exibido (`From:`). Padrão: `SMTP_USERNAME`. Ex.: `Dokivo <no-reply@seudominio.com.br>`. |
 | `MAILER_DEFAULT_HOST` | Não | Host em links gerados pelo Rails (Devise, rotas de mailer). Dev: `localhost`. Prod: domínio público. |
 | `MAILER_DEFAULT_PORT` | Não | Porta nos links em **development** (padrão `3000`). |
-| `PUBLIC_APP_HOST` | Não | Host dos links de upload público nos e-mails de convite. Se omitido, usa `MAILER_DEFAULT_HOST` (sem prefixo `portal.`). |
+| `PUBLIC_APP_HOST` | Não | Host dos links do portal nos e-mails de convite. Se omitido, usa `MAILER_DEFAULT_HOST` (sem prefixo `portal.`). |
+
+### Links do portal de upload
+
+Convites de upload (e-mail e modal de compartilhamento) geram URLs no formato:
+
+```
+/portal/:token/upload          # envio mensal
+/portal/:token/onboarding      # onboarding
+```
+
+O **path** é o mesmo em todos os ambientes; o **host** e o **protocolo** variam:
+
+| Contexto | Development | Production |
+|----------|-------------|------------|
+| E-mail de convite | `http://localhost/portal/...` | `https://app.seudominio.com.br/portal/...` |
+| Modal (copiar link) | host do browser (`localhost`) | host do browser (`app.seudominio.com.br`) |
+
+**E-mails** — montados por [`Clients::PublicUploadUrl`](app/services/clients/public_upload_url.rb): usa `PUBLIC_APP_HOST` (se definido) ou `MAILER_DEFAULT_HOST`; em development o protocolo é `http`, em production é `https`.
+
+**Modal na UI** — montado por `client_public_upload_url` no helper: usa `PUBLIC_APP_HOST` (se definido) ou o host da requisição atual (`request.host`).
+
+Se o host configurado tiver prefixo `portal.` (ex.: `portal.seudominio.com.br`), ele é removido automaticamente — o path `/portal/...` já identifica a área pública.
+
+Em produção, configure pelo menos `MAILER_DEFAULT_HOST` (e opcionalmente `PUBLIC_APP_HOST` para forçar o mesmo host nos e-mails):
+
+```env
+MAILER_DEFAULT_HOST=app.seudominio.com.br
+PUBLIC_APP_HOST=app.seudominio.com.br
+```
 
 ### Modos
 

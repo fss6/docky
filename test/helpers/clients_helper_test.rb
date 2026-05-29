@@ -38,6 +38,8 @@ class ClientsHelperTest < ActiveSupport::TestCase
     url = client_public_upload_url("test-token")
     assert_includes url, "localhost"
     assert_not_includes url, "portal."
+    assert_includes url, "/portal/"
+    assert_not_includes url, "/public/folders/"
     assert_includes url, "test-token"
   end
 end

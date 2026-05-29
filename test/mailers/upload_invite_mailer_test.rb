@@ -16,7 +16,7 @@ class UploadInviteMailerTest < ActionMailer::TestCase
         expires_at: 30.days.from_now
       )
     end
-    @url = "https://app.example.com/public/folders/token/upload"
+    @url = "https://app.example.com/portal/token/upload"
     @rendered = UploadShareMessageRenderer.call(
       setting: @setting,
       client: @client,

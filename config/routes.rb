@@ -101,11 +101,11 @@ Rails.application.routes.draw do
       delete :remove_tag
     end
   end
-  get "public/folders/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
-  post "public/folders/:token/upload", to: "public_folder_uploads#create"
-  get "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
-  post "public/folders/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
-  post "public/folders/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
+  get "portal/:token/upload", to: "public_folder_uploads#show", as: :public_folder_upload
+  post "portal/:token/upload", to: "public_folder_uploads#create"
+  get "portal/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
+  post "portal/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
+  post "portal/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
   resources :groups do
     resources :memberships, controller: "group_memberships", only: %i[create destroy]
   end
