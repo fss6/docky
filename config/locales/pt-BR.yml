@@ -346,7 +346,6 @@ pt-BR:
       body_prefix: "A pasta "
       body_suffix: " será removida permanentemente. Esta ação não pode ser desfeita."
       confirm: Excluir pasta
-    delete_folder_blocked: Remova todos os arquivos antes de excluir esta pasta.
     attach_document: Anexar arquivo
     remove_document: Remover arquivo
     empty_documents: Nenhum arquivo nesta pasta ainda.
