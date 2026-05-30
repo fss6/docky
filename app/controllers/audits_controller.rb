@@ -8,6 +8,8 @@ class AuditsController < ApplicationController
 
     logs_scope = unified_logs_scope
     @pagy, @logs = pagy(logs_scope, limit: 10)
+    preload_log_context!
+    @presented_logs = @logs.map { |log| build_log_presenter(log) }
   end
 
   private
@@ -97,5 +99,30 @@ class AuditsController < ApplicationController
     Date.parse(raw_date.to_s)
   rescue ArgumentError
     nil
+  end
+
+  def preload_log_context!
+    event_ids = @logs.select { |log| log.source == "event" }.map(&:row_id)
+    audit_ids = @logs.select { |log| log.source == "audit" }.map(&:row_id)
+
+    @audit_events_by_id = AuditEvent
+      .where(id: event_ids, account_id: current_user.account_id)
+      .index_by(&:id)
+    @audits_by_id = Audit
+      .where(id: audit_ids, account_id: current_user.account_id)
+      .index_by(&:id)
+    @subject_labels = AuditLog::SubjectLabelResolver.call(
+      @logs,
+      account_id: current_user.account_id
+    )
+  end
+
+  def build_log_presenter(log)
+    AuditLog::Presenter.new(
+      log,
+      audit_events_by_id: @audit_events_by_id,
+      audits_by_id: @audits_by_id,
+      subject_labels: @subject_labels
+    )
   end
 end
