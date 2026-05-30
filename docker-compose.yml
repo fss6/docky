@@ -17,7 +17,7 @@ services:
       # S3_FORCE_PATH_STYLE: "true"
       # AWS_ACCESS_KEY_ID: minioadmin
       # AWS_SECRET_ACCESS_KEY: minioadmin
-      S3_BUCKET: feedback-audios
+      S3_BUCKET: docfy-development
     depends_on:
       - postgres
       - redis
@@ -37,7 +37,7 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
       MINIO_SERVER_URL: http://localhost:9000
-      S3_BUCKET: feedback-audios
+      S3_BUCKET: docfy-development
     volumes:
       - minio-data:/data
     networks:
