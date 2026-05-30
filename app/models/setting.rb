@@ -27,7 +27,7 @@
 class Setting < ApplicationRecord
   LINK_PLACEHOLDER = "{{link}}"
 
-  DEFAULT_UPLOAD_SHARE_WHATSAPP_TEMPLATE = "Olá! Envie seus documentos de {{nome_cliente}} pelo link: #{LINK_PLACEHOLDER}"
+  DEFAULT_UPLOAD_SHARE_WHATSAPP_TEMPLATE = "Olá! Precisamos dos documentos da empresa {{nome_cliente}} referentes à competência {{competencia}}. Envie por aqui: #{LINK_PLACEHOLDER}"
   DEFAULT_UPLOAD_SHARE_EMAIL_SUBJECT_TEMPLATE = "Envio de documentos — {{nome_cliente}}"
   DEFAULT_UPLOAD_SHARE_EMAIL_BODY_TEMPLATE = <<~TEXT.strip
     Olá,

@@ -22,7 +22,7 @@
              data-template-default-restore-confirm-text-value="<%= t("settings.template_defaults.confirm_modal.confirm") %>">
       <%= render "settings/template_card_header",
             title: "Mensagem de WhatsApp",
-            hint: "Obrigatório conter <code class=\"rounded bg-zinc-100 px-1\">{{link}}</code>.".html_safe %>
+            hint: "Placeholders disponíveis: {{nome_cliente}}, {{competencia}}, {{link}}. Obrigatório conter <code class=\"rounded bg-zinc-100 px-1\">{{link}}</code>.".html_safe %>
       <div class="mt-4">
         <%= form.label :upload_share_whatsapp_template, "Mensagem", class: "sr-only" %>
         <%= form.text_area :upload_share_whatsapp_template,

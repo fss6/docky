@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AddUploadShareTemplatesToSettings < ActiveRecord::Migration[8.0]
-  WHATSAPP_DEFAULT = "Olá! Envie seus documentos de {{nome_cliente}} pelo link: {{link}}"
+  WHATSAPP_DEFAULT = "Olá! Precisamos dos documentos da empresa {{nome_cliente}} referentes à competência {{competencia}}. Envie por aqui: {{link}}"
   EMAIL_SUBJECT_DEFAULT = "Envio de documentos — {{nome_cliente}}"
   EMAIL_BODY_DEFAULT = <<~TEXT.strip
     Olá,
