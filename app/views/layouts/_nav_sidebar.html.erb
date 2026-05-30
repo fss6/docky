@@ -18,14 +18,9 @@
         ]
       },
       {
-        title: "Documentos",
-        items: [
-          { key: :conversations, label: "Chat IA", path: nav_chat_path, icon: :conversations, policy_ok: policy(Conversation).index? }
-        ]
-      },
-      {
         title: "Inteligência",
         items: [
+          { key: :conversations, label: "Chat IA", path: nav_chat_path, icon: :conversations, policy_ok: policy(Conversation).index? },
           { key: :wiki, label: "Wiki", path: wiki_path, icon: :book_open, policy_ok: WikiPagePolicy.new(current_user, :wiki_page).index? },
           { key: :audit, label: "Auditoria", path: audits_path, icon: :document_text, policy_ok: policy(:audit).index? },
           { key: :erp_export, label: "Exporta ERP", icon: :circle_stack, disabled: true, policy_ok: true }
