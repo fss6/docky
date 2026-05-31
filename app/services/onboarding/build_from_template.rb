@@ -33,6 +33,8 @@ module Onboarding
         )
       end
 
+      EnsureClientFolder.call(client: @client, account: @account)
+
       checklist
     end
   end

@@ -47,7 +47,7 @@ module Seeds
           client = upsert_client!(account: account, sequence: sequence, onboarding: onboarding)
           seeded_clients += 1 if client.previous_changes.key?("id")
 
-          seeded_folders += seed_folders_for!(client)
+          seeded_folders += seed_folders_for!(client, onboarding: onboarding)
           seed_client_checklist_items_for!(client)
           seeded_periods += seed_periods_for!(client, owner: owner)
           seeded_invites += seed_upload_invites_for!(client, owner: owner)
@@ -128,14 +128,23 @@ module Seeds
       lines.join("\n")
     end
 
-    def seed_folders_for!(client)
+    def seed_folders_for!(client, onboarding:)
       folders_created = 0
-      folder_names = [
-        "Recebidos #{Date.current.year}",
-        "Fiscal #{Date.current.year}",
-        "Financeiro #{Date.current.year}",
-        "Documentos societarios"
-      ]
+      folder_names = if onboarding
+        [
+          I18n.t("folders.onboarding.name"),
+          "Fiscal #{Date.current.year}",
+          "Financeiro #{Date.current.year}",
+          "Documentos societarios"
+        ]
+      else
+        [
+          "Recebidos #{Date.current.year}",
+          "Fiscal #{Date.current.year}",
+          "Financeiro #{Date.current.year}",
+          "Documentos societarios"
+        ]
+      end
 
       folder_names.each do |folder_name|
         folder = Folder.find_or_initialize_by(account_id: client.account_id, client_id: client.id, name: folder_name)

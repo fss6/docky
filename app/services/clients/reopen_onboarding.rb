@@ -31,6 +31,8 @@ module Clients
 
         @client.update!(status: :onboarding)
 
+        Onboarding::EnsureClientFolder.call(client: @client, account: @account)
+
         AuditEvents::Recorder.call(
           account: @account,
           user: @user,

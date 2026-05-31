@@ -156,6 +156,7 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to public_onboarding_upload_path(token: invite.token)
     document = Document.order(:created_at).last
     assert_equal "onboarding_extra", document.metadata["upload_source"]
+    assert_equal I18n.t("folders.onboarding.name"), document.folder.name
     assert document.content_sha256.present?
     assert_equal "pending", document.status
   end
@@ -172,6 +173,8 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
          params: { onboarding_checklist_item_id: item.id, document: { file: file } }
 
     assert_redirected_to public_onboarding_upload_path(token: invite.token)
+    document = Document.order(:created_at).last
+    assert_equal I18n.t("folders.onboarding.name"), document.folder.name
     assert invite.reload.active?
     assert client.reload.onboarding?
   end

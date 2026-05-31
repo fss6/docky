@@ -100,7 +100,7 @@ class PublicFolderUploadsController < ApplicationController
       return
     end
 
-    folder = ensure_client_folder!
+    folder = Onboarding::EnsureClientFolder.call(client: @client, account: @account)
     document = folder.documents.build
     document.file.attach(file)
     document.assign_attributes(
@@ -318,17 +318,5 @@ class PublicFolderUploadsController < ApplicationController
 
   def render_expired_link(status:)
     render :expired, status: status
-  end
-
-  def ensure_client_folder!
-    folder = @client.folders.visible.first
-    return folder if folder
-
-    Folder.create!(
-      account: @account,
-      client: @client,
-      name: "Documentos",
-      visible: true
-    )
   end
 end

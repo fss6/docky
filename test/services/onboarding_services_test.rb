@@ -13,6 +13,31 @@ class OnboardingServicesTest < ActiveSupport::TestCase
     assert_equal 7, client.onboarding_checklist.items.count
   end
 
+  test "build from template creates onboarding folder" do
+    client = create_onboarding_client
+    folder = client.folders.find_by(name: I18n.t("folders.onboarding.name"))
+
+    assert folder
+    assert folder.visible?
+  end
+
+  test "ensure client folder reuses onboarding folder when other visible folders exist" do
+    client = create_onboarding_client
+    ActsAsTenant.with_tenant(client.account) do
+      Folder.create!(
+        account: client.account,
+        client: client,
+        name: "Recebidos #{Date.current.year}",
+        visible: true
+      )
+
+      folder = Onboarding::EnsureClientFolder.call(client: client, account: client.account)
+
+      assert_equal I18n.t("folders.onboarding.name"), folder.name
+      assert_equal 1, client.folders.where(name: I18n.t("folders.onboarding.name")).count
+    end
+  end
+
   test "migration template has more items" do
     client = create_onboarding_client(onboarding_kind: "migration")
     assert_equal 12, client.onboarding_checklist.items.count

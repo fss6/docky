@@ -492,6 +492,8 @@ pt-BR:
       platform_footer: "Este e-mail foi enviado automaticamente pela plataforma Dokivo."
 
   folders:
+    onboarding:
+      name: Documentos do onboarding
     tab_description: Organize documentos permanentes do cliente em pastas — contratos, certidões e arquivos que não pertencem a um mês específico.
     drawer:
       close: Fechar pasta

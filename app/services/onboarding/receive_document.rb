@@ -15,7 +15,7 @@ module Onboarding
     end
 
     def call
-      folder = ensure_client_folder!
+      folder = EnsureClientFolder.call(client: @client, account: @account)
 
       document = folder.documents.build
       document.file.attach(@file)
@@ -40,20 +40,6 @@ module Onboarding
       Documents::ProcessAfterUpload.call(document: document, file_io: @file)
 
       document
-    end
-
-    private
-
-    def ensure_client_folder!
-      folder = @client.folders.visible.first
-      return folder if folder
-
-      Folder.create!(
-        account: @account,
-        client: @client,
-        name: "Documentos",
-        visible: true
-      )
     end
   end
 end
