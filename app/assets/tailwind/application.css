@@ -206,6 +206,18 @@ body[data-toast-layout="minimal"] .notyf {
     @apply h-20 w-20 text-xl;
   }
 
+  .account-logo {
+    @apply flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-client-accent font-semibold text-white;
+  }
+
+  .account-logo--sm {
+    @apply h-8 w-8 text-xs;
+  }
+
+  .account-logo--lg {
+    @apply h-20 w-20 text-xl;
+  }
+
   .client-badge-vincular {
     @apply inline-flex cursor-pointer list-none items-center gap-1 rounded-full border border-client-accent bg-white px-2.5 py-1 text-xs font-semibold text-client-accent [&::-webkit-details-marker]:hidden;
   }

@@ -34,7 +34,7 @@ en:
     flashes:
       updated: Profile updated successfully.
     title_suffix: " · Dokivo"
-    breadcrumb: Account
+    breadcrumb: Profile
     edit:
       title: Edit profile
       subtitle: Update your name, email, and photo.
@@ -48,6 +48,35 @@ en:
       edit: Edit profile
     errors:
       avatar_invalid: must be JPG, PNG, or WebP up to 2 MB
+
+  account_profiles:
+    flashes:
+      updated: Account profile updated successfully.
+    title_suffix: " · Dokivo"
+    breadcrumb: Account
+    edit:
+      title: Account profile
+      subtitle: Update your account details.
+    form:
+      logo: Account logo
+      logo_hint: JPG, PNG, or WebP. Maximum 2 MB.
+      remove_logo: Remove logo
+      contact_email: Contact email
+      section_account: Account details
+      cancel: Cancel
+      submit: Save profile
+    menu:
+      edit: Account profile
+    subscription:
+      heading: Plan and subscription
+      read_only_hint: Billing information is read-only.
+      plan: Plan
+      status: Status
+      period_end: Renewal
+      trial_ends: Trial ends
+      none: —
+    errors:
+      logo_invalid: must be JPG, PNG, or WebP up to 2 MB
 
   number:
     currency:

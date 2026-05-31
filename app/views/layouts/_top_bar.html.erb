@@ -100,6 +100,12 @@
         <%= heroicon "user", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-zinc-500", "aria-hidden": "true" } %>
         <span><%= t("profiles.menu.edit") %></span>
       <% end %>
+      <% if policy(:account_profile).edit? %>
+        <%= link_to edit_account_profile_path, class: "flex w-full items-center gap-2 px-4 py-2 text-sm text-zinc-700 no-underline transition-colors hover:bg-zinc-50" do %>
+          <%= heroicon "building-office", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-zinc-500", "aria-hidden": "true" } %>
+          <span><%= t("account_profiles.menu.edit") %></span>
+        <% end %>
+      <% end %>
       <% if policy(Setting).show? %>
         <%= link_to settings_path, class: "flex w-full items-center gap-2 px-4 py-2 text-sm text-zinc-700 no-underline transition-colors hover:bg-zinc-50" do %>
           <%= heroicon "cog-6-tooth", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-zinc-500", "aria-hidden": "true" } %>

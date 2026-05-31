@@ -82,6 +82,7 @@ Rails.application.routes.draw do
   get "wiki/:slug", to: "wiki_pages#show", as: :wiki_page, constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   resource :settings, only: :show
   resource :profile, only: %i[edit update]
+  resource :account_profile, only: %i[edit update]
   namespace :settings do
     resource :permissions, only: %i[show update]
     resource :ai_settings, only: %i[edit update]

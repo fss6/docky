@@ -2,13 +2,14 @@
 #
 # Table name: accounts
 #
-#  id          :bigint           not null, primary key
-#  active      :boolean
-#  description :text
-#  name        :string
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  plan_id     :bigint           not null
+#  id            :bigint           not null, primary key
+#  active        :boolean
+#  contact_email :string
+#  description   :text
+#  name          :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  plan_id       :bigint           not null
 #
 # Indexes
 #
@@ -21,9 +22,12 @@
 class Account < ApplicationRecord
   belongs_to :plan
 
+  has_one_attached :logo
+
   has_many :users, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :conversations, dependent: :destroy
+  has_many :subscriptions, dependent: :destroy
   has_one :setting, dependent: :destroy
   has_many :wiki_pages, dependent: :destroy
   has_many :wiki_logs, dependent: :destroy
@@ -42,6 +46,9 @@ class Account < ApplicationRecord
   has_many :onboarding_templates, dependent: :destroy
   has_many :permission_grants, class_name: "AccountPermissionGrant", dependent: :destroy
 
+  validates :contact_email, format: { with: Devise.email_regexp }, allow_blank: true
+  validate :acceptable_logo, if: -> { logo.attached? && logo.changed? }
+
   after_create :create_default_setting!
   after_create :seed_default_permission_grants!
   after_create :seed_default_institutions!
@@ -51,7 +58,21 @@ class Account < ApplicationRecord
     setting&.generate_tags_automatically == true
   end
 
+  def current_subscription
+    subscriptions.where(status: %w[trialing active]).order(created_at: :desc).first
+  end
+
+  def remove_logo=(value)
+    logo.purge if ActiveModel::Type::Boolean.new.cast(value)
+  end
+
   private
+
+  def acceptable_logo
+    return if Accounts::LogoUpload.allowed_blob?(logo.blob)
+
+    errors.add(:logo, Accounts::LogoUpload.validation_error_message)
+  end
 
   def create_default_setting!
     create_setting! unless setting

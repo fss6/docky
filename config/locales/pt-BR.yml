@@ -109,6 +109,10 @@ pt-BR:
         one: Conta
         other: Contas
     attributes:
+      account:
+        name: Nome
+        description: Descrição
+        contact_email: E-mail de contato
       user:
         name: Nome
         email: E-mail
@@ -126,6 +130,14 @@ pt-BR:
           member: Membro
           owner: Administrador da conta
           administrator: Administrador do sistema
+      subscription:
+        status:
+          trialing: Em trial
+          active: Ativa
+          past_due: Pagamento pendente
+          unpaid: Não paga
+          canceled: Cancelada
+          expired: Expirada
     errors:
       models:
         user:
@@ -160,7 +172,7 @@ pt-BR:
     flashes:
       updated: Perfil atualizado com sucesso.
     title_suffix: " · Dokivo"
-    breadcrumb: Conta
+    breadcrumb: Perfil
     edit:
       title: Editar perfil
       subtitle: Atualize seu nome, e-mail e foto.
@@ -171,9 +183,38 @@ pt-BR:
       cancel: Cancelar
       submit: Salvar perfil
     menu:
-      edit: Editar perfil
+      edit: Perfil do usuário
     errors:
       avatar_invalid: deve ser JPG, PNG ou WebP com no máximo 2 MB
+
+  account_profiles:
+    flashes:
+      updated: Perfil da conta atualizado com sucesso.
+    title_suffix: " · Dokivo"
+    breadcrumb: Conta
+    edit:
+      title: Perfil da conta
+      subtitle: Atualize os dados da sua conta.
+    form:
+      logo: Logo da conta
+      logo_hint: JPG, PNG ou WebP. Máximo 2 MB.
+      remove_logo: Remover logo
+      contact_email: E-mail de contato
+      section_account: Dados da conta
+      cancel: Cancelar
+      submit: Salvar perfil
+    menu:
+      edit: Perfil da conta
+    subscription:
+      heading: Plano e assinatura
+      read_only_hint: Informações de cobrança são somente leitura.
+      plan: Plano
+      status: Status
+      period_end: Renovação
+      trial_ends: Fim do trial
+      none: —
+    errors:
+      logo_invalid: deve ser JPG, PNG ou WebP com no máximo 2 MB
 
   users:
     flashes:

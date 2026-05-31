@@ -1,0 +1,29 @@
+<% subscription = account.current_subscription %>
+
+<div class="h-full rounded-lg border border-zinc-200 bg-zinc-50/80 px-4 py-5 sm:px-5">
+  <p class="text-sm font-semibold text-zinc-900"><%= t("account_profiles.subscription.heading") %></p>
+  <p class="mt-1 text-sm text-zinc-500"><%= t("account_profiles.subscription.read_only_hint") %></p>
+
+  <dl class="mt-5 space-y-4">
+    <div>
+      <dt class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("account_profiles.subscription.plan") %></dt>
+      <dd class="mt-1 text-sm font-medium text-zinc-900"><%= account.plan&.name.presence || t("account_profiles.subscription.none") %></dd>
+    </div>
+    <div>
+      <dt class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("account_profiles.subscription.status") %></dt>
+      <dd class="mt-1 text-sm font-medium text-zinc-900"><%= subscription_status_label(subscription) %></dd>
+    </div>
+    <div>
+      <dt class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("account_profiles.subscription.period_end") %></dt>
+      <dd class="mt-1 text-sm font-medium text-zinc-900">
+        <%= subscription&.current_period_end ? l(subscription.current_period_end, format: :long) : t("account_profiles.subscription.none") %>
+      </dd>
+    </div>
+    <div>
+      <dt class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("account_profiles.subscription.trial_ends") %></dt>
+      <dd class="mt-1 text-sm font-medium text-zinc-900">
+        <%= subscription&.trial_ends_at ? l(subscription.trial_ends_at, format: :long) : t("account_profiles.subscription.none") %>
+      </dd>
+    </div>
+  </dl>
+</div>
