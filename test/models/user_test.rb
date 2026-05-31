@@ -121,4 +121,45 @@ class UserTest < ActiveSupport::TestCase
     assert user.founding_user?
     assert user.role_owner?
   end
+
+  test "accepts valid avatar" do
+    user = users(:three)
+    file = Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/files/avatar.png"), "image/png")
+    user.avatar = file
+
+    assert user.valid?, user.errors.full_messages.to_sentence
+  end
+
+  test "rejects invalid avatar content type" do
+    user = users(:three)
+    file = Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/files/minimal.pdf"), "application/pdf")
+    user.avatar = file
+
+    assert_not user.valid?
+    assert_includes user.errors[:avatar], Users::AvatarUpload.validation_error_message
+  end
+
+  test "rejects avatar larger than 2 MB" do
+    user = users(:three)
+    large_io = StringIO.new("x" * (2.megabytes + 1))
+    file = Rack::Test::UploadedFile.new(large_io, "image/png", original_filename: "large.png")
+    user.avatar = file
+
+    assert_not user.valid?
+    assert_includes user.errors[:avatar], Users::AvatarUpload.validation_error_message
+  end
+
+  test "remove_avatar purges attachment" do
+    user = users(:three)
+    user.avatar.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/avatar.png")),
+      filename: "avatar.png",
+      content_type: "image/png"
+    )
+
+    user.remove_avatar = "1"
+    user.valid?
+
+    assert_not user.avatar.attached?
+  end
 end

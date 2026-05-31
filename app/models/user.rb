@@ -59,6 +59,8 @@ class User < ApplicationRecord
   has_many :group_memberships, dependent: :destroy
   has_many :groups, through: :group_memberships
 
+  has_one_attached :avatar
+
   before_validation :assign_founding_user, on: :create
   before_validation :enforce_founding_user_defaults, on: :create
 
@@ -69,6 +71,7 @@ class User < ApplicationRecord
   validate :founding_user_must_be_owner, on: :create
   validate :updater_cannot_change_own_role, on: :update
   validate :account_owner_invariants, on: :update
+  validate :acceptable_avatar, if: -> { avatar.attached? && avatar.changed? }
 
   enum :role, {
     member: "member", # Membro da conta
@@ -116,7 +119,17 @@ class User < ApplicationRecord
     keys.map { |key| [ I18n.t("activerecord.enums.user.role.#{key}"), key ] }
   end
 
+  def remove_avatar=(value)
+    avatar.purge if ActiveModel::Type::Boolean.new.cast(value)
+  end
+
   private
+
+  def acceptable_avatar
+    return if Users::AvatarUpload.allowed_blob?(avatar.blob)
+
+    errors.add(:avatar, Users::AvatarUpload.validation_error_message)
+  end
 
   def assign_founding_user
     return unless account

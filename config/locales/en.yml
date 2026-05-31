@@ -30,6 +30,25 @@
 en:
   hello: "Hello world"
 
+  profiles:
+    flashes:
+      updated: Profile updated successfully.
+    title_suffix: " · Dokivo"
+    breadcrumb: Account
+    edit:
+      title: Edit profile
+      subtitle: Update your name, email, and photo.
+    form:
+      avatar: Profile photo
+      avatar_hint: JPG, PNG, or WebP. Maximum 2 MB.
+      remove_avatar: Remove photo
+      cancel: Cancel
+      submit: Save profile
+    menu:
+      edit: Edit profile
+    errors:
+      avatar_invalid: must be JPG, PNG, or WebP up to 2 MB
+
   number:
     currency:
       format:

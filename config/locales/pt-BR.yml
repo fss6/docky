@@ -156,6 +156,25 @@ pt-BR:
     user:
       role_prompt: Selecione uma função
 
+  profiles:
+    flashes:
+      updated: Perfil atualizado com sucesso.
+    title_suffix: " · Dokivo"
+    breadcrumb: Conta
+    edit:
+      title: Editar perfil
+      subtitle: Atualize seu nome, e-mail e foto.
+    form:
+      avatar: Foto de perfil
+      avatar_hint: JPG, PNG ou WebP. Máximo 2 MB.
+      remove_avatar: Remover foto
+      cancel: Cancelar
+      submit: Salvar perfil
+    menu:
+      edit: Editar perfil
+    errors:
+      avatar_invalid: deve ser JPG, PNG ou WebP com no máximo 2 MB
+
   users:
     flashes:
       created: "Usuário criado com sucesso. Enviamos um e-mail com o link para definir a senha."

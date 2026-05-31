@@ -1,0 +1,13 @@
+<% content_for :title, t("profiles.edit.title") + t("profiles.title_suffix") %>
+
+<div class="mx-auto max-w-xl space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent"><%= t("profiles.breadcrumb") %></p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl"><%= t("profiles.edit.title") %></h1>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600"><%= t("profiles.edit.subtitle") %></p>
+  </header>
+
+  <div class="app-card p-6 sm:p-8">
+    <%= render "form", user: @user %>
+  </div>
+</div>
