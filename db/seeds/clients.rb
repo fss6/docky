@@ -104,7 +104,7 @@ module Seeds
 
     def upsert_client!(account:, sequence:, onboarding:)
       suffix = format("%02d", sequence)
-      tax_id = format("9000000000%04d", sequence)
+      tax_id = seed_cnpj_for(sequence)
       template_kind = ONBOARDING_TEMPLATE_KINDS[sequence % ONBOARDING_TEMPLATE_KINDS.size]
       template = account.onboarding_templates.find_by(kind: template_kind) if onboarding
 
@@ -273,6 +273,19 @@ module Seeds
       end
 
       1
+    end
+
+    def seed_cnpj_for(sequence)
+      base = format("90000000%04d", sequence)
+      first_digit = cnpj_check_digit(base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+      second_digit = cnpj_check_digit("#{base}#{first_digit}", [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+      "#{base}#{first_digit}#{second_digit}"
+    end
+
+    def cnpj_check_digit(body, weights)
+      sum = body.chars.each_with_index.sum { |digit, index| digit.to_i * weights[index] }
+      remainder = sum % 11
+      remainder < 2 ? 0 : 11 - remainder
     end
   end
 end

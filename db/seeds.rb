@@ -29,7 +29,7 @@ if Rails.env.development?
 
     client = Client.find_or_initialize_by(account: account, name: "Pão de Forma LTDA")
     client.assign_attributes(
-      tax_id: "12345678901234",
+      tax_id: "19131243000197",
       email: "contato@paodeforma.test"
     )
     client.save!
