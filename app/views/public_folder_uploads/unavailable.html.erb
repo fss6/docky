@@ -1,9 +1,9 @@
 <% content_for :title, "Envio indisponível · Dokivo" %>
 
 <section class="app-card mx-auto w-full max-w-xl overflow-hidden">
-  <% if @account_name.present? %>
+  <% if @portal_account.present? %>
     <div class="border-b border-zinc-100 px-5 py-4 sm:px-6">
-      <%= render "public_folder_uploads/portal_header", account_name: @account_name %>
+      <%= render "public_folder_uploads/portal_header", account: @portal_account %>
     </div>
   <% end %>
 

@@ -1,4 +1,4 @@
 <div class="flex items-center justify-center gap-2.5">
-  <%= image_tag "/brand/logo.svg", alt: "Dokivo", class: "h-6 w-6 shrink-0 opacity-70" %>
-  <p class="text-base font-semibold text-zinc-900"><%= account_name %></p>
+  <%= client_facing_account_logo(account) %>
+  <p class="text-base font-semibold text-zinc-900"><%= account.name %></p>
 </div>

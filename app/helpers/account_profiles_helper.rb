@@ -24,6 +24,21 @@ module AccountProfilesHelper
     account.logo.attached? && account.logo.blob&.persisted?
   end
 
+  def client_facing_account_logo(account, size: :sm)
+    size_class = size == :lg ? "client-brand-logo--lg" : "client-brand-logo--sm"
+    base_class = "client-brand-logo #{size_class}"
+
+    if account_logo_displayable?(account)
+      image_tag account.logo,
+                alt: account.name,
+                class: "#{base_class} object-contain"
+    else
+      image_tag "/brand/logo.svg",
+                alt: "Dokivo",
+                class: "#{base_class} opacity-70"
+    end
+  end
+
   def subscription_status_label(subscription)
     return t("account_profiles.subscription.none") if subscription.blank?
 

@@ -218,6 +218,18 @@ body[data-toast-layout="minimal"] .notyf {
     @apply h-20 w-20 text-xl;
   }
 
+  .client-brand-logo {
+    @apply shrink-0;
+  }
+
+  .client-brand-logo--sm {
+    @apply h-6 w-6;
+  }
+
+  .client-brand-logo--lg {
+    @apply h-10 w-10;
+  }
+
   .client-badge-vincular {
     @apply inline-flex cursor-pointer list-none items-center gap-1 rounded-full border border-client-accent bg-white px-2.5 py-1 text-xs font-semibold text-client-accent [&::-webkit-details-marker]:hidden;
   }

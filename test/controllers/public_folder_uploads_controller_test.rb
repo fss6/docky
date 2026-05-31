@@ -36,6 +36,8 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match @account.name, response.body
+    assert_match 'alt="Dokivo"', response.body
+    assert_match "/brand/logo.svg", response.body
     assert_match "Enviando para", response.body
     assert_match @period_label, response.body
     assert_match "Envie seus documentos", response.body
@@ -48,6 +50,37 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
     assert_match "text-emerald-500", response.body
     assert_no_match "portal-upload-banner", response.body
     assert_no_match "competência", response.body.downcase
+  end
+
+  test "show renders account logo when attached" do
+    ActsAsTenant.with_tenant(@account) do
+      @account.logo.attach(
+        io: File.open(Rails.root.join("test/fixtures/files/avatar.png")),
+        filename: "logo.png",
+        content_type: "image/png"
+      )
+    end
+
+    get public_folder_upload_url(token: @invite.token)
+
+    assert_response :success
+    assert_match @account.name, response.body
+    assert_match "/rails/active_storage/", response.body
+    assert_no_match 'alt="Dokivo"', response.body
+  end
+
+  test "onboarding renders portal header with account branding" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+
+    get public_onboarding_upload_url(token: invite.token)
+
+    assert_response :success
+    assert_match @account.name, response.body
+    assert_match 'alt="Dokivo"', response.body
+    assert_match "Vamos configurar sua conta?", response.body
   end
 
   test "show renders unavailable when period does not exist" do

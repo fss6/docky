@@ -196,7 +196,6 @@ class PublicFolderUploadsController < ApplicationController
     @checklist = @client.onboarding_checklist
     @onboarding_items = @checklist&.items&.ordered || []
     @progress = @checklist ? Onboarding::Progress.call(checklist: @checklist) : nil
-    @account_name = @account.name
   end
 
   def ensure_period_allows_upload!
@@ -204,7 +203,7 @@ class PublicFolderUploadsController < ApplicationController
 
     if @period_record.blank?
       @blocked_message = PublicUploads::BlockedMessage.for(kind: :period_missing)
-      load_portal_account_name
+      load_portal_account
       return render :unavailable, status: :ok
     end
 
@@ -212,17 +211,17 @@ class PublicFolderUploadsController < ApplicationController
     return if guard.allowed
 
     @blocked_message = PublicUploads::BlockedMessage.for(kind: :period_closed, period: @period)
-    load_portal_account_name
+    load_portal_account
     render :unavailable, status: :ok
   end
 
-  def load_portal_account_name
-    @account_name = @upload_invite&.account&.name || @folder&.account&.name
+  def load_portal_account
+    @portal_account = @upload_invite&.account || @folder&.account
   end
 
   def load_monthly_portal_context
     @period_label = PeriodFormatting.display_label(@period) if @period.present?
-    load_portal_account_name
+    load_portal_account
     @pending_checklist_items = @period_record&.items&.select(&:awaiting_receipt?) || []
     @recent_public_documents = recent_public_documents
   end
