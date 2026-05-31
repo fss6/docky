@@ -154,7 +154,7 @@ export default class extends Controller {
   inviteSuccessMessage() {
     const url = this.createUrlValue || ""
     if (url.includes("onboarding_upload_invites")) {
-      return "Link de onboarding gerado."
+      return "Link para o cliente gerado."
     }
     return "Link gerado com sucesso."
   }

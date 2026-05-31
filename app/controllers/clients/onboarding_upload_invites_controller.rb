@@ -15,7 +15,7 @@ module Clients
 
       respond_to do |format|
         format.html do
-          redirect_to @client, notice: "Link de onboarding gerado."
+          redirect_to @client, notice: "Link para o cliente gerado."
         end
         format.json do
           render json: {

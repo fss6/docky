@@ -30,7 +30,7 @@
       <% unless client.archived? %>
       <button type="button" class="app-btn-secondary inline-flex items-center gap-2" data-action="click->share-link-modal#open">
         <%= heroicon "link", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
-        Link de onboarding
+        Gerar link para o cliente
       </button>
       <% end %>
       <%= render "clients/show/configure_menu", client: client, variant: :onboarding %>

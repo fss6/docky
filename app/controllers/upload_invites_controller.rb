@@ -12,7 +12,7 @@ class UploadInvitesController < ApplicationController
     end
 
     if @client.onboarding?
-      return redirect_to @client, alert: "Use o link de onboarding nesta fase.", status: :see_other
+      return redirect_to @client, alert: "Use o link para o cliente nesta fase.", status: :see_other
     end
 
     @period = parse_period_param(params[:period]) || Date.current.beginning_of_month
