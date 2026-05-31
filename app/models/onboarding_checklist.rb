@@ -40,8 +40,6 @@ class OnboardingChecklist < ApplicationRecord
   validates :started_at, presence: true
   validates :client_id, uniqueness: true
 
-  scope :stale, ->(days = 30) { in_progress.where(started_at: ...days.days.ago) }
-
   def all_items_complete?
     items.exists? && items.where.not(state: %w[received validated]).none?
   end

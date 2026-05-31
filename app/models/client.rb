@@ -67,10 +67,6 @@ class Client < ApplicationRecord
 
   scope :kept, -> { where(archived_at: nil) }
 
-  scope :onboarding_stale, ->(days = 30) {
-    onboarding.joins(:onboarding_checklist).merge(OnboardingChecklist.stale(days))
-  }
-
   scope :search_q, ->(q) {
     term = q.to_s.strip
     next all if term.blank?

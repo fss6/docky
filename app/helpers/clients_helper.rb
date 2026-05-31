@@ -13,7 +13,7 @@ module ClientsHelper
     if client.archived?
       tag.span(t("clients.archived.badge"), class: client_archived_badge_classes)
     elsif client.onboarding?
-      tag.span("Em onboarding", class: client_onboarding_badge_classes(stale: client_onboarding_stale?(client)))
+      tag.span("Em onboarding", class: client_onboarding_badge_classes)
     else
       tag.span("Ativo", class: "inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20")
     end
@@ -256,19 +256,8 @@ module ClientsHelper
     )
   end
 
-  def client_onboarding_badge_classes(stale: false)
-    if stale
-      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-50 text-red-800 ring-1 ring-inset ring-red-600/20"
-    else
-      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold client-onboarding-badge ring-1 ring-inset ring-violet-600/20"
-    end
-  end
-
-  def client_onboarding_stale?(client)
-    return false unless client.onboarding?
-
-    checklist = client.onboarding_checklist
-    checklist.present? && checklist.started_at <= 30.days.ago
+  def client_onboarding_badge_classes
+    "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold client-onboarding-badge ring-1 ring-inset ring-violet-600/20"
   end
 
   def client_onboarding_start_confirm_modal_data(client:)
