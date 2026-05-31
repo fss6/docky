@@ -22,7 +22,7 @@
           <%= link_to "Instituições", institutions_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <% end %>
         <% if policy(Conversation).index? %>
-          <%= link_to "Chat", chat_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
+          <%= link_to "Assistente IA", chat_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>
         <% end %>
         <% if policy(Group).index? %>
           <%= link_to "Grupos", groups_path, class: "block px-4 py-2 text-sm text-zinc-700 no-underline hover:bg-zinc-50" %>

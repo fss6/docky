@@ -10,7 +10,7 @@ module Rag
         <<~TXT.strip
           Sou o assistente Dokivo desta conta. Não sou uma pessoa: sou o assistente configurado para ajudar você a consultar os documentos indexados aqui.
 
-          Posso responder perguntas com base nesses arquivos, resumir trechos, localizar cláusulas, valores ou prazos, e citar a fonte (arquivo e página) quando uso o conteúdo dos documentos.
+          Posso responder perguntas com base nesses arquivos, resumir trechos, localizar cláusulas, valores ou prazos. As fontes utilizadas aparecem no painel de contexto ao lado da conversa.
 
           O que você gostaria de saber sobre os seus documentos?
         TXT
@@ -23,7 +23,7 @@ module Rag
           - Consultas sobre o conteúdo dos documentos desta conta (só uso o que foi enviado e indexado)
           - Resumos e sínteses de trechos ou temas presentes nos arquivos
           - Localização de informações (cláusulas, prazos, valores, definições) dentro dos textos
-          - Citações: quando a resposta vem de um documento, indico arquivo e página
+          - Rastreabilidade: as fontes e trechos dos documentos aparecem no painel de contexto
 
           Faça uma pergunta objetiva sobre o que está nos seus documentos — por exemplo sobre um contrato, cláusula ou dado que você sabe que enviou.
         TXT
@@ -48,13 +48,81 @@ module Rag
     end
 
     # :greeting tratado em Rag::GreetingMessage antes de chamar #kind para título/RAG.
-    def self.kind(text)
+    def self.kind(text, conversation: nil, user_message: nil)
       return :greeting if GreetingMessage.only?(text)
       return :meta_identity if meta_identity?(text)
       return :meta_capabilities if meta_capabilities?(text)
       return :out_of_scope if out_of_scope?(text)
+      return :tabular if tabular_request?(text, conversation: conversation, user_message: user_message)
 
       :document
+    end
+
+    TABULAR_ERROR_SNIPPET = "Não foi possível gerar a tabela"
+
+    def self.tabular_request?(text, conversation: nil, user_message: nil)
+      t = text.to_s.strip
+      return false if t.blank? || t.length > 800
+      return true if direct_tabular_request?(t)
+
+      conversation.present? && user_message.present? &&
+        tabular_follow_up?(t) &&
+        tabular_context_in_conversation?(conversation, before_message_id: user_message.id)
+    end
+
+    def self.direct_tabular_request?(text)
+      t = text.to_s.strip
+      return false if t.blank?
+
+      TABULAR_REQUEST_PATTERNS.any? { |re| t.match?(re) }
+    end
+
+    # Pergunta efectiva para o LLM quando o utilizador só diz "gere" após pedido de tabela.
+    def self.tabular_effective_question(user_message, conversation)
+      current = user_message.content.to_s.strip
+      return current if direct_tabular_request?(current)
+
+      prior = conversation.messages
+        .where(role: "user")
+        .where("id < ?", user_message.id)
+        .order(id: :desc)
+        .find { |m| direct_tabular_request?(m.content) }
+
+      return current if prior.blank?
+
+      "#{prior.content}\n\n(Continuação: #{current})"
+    end
+
+    def self.tabular_follow_up?(text)
+      t = text.to_s.strip
+      return false if t.blank? || t.length > 120
+
+      TABULAR_FOLLOW_UP_PATTERNS.any? { |re| t.match?(re) }
+    end
+
+    def self.tabular_context_in_conversation?(conversation, before_message_id:)
+      conversation.messages
+        .where("id < ?", before_message_id)
+        .order(id: :desc)
+        .limit(8)
+        .any? { |m| tabular_context_message?(m) }
+    end
+
+    def self.tabular_context_message?(message)
+      if message.user?
+        direct_tabular_request?(message.content)
+      else
+        assistant_tabular_context?(message)
+      end
+    end
+
+    def self.assistant_tabular_context?(message)
+      return true if message.structured_tables.any?
+
+      meta = message.metadata
+      return true if meta.is_a?(Hash) && Array(meta["tables"]).any?
+
+      message.content.to_s.include?(TABULAR_ERROR_SNIPPET)
     end
 
     def self.skip_title_generation?(text)
@@ -101,6 +169,32 @@ module Rag
       /\A\s*what\s+can\s+you\s+do\b/i,
       /\A\s*how\s+does\s+(it|this)\s+work\b/i,
       /\A\s*help\s*[!?.]*\s*\z/i
+    ].freeze
+
+    TABULAR_REQUEST_PATTERNS = [
+      /\btabela\b/i,
+      /\bem\s+formato\s+de\s+tabela\b/i,
+      /\borganiz(e|ar)\s+em\s+colunas\b/i,
+      /\bgere.*\btabela\b/i,
+      /\bmostre.*\btabela\b/i,
+      /\bapresente.*\btabela\b/i,
+      /\bformato\s+tabular\b/i,
+      /\bem\s+colunas\s+e\s+linhas\b/i,
+      /\bpreciso\s+ver.*\btabela\b/i,
+      /\bdados\s+em\s+tabela\b/i,
+      /\bver.*\bem\s+tabela\b/i,
+      /\bem\s+colunas\b/i,
+      /\bgerar?\s+.*\btabela\b/i
+    ].freeze
+
+    TABULAR_FOLLOW_UP_PATTERNS = [
+      /\A\s*gere?\s*[!?.]*\s*\z/i,
+      /\A\s*gera(r)?\s*(de\s+)?novo\s*[!?.]*\s*\z/i,
+      /\A\s*tenta(r)?\s+(de\s+)?novo\s*[!?.]*\s*\z/i,
+      /\A\s*sim\s*[!?.]*\s*\z/i,
+      /\A\s*ok\s*[!?.]*\s*\z/i,
+      /\A\s*pode\s+gerar\s*[!?.]*\s*\z/i,
+      /\A\s*gera(r)?\s*[!?.]*\s*\z/i
     ].freeze
 
     OUT_OF_SCOPE_PATTERNS = [

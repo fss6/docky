@@ -40,6 +40,7 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 
+gem "redis", "~> 5.0"
 gem 'sidekiq', '~> 8.1', '>= 8.1.2'
 gem "sidekiq-cron", "~> 2.3"
 gem "aws-sdk-s3", require: false
@@ -80,6 +81,7 @@ group :test do
   gem "mocha", require: false
 end
 
+gem "commonmarker", "~> 2.0"
 gem "tailwindcss-rails", "~> 4.4"
 gem "heroicons", "~> 2.2"
 gem "audited", "~> 5.8"

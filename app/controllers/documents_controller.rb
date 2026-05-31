@@ -5,6 +5,8 @@ class DocumentsController < ApplicationController
   before_action :authorize_policy
 
   def show
+    @highlight_chunk_id = params[:highlight_chunk].presence&.to_i
+    @highlight_page = params[:page].presence&.to_i
   end
 
   def tags_search

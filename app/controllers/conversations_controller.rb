@@ -5,19 +5,19 @@ class ConversationsController < ApplicationController
   before_action :authorize_policy
 
   def index
-    @conversations = scoped_conversations.includes(:user).order(updated_at: :desc)
-    @sidebar_conversations = @conversations.limit(40)
+    @sidebar_conversations = scoped_conversations
+      .includes(:user)
+      .order(updated_at: :desc)
+      .limit(40)
   end
 
   def show
     @conversation = scoped_conversations.find(params.expect(:id))
-    @messages = @conversation.messages.order(:id)
+    @messages = @conversation.messages.order(:id).to_a
+    Messages::FinalizeStuckStreaming.call(@messages)
     @document_count = @account.documents.count
-    @focus_document_id = params[:focus_document_id].presence
-    @focus_document =
-      if @focus_document_id
-        @account.documents.with_attached_file.find_by(id: @focus_document_id)
-      end
+    @focus_document_id = params[:focus_document_id].presence || last_focus_document_id(@messages)
+    @focus_document = @account.documents.with_attached_file.find_by(id: @focus_document_id) if @focus_document_id
     @focus_document_id = nil if @focus_document.blank? && @focus_document_id.present?
 
     @sidebar_conversations = scoped_conversations
@@ -65,5 +65,9 @@ class ConversationsController < ApplicationController
 
   def redirect_back_or_root(alert:)
     redirect_back fallback_location: root_path, alert: alert
+  end
+
+  def last_focus_document_id(messages)
+    messages.reverse_each.filter_map(&:focus_document_id).first
   end
 end

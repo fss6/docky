@@ -1,6 +1,8 @@
 <%# locals: (conversation:, variant:) %>
 <% desktop = variant == :desktop %>
+<% title_text = conversation.title.presence || "Conversa ##{conversation.id}" %>
 <span
   id="<%= desktop ? dom_id(conversation, :sidebar_title_desktop) : dom_id(conversation, :sidebar_title_mobile) %>"
-  class="<%= desktop ? "line-clamp-2 font-medium leading-snug" : "line-clamp-2 font-medium" %>"
-><%= conversation.title.presence || "Conversa ##{conversation.id}" %></span>
+  class="<%= desktop ? "block truncate font-medium leading-snug" : "block truncate font-medium" %>"
+  title="<%= title_text %>"
+><%= title_text %></span>

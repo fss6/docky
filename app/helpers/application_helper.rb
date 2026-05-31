@@ -1,6 +1,11 @@
 module ApplicationHelper
   include AppConfirmModalHelper
 
+  MARKDOWN_ALLOWED_TAGS = %w[
+    p br strong em ul ol li h1 h2 h3 h4 table thead tbody tr th td a code pre blockquote
+  ].freeze
+  MARKDOWN_ALLOWED_ATTRIBUTES = %w[href].freeze
+
   def signup_disabled?
     Dokivo.signup_disabled?
   end
@@ -15,15 +20,40 @@ module ApplicationHelper
     controller_name == "conversations" && %w[index show].include?(action_name)
   end
 
-  # Renderiza conteúdo Markdown como HTML seguro (via elemento com data-markdown).
-  # A conversão acontece client-side via marked.js carregado no layout.
+  # Tipografia das respostas do assistente (alinhada ao wiki).
+  def chat_assistant_prose_classes
+    [
+      "chat-assistant-content",
+      "prose prose-sm sm:prose-base prose-zinc max-w-none",
+      "prose-headings:font-semibold prose-a:text-accent prose-code:text-sm"
+    ].join(" ")
+  end
+
+  # HTML seguro a partir de Markdown (chat do assistente).
+  def assistant_message_html(content)
+    markdown_html(content)
+  end
+
+  def assistant_structured_html(message)
+    return "".html_safe unless message.structured_components.any?
+
+    Messages::AiResponseRenderer.render(message.structured_components)
+  end
+
+  # Wiki e outros conteúdos longos em Markdown.
   def wiki_page_content_html(markdown_content)
     return "" if markdown_content.blank?
 
-    content_tag(:div,
-      markdown_content,
-      data: { markdown: true },
-      class: "wiki-markdown-content"
+    content_tag(:div, markdown_html(markdown_content), class: "wiki-markdown-content chat-assistant-content")
+  end
+
+  def markdown_html(content)
+    return "" if content.blank?
+
+    sanitize(
+      Messages::RenderMarkdown.call(content),
+      tags: MARKDOWN_ALLOWED_TAGS,
+      attributes: MARKDOWN_ALLOWED_ATTRIBUTES
     )
   end
 

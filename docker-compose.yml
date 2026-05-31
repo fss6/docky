@@ -21,9 +21,9 @@ services:
     depends_on:
       - postgres
       - redis
-    links:
-      - postgres
-      - redis
+    # links:
+    #   - postgres
+    #   - redis
     networks:
       - app
   minio:

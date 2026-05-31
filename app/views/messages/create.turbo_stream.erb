@@ -1,10 +1,11 @@
 <%= turbo_stream.append "messages", partial: "messages/message", locals: { message: @user_message, account: @account } %>
-<%= turbo_stream.append "messages", partial: "messages/thinking", locals: { message: @ai_message } %>
+<%= turbo_stream.append "messages", partial: "messages/message", locals: { message: @ai_message, account: @account } %>
+<%= turbo_stream.remove "chat-empty-state" %>
 <%= turbo_stream.replace "chat-form" do %>
   <div id="chat-form">
     <%= render "messages/chat_form",
           account: @account,
           conversation: @conversation,
-          focus_document_id: nil %>
+          focus_document_id: @focus_document_id %>
   </div>
 <% end %>

@@ -394,7 +394,7 @@ pt-BR:
         groups: Grupos
         users: Usuários
         settings: Configurações
-        conversations: Chat IA
+        conversations: Assistente IA
         wiki: Wiki
         audit: Auditoria
       capabilities:
@@ -597,7 +597,34 @@ pt-BR:
       body_suffix: " e os documentos vinculados serão removidos permanentemente. Esta ação não pode ser desfeita."
       confirm: Excluir pasta
 
+  messages:
+    chat:
+      assistant_name: "Assistente Dokivo"
+      thinking: "🧠 Analisando documentos..."
+      preparing_table: "Preparando a tabela…"
+      thinking_status:
+        brand: "Assistente Dokivo"
+        chunks_found:
+          one: "%{count} trecho relevante encontrado"
+          other: "%{count} trechos relevantes encontrados"
+        retrieving:
+          document:
+            primary: "Consultando os documentos…"
+          focus:
+            primary: "Analisando %{filename}…"
+          tabular:
+            primary: "Reunindo dados para a tabela…"
+        generating:
+          document:
+            primary: "Elaborando a resposta…"
+          focus:
+            primary: "Elaborando a resposta…"
+          tabular:
+            primary: "Preparando a tabela…"
+
   documents:
+    show:
+      open_pdf: "Abrir PDF"
     confirm_modal:
       heading: Excluir documento?
       body_prefix: "O documento "

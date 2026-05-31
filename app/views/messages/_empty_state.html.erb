@@ -1,0 +1,46 @@
+<%# locals: (focus_document: nil) %>
+<%
+  prompts = [
+    "Resuma os principais pontos deste documento.",
+    "Quais prazos e datas aparecem aqui?",
+    "Localize a cláusula que fala sobre obrigações e responsabilidades.",
+    "Explique este documento em linguagem simples."
+  ]
+  title = focus_document&.file&.attached? ? "Converse sobre #{focus_document.file.filename}" : "Comece uma nova conversa"
+  description =
+    if focus_document&.file&.attached?
+      "O assistente vai priorizar este arquivo nas respostas. Escolha uma sugestão abaixo ou faça sua própria pergunta."
+    else
+      "Pergunte sobre contratos, relatórios ou qualquer outro arquivo indexado da conta. Você também pode começar com uma das sugestões abaixo."
+    end
+%>
+
+<div
+  id="chat-empty-state"
+  data-chat-target="emptyState"
+  class="flex min-h-full flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200/80 bg-white/80 px-5 py-8 text-center shadow-sm"
+>
+  <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-accent shadow-sm ring-1 ring-teal-100">
+    <%= heroicon "sparkles", variant: :outline, options: { class: "h-6 w-6", "aria-hidden": "true" } %>
+  </div>
+
+  <h3 class="mt-4 text-base font-semibold tracking-tight text-zinc-900 sm:text-lg">
+    <%= title %>
+  </h3>
+  <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">
+    <%= description %>
+  </p>
+
+  <div class="mt-6 grid w-full max-w-3xl gap-3 sm:grid-cols-2">
+    <% prompts.each do |prompt| %>
+      <button
+        type="button"
+        data-action="chat#applyPrompt"
+        data-chat-prompt="<%= prompt %>"
+        class="rounded-xl border border-zinc-200/90 bg-white px-4 py-3 text-left text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:border-teal-200 hover:bg-teal-50/70 hover:text-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        <span class="block leading-relaxed"><%= prompt %></span>
+      </button>
+    <% end %>
+  </div>
+</div>

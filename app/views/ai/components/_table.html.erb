@@ -1,0 +1,24 @@
+<%# locals: (title: nil, headers:, rows:) %>
+<% if title.present? %>
+  <h3 class="mt-4 mb-2 text-base font-semibold text-zinc-900"><%= title %></h3>
+<% end %>
+<div class="my-3 max-w-full overflow-x-auto">
+  <table class="w-full border-collapse text-sm">
+    <thead>
+      <tr>
+        <% headers.each do |header| %>
+          <th class="border-b border-zinc-100 bg-zinc-50/70 px-3 py-2 text-left font-semibold text-zinc-800"><%= header %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.each_with_index do |row, index| %>
+        <tr class="<%= index.even? ? "bg-zinc-50/50" : "" %>">
+          <% headers.each_with_index do |_header, col_index| %>
+            <td class="border-b border-zinc-100 px-3 py-2 text-zinc-700"><%= row[col_index].to_s %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -45,4 +45,69 @@ class Message < ApplicationRecord
   def user?
     role == "user"
   end
+
+  def structured_components
+    return [] unless metadata.is_a?(Hash)
+
+    Array(metadata["components"]).filter_map do |component|
+      next unless component.is_a?(Hash)
+      next if component["type"].blank?
+      next unless component["data"].is_a?(Hash)
+
+      component
+    end
+  end
+
+  def structured_response?
+    structured_components.any?
+  end
+
+  def structured_tables
+    from_components = structured_components.filter_map do |component|
+      next unless component["type"] == "table"
+
+      data = component["data"]
+      headers = Array(data["headers"]).map(&:to_s).reject(&:blank?)
+      rows = Array(data["rows"]).map { |row| Array(row).map(&:to_s) }
+      next if headers.blank? || rows.blank?
+
+      {
+        "title" => data["title"].to_s.presence,
+        "columns" => headers,
+        "rows" => rows
+      }
+    end
+    return from_components if from_components.any?
+
+    return [] unless metadata.is_a?(Hash)
+
+    Array(metadata["tables"]).filter_map do |table|
+      next unless table.is_a?(Hash)
+
+      columns = Array(table["columns"]).map(&:to_s).reject(&:blank?)
+      rows = Array(table["rows"]).map { |row| Array(row).map(&:to_s) }
+      next if columns.blank? || rows.blank?
+
+      table.merge("columns" => columns, "rows" => rows)
+    end
+  end
+
+  def context_sources
+    return [] unless metadata.is_a?(Hash)
+
+    Array(metadata["context_sources"])
+  end
+
+  def context_sources?
+    context_sources.any?
+  end
+
+  def answer_text_for_sources
+    return content.to_s if structured_components.blank?
+
+    Messages::AiComponents::Registry.plain_text_answer(
+      summary: metadata.is_a?(Hash) ? metadata["summary"].to_s : "",
+      components: structured_components
+    )
+  end
 end

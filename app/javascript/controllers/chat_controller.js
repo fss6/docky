@@ -3,8 +3,12 @@ import { Controller } from "@hotwired/stimulus"
 /** Pixels from bottom to consider the user “following” new messages (streaming). */
 const NEAR_BOTTOM_PX = 140
 
+/** Single-line composer height; grows only up to this cap (≈4 lines). */
+const INPUT_MIN_HEIGHT_PX = 36
+const INPUT_MAX_HEIGHT_PX = 96
+
 export default class extends Controller {
-  static targets = ["input", "messages", "form"]
+  static targets = ["input", "messages", "form", "emptyState"]
 
   connect() {
     this.pinnedToBottom = true
@@ -35,6 +39,11 @@ export default class extends Controller {
       if (event.persisted && this.hasMessagesTarget) this.scheduleScrollToBottom()
     }
     window.addEventListener("pageshow", this.boundPageShow)
+
+    this.boundAfterStreamRender = () => this.onAfterStreamRender()
+    document.addEventListener("turbo:after-stream-render", this.boundAfterStreamRender)
+
+    if (this.hasInputTarget) this.resetInputHeight()
   }
 
   disconnect() {
@@ -42,6 +51,12 @@ export default class extends Controller {
     this.mutationObserver.disconnect()
     document.removeEventListener("turbo:load", this.boundTurboLoad)
     window.removeEventListener("pageshow", this.boundPageShow)
+    document.removeEventListener("turbo:after-stream-render", this.boundAfterStreamRender)
+  }
+
+  onAfterStreamRender() {
+    if (this.hasInputTarget) this.resetInputHeight()
+    if (this.pinnedToBottom) this.requestScrollFrame()
   }
 
   submit(event) {
@@ -49,15 +64,41 @@ export default class extends Controller {
     const text = this.inputTarget.value.trim()
     if (!text) return
 
+    this.removeEmptyState()
     this.formTarget.requestSubmit()
     this.inputTarget.value = ""
+    this.resetInputHeight()
+  }
+
+  applyPrompt(event) {
+    const prompt = event.currentTarget.dataset.chatPrompt || ""
+    if (!prompt) return
+
+    this.inputTarget.value = prompt
     this.resize()
+    this.inputTarget.focus()
+    this.inputTarget.setSelectionRange(this.inputTarget.value.length, this.inputTarget.value.length)
+  }
+
+  resetInputHeight() {
+    const el = this.inputTarget
+    el.style.height = `${INPUT_MIN_HEIGHT_PX}px`
+    el.style.overflowY = "hidden"
   }
 
   resize() {
     const el = this.inputTarget
+    const value = el.value
+
+    if (!value.includes("\n") && value.length < 80) {
+      this.resetInputHeight()
+      return
+    }
+
     el.style.height = "auto"
-    el.style.height = Math.min(el.scrollHeight, 160) + "px"
+    const next = Math.min(Math.max(el.scrollHeight, INPUT_MIN_HEIGHT_PX), INPUT_MAX_HEIGHT_PX)
+    el.style.height = `${next}px`
+    el.style.overflowY = el.scrollHeight > INPUT_MAX_HEIGHT_PX ? "auto" : "hidden"
   }
 
   isNearBottom() {
@@ -92,6 +133,11 @@ export default class extends Controller {
       last.scrollIntoView({ block: "end", behavior: "auto" })
     }
     this.pinnedToBottom = true
+  }
+
+  removeEmptyState() {
+    if (!this.hasEmptyStateTarget) return
+    this.emptyStateTarget.remove()
   }
 
   keydown(event) {

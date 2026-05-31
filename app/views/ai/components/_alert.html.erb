@@ -1,0 +1,18 @@
+<%# locals: (severity:, title:, description:) %>
+<%
+  severity_classes = {
+    "info" => "border-sky-100 bg-sky-50/80 text-sky-900",
+    "success" => "border-teal-100 bg-teal-50/80 text-teal-900",
+    "warning" => "border-amber-100 bg-amber-50/80 text-amber-950",
+    "error" => "border-red-100 bg-red-50/80 text-red-900"
+  }
+  box_class = severity_classes.fetch(severity.to_s, severity_classes["info"])
+%>
+<div class="my-3 rounded-xl border px-4 py-3 text-sm <%= box_class %>" role="status">
+  <% if title.present? %>
+    <p class="font-semibold"><%= title %></p>
+  <% end %>
+  <% if description.present? %>
+    <p class="<%= title.present? ? "mt-1" : "" %>"><%= description %></p>
+  <% end %>
+</div>

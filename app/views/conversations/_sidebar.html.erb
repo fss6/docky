@@ -1,11 +1,11 @@
 <%# locals: (account:, sidebar_conversations:, conversation: nil) %>
 <% current_id = conversation&.id %>
 <aside
-  class="flex min-h-0 w-full shrink-0 flex-col border-b border-zinc-200 bg-white text-zinc-800 lg:max-h-full lg:w-[min(100%,19rem)] lg:border-b-0 lg:border-r lg:border-zinc-200"
+  class="flex min-h-0 w-full shrink-0 flex-col border-b border-zinc-100 bg-white text-zinc-800 lg:max-h-full lg:w-[min(100%,19rem)] lg:border-b-0 lg:border-r lg:border-zinc-100"
   aria-label="Conversas"
 >
   <%# Bloco Conversas + Nova conversa (como referência Chista / ChatGPT) %>
-  <div class="border-b border-zinc-200 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
+  <div class="border-b border-zinc-100 px-4 pb-3 pt-4 sm:px-5 sm:pt-5">
     <div class="mb-3 flex items-center gap-2 text-zinc-900">
       <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-5 w-5 shrink-0 text-accent", "aria-hidden": "true" } %>
       <span class="text-sm font-semibold tracking-tight">Conversas</span>
@@ -21,12 +21,6 @@
         Nova conversa
       <% end %>
     <% end %>
-
-    <%= link_to account_conversations_path(account),
-            class: "mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-center text-xs font-medium text-zinc-500 no-underline transition-colors hover:bg-zinc-100 hover:text-zinc-700" do %>
-      <%= heroicon "queue-list", variant: :outline, options: { class: "h-3.5 w-3.5 shrink-0 opacity-80", "aria-hidden": "true" } %>
-      Ver todas
-    <% end %>
   </div>
 
   <div class="hidden min-h-0 flex-1 flex-col overflow-hidden px-3 pb-4 pt-2 sm:px-4 lg:flex">
@@ -34,7 +28,7 @@
       <% sidebar_conversations.each do |conv| %>
         <% active = current_id.present? && conv.id == current_id %>
         <div
-          class="group flex items-start gap-0.5 rounded-lg <%= active ? "bg-teal-50 text-zinc-900 shadow-[inset_0_0_0_1px_rgb(20_184_166/0.35)]" : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900" %>"
+          class="group flex items-start gap-0.5 rounded-lg <%= active ? "bg-teal-50/80 text-zinc-900 ring-1 ring-inset ring-teal-200/40" : "text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900" %>"
         >
           <%= link_to account_conversation_path(account, conv),
                 class: [
@@ -60,27 +54,37 @@
     </nav>
   </div>
 
-  <details class="border-t border-zinc-200 p-2 lg:hidden">
-    <summary class="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-2 py-2 text-sm font-medium text-zinc-700 [&::-webkit-details-marker]:hidden">
-      <span class="flex items-center gap-2">
-        <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-4 w-4 text-accent", "aria-hidden": "true" } %>
-        Conversas
+  <details class="border-t border-zinc-100 bg-zinc-50/50 p-3 lg:hidden" <%= "open" if current_id.present? %>>
+    <summary class="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl border border-zinc-100 bg-white px-3 py-3 text-sm font-medium text-zinc-700 shadow-sm [&::-webkit-details-marker]:hidden">
+      <span class="flex min-w-0 items-center gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-accent">
+          <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-4 w-4", "aria-hidden": "true" } %>
+        </span>
+        <span class="min-w-0">
+          <span class="block text-sm font-semibold text-zinc-900">Histórico recente</span>
+          <span class="block text-xs font-normal text-zinc-500">
+            <%= sidebar_conversations.size %> <%= sidebar_conversations.size == 1 ? "conversa" : "conversas" %> disponíveis
+          </span>
+        </span>
       </span>
-      <%= heroicon "chevron-down", variant: :outline, options: { class: "h-4 w-4 text-zinc-400", "aria-hidden": "true" } %>
+      <%= heroicon "chevron-down", variant: :outline, options: { class: "h-4 w-4 shrink-0 text-zinc-400", "aria-hidden": "true" } %>
     </summary>
-    <div class="mt-1 max-h-64 space-y-0.5 overflow-y-auto border-t border-zinc-200 pt-2">
+    <div class="mt-3 max-h-72 space-y-1 overflow-y-auto rounded-xl border border-zinc-100 bg-white p-2 shadow-sm">
       <% sidebar_conversations.each do |conv| %>
         <% active = current_id.present? && conv.id == current_id %>
-        <div class="group flex items-start gap-0.5 rounded-lg <%= active ? "bg-teal-50 text-zinc-900" : "text-zinc-700" %>">
+        <div class="group flex items-start gap-1 rounded-lg <%= active ? "bg-teal-50/80 text-zinc-900 ring-1 ring-inset ring-teal-200/40" : "text-zinc-700" %>">
           <%= link_to account_conversation_path(account, conv),
-                class: "min-w-0 flex-1 rounded-lg px-2 py-2 text-sm no-underline #{active ? "" : "hover:bg-zinc-100"}" do %>
+                class: "min-w-0 flex-1 rounded-lg px-3 py-2.5 text-sm no-underline #{active ? "" : "hover:bg-zinc-100"}" do %>
             <%= render "conversations/sidebar_title_span", conversation: conv, variant: :mobile %>
             <span class="mt-0.5 block text-[11px] opacity-80"><%= conv.updated_at.strftime("%d/%m/%Y") %></span>
           <% end %>
-          <div class="shrink-0 pt-1.5 pr-0.5">
+          <div class="shrink-0 pt-2 pr-1">
             <%= render "conversations/delete_button", account: account, conversation: conv, variant: :sidebar, active: active %>
           </div>
         </div>
+      <% end %>
+      <% if sidebar_conversations.empty? %>
+        <p class="px-3 py-5 text-center text-xs leading-relaxed text-zinc-500">Nenhuma conversa ainda. Crie uma nova conversa acima para começar.</p>
       <% end %>
     </div>
   </details>

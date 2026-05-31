@@ -1,0 +1,11 @@
+<%# locals: (title: nil, actions:) %>
+<div class="my-3 rounded-xl border border-zinc-100 bg-zinc-50/50 px-4 py-3">
+  <% if title.present? %>
+    <p class="mb-2 text-sm font-semibold text-zinc-900"><%= title %></p>
+  <% end %>
+  <ul class="list-disc space-y-1 pl-5 text-sm text-zinc-700">
+    <% actions.each do |action| %>
+      <li><%= action %></li>
+    <% end %>
+  </ul>
+</div>

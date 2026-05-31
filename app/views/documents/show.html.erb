@@ -1,6 +1,6 @@
 <% content_for :title, "Documento · Dokivo" %>
 
-<div class="space-y-6" data-controller="app-confirm-modal">
+<div class="space-y-6" data-controller="app-confirm-modal document-highlight">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
       <nav class="text-xs font-medium text-zinc-500" aria-label="Breadcrumb">
@@ -46,7 +46,11 @@
     </div>
   </header>
 
-  <%= render @document %>
+  <%= render partial: "documents/document", locals: {
+        document: @document,
+        highlight_chunk_id: @highlight_chunk_id,
+        highlight_page: @highlight_page
+      } %>
 
   <div class="app-card border-red-100 bg-red-50/30 p-4 sm:p-5">
     <p class="text-sm font-medium text-zinc-800">Zona de risco</p>

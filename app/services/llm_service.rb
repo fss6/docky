@@ -19,11 +19,11 @@ class LlmService
   end
 
   # context pode ser uma String simples (legado) ou um Hash { wiki_chunks:, doc_chunks: }
-  def self.system_prompt(context)
+  def self.system_prompt(context, markdown_block: Messages::MarkdownGuidelines::PROMPT_BLOCK)
     if context.is_a?(Hash)
-      build_wiki_system_prompt(context)
+      build_wiki_system_prompt(context, markdown_block: markdown_block)
     else
-      build_plain_system_prompt(context.to_s)
+      build_plain_system_prompt(context.to_s, markdown_block: markdown_block)
     end
   end
 
@@ -34,14 +34,14 @@ class LlmService
       O usuário mandou só uma saudação ou mensagem muito curta (sem pergunta ainda).
       Responda no mesmo idioma da mensagem, com tom caloroso e natural — como um assistente real cumprimentando e se colocando à disposição.
 
-      Explique em 2–4 frases curtas como pode ajudar, por exemplo: responder perguntas com base nos documentos que a conta carregou, resumir trechos, localizar cláusulas ou dados, e citar fontes (arquivo e página) quando usar o conteúdo dos arquivos.
+      Explique em 2–4 frases curtas como pode ajudar, por exemplo: responder perguntas com base nos documentos que a conta carregou, resumir trechos e localizar cláusulas ou dados. As fontes são exibidas à parte na interface; não mencione arquivo ou página no texto.
       Convide a fazer a primeira pergunta sobre os documentos.
 
       Não invente nomes de arquivos nem trechos. Não diga que "não encontrou" informação só porque foi uma saudação.
     PROMPT
   end
 
-  private_class_method def self.build_wiki_system_prompt(context)
+  private_class_method def self.build_wiki_system_prompt(context, markdown_block:)
     wiki_chunks = Array(context[:wiki_chunks])
     doc_chunks  = Array(context[:doc_chunks])
     if wiki_chunks.empty? && doc_chunks.empty?
@@ -68,13 +68,15 @@ class LlmService
       Trate o CONHECIMENTO ACUMULADO (Wiki) como informação já validada e consolidada.
       Trate os TRECHOS DOS DOCUMENTOS ORIGINAIS como evidência bruta de suporte.
       Se a resposta não estiver no contexto, diga explicitamente que não encontrou.
-      Sempre cite a fonte: página do wiki (slug), ou nome do arquivo e página.
+      #{Messages::CitationGuidelines::NO_INLINE_CITATIONS}
+
+      #{markdown_block}
 
       #{full_context}
     PROMPT
   end
 
-  private_class_method def self.build_plain_system_prompt(ctx)
+  private_class_method def self.build_plain_system_prompt(ctx, markdown_block:)
     ctx = ctx.strip
     return smalltalk_system_prompt if ctx.blank?
 
@@ -88,7 +90,9 @@ class LlmService
 
       Para conteúdo factual sobre os arquivos, use exclusivamente os trechos abaixo.
       Se a resposta não estiver nos trechos, diga explicitamente que não encontrou.
-      Sempre cite a fonte: nome do arquivo e número da página.
+      #{Messages::CitationGuidelines::NO_INLINE_CITATIONS}
+
+      #{markdown_block}
 
       TRECHOS RELEVANTES:
       #{ctx}

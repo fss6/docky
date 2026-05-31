@@ -25,33 +25,21 @@
       </p>
     </header>
 
-    <div class="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
-      <% if @conversations.any? %>
-        <ul class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white shadow-[var(--shadow-card)]">
-          <% @conversations.each do |conversation| %>
-            <li class="group flex items-stretch gap-1 px-2 py-1 sm:px-3">
-              <%= link_to account_conversation_path(@account, conversation),
-                    class: "min-w-0 flex-1 rounded-lg px-3 py-3 transition-colors hover:bg-zinc-50 sm:px-4" do %>
-                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <p class="font-medium text-zinc-900">
-                    <%= conversation.title.presence || "Conversa ##{conversation.id}" %>
-                  </p>
-                  <p class="text-xs text-zinc-500">
-                    <%= conversation.updated_at.strftime("%d/%m/%Y %H:%M") %>
-                  </p>
-                </div>
-                <p class="mt-1 text-sm text-zinc-600">
-                  <%= conversation.user&.name.presence || conversation.user&.email.presence || "Usuário ##{conversation.user_id}" %>
-                </p>
-              <% end %>
-              <div class="flex shrink-0 items-start pt-2 sm:items-center sm:pt-0">
-                <%= render "conversations/delete_button", account: @account, conversation: conversation, variant: :list %>
-              </div>
-            </li>
-          <% end %>
-        </ul>
+    <div class="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <% if @sidebar_conversations.any? %>
+        <div class="mx-auto flex max-w-lg flex-col items-center rounded-2xl border border-dashed border-zinc-200/80 bg-white/80 px-6 py-10 text-center shadow-sm">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-accent shadow-sm ring-1 ring-teal-100">
+            <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-6 w-6", "aria-hidden": "true" } %>
+          </div>
+          <h3 class="mt-4 text-base font-semibold tracking-tight text-zinc-900 sm:text-lg">
+            Selecione uma conversa
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-zinc-600">
+            Escolha um tópico no painel à esquerda ou use <span class="font-medium text-zinc-800">Nova conversa</span> para começar.
+          </p>
+        </div>
       <% else %>
-        <div class="app-card border-dashed border-zinc-200/80 p-8 text-center">
+        <div class="app-card mx-auto max-w-lg border-dashed border-zinc-200/80 p-8 text-center">
           <p class="text-sm text-zinc-600">Nenhuma conversa ainda.</p>
           <p class="mt-2 text-sm text-zinc-500">
             Use <span class="font-medium text-zinc-800">Nova conversa</span> no painel à esquerda para começar.

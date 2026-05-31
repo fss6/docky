@@ -1,7 +1,22 @@
-<%# locals: message %>
+<%# locals: (message:, streaming: nil) %>
+<% streaming_mode = streaming.nil? ? message.streaming? : streaming %>
+<% bubble_classes = "rounded-2xl rounded-bl-md bg-white px-4 py-3 shadow-sm ring-1 ring-zinc-100/90" %>
 <div
   id="<%= dom_id(message, :content) %>"
-  class="rounded-2xl rounded-bl-md bg-white px-4 py-3 text-[13px] leading-relaxed text-zinc-800 shadow-sm ring-1 ring-zinc-200/80 whitespace-pre-wrap"
+  class="<%= [bubble_classes, streaming_mode ? nil : chat_assistant_prose_classes].compact.join(" ") %>"
+  <% if streaming_mode %>
+    aria-live="polite"
+    aria-busy="true"
+  <% end %>
 >
-  <%= message.content.presence || "" %>
+  <% if streaming_mode %>
+    <%= render "messages/thinking_indicator", **thinking_indicator_locals(message) %>
+  <% elsif message.structured_response? %>
+    <%= assistant_structured_html(message) %>
+  <% else %>
+    <%= assistant_message_html(message.content) if message.content.present? %>
+    <% if message.structured_tables.any? %>
+      <%= render "messages/assistant_tables", tables: message.structured_tables %>
+    <% end %>
+  <% end %>
 </div>

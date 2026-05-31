@@ -31,7 +31,7 @@ module Permissions
       groups: "Grupos",
       users: "Usuários",
       settings: "Configurações",
-      conversations: "Chat IA",
+      conversations: "Assistente IA",
       wiki: "Wiki",
       audit: "Auditoria"
     }.freeze

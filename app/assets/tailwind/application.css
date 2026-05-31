@@ -175,7 +175,59 @@ body[data-toast-layout="minimal"] .notyf {
     animation-delay: 400ms;
   }
 
+  /* Assistente IA — conteúdo Markdown do assistente (tabelas e blocos legíveis) */
+  .chat-assistant-content {
+    @apply text-zinc-800;
+  }
 
+  .chat-assistant-content :where(strong) {
+    @apply font-semibold text-zinc-900;
+  }
+
+  .chat-assistant-content :where(h3) {
+    @apply mt-4 mb-2 text-base font-semibold text-zinc-900;
+  }
+
+  .chat-assistant-content :where(ul) {
+    @apply my-2 list-disc space-y-1 pl-5;
+  }
+
+  .chat-assistant-content :where(table) {
+    @apply my-3 w-full border-collapse text-sm;
+  }
+
+  .chat-assistant-content :where(thead th) {
+    @apply border-b border-zinc-100 bg-zinc-50/70 px-3 py-2 text-left font-semibold text-zinc-800;
+  }
+
+  .chat-assistant-content :where(tbody td) {
+    @apply border-b border-zinc-100 px-3 py-2 text-zinc-700;
+  }
+
+  .chat-assistant-content :where(tbody tr:last-child td) {
+    @apply border-b-0;
+  }
+
+  .chat-assistant-content :where(tbody tr:nth-child(even) td) {
+    @apply bg-zinc-50/50;
+  }
+
+  .chat-assistant-content :where(.table-wrapper),
+  .chat-assistant-content :where(table) {
+    @apply block max-w-full overflow-x-auto;
+  }
+
+  .chat-assistant-content :where(pre) {
+    @apply overflow-x-auto rounded-xl border border-zinc-100 bg-zinc-50/80 p-3 text-xs leading-relaxed text-zinc-800;
+  }
+
+  .chat-assistant-content :where(pre:has(code)) {
+    @apply bg-zinc-950 text-zinc-100 border-zinc-800;
+  }
+
+  .chat-assistant-content :where(pre code) {
+    @apply bg-transparent p-0 text-inherit;
+  }
 
   /* Tela detalhe do cliente — tabs, filtros e badges em teal; CTAs usam app-btn-* (azul) */
   .client-tab-active {

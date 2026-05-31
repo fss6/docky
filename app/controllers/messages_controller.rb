@@ -21,6 +21,7 @@ class MessagesController < ApplicationController
       streaming: false,
       metadata: meta
     )
+    @focus_document_id = @user_message.focus_document_id
     @ai_message = @conversation.messages.create!(role: "assistant", content: "", streaming: true)
 
     RagQueryJob.perform_later(@ai_message.id)
