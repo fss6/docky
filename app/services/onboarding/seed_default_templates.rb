@@ -5,6 +5,7 @@ module Onboarding
     TEMPLATES = {
       "mei" => {
         name: "MEI / Microempreendedor",
+        description: "Checklist enxuto para microempreendedor individual",
         items: [
           { name: "CCMEI atualizado", help_text: nil },
           { name: "RG / CPF", help_text: nil },
@@ -15,6 +16,7 @@ module Onboarding
       },
       "new_company" => {
         name: "Empresa nova (constituição)",
+        description: "Contrato social, certificado digital, procuração e-CAC e demais documentos iniciais",
         items: [
           { name: "Contrato social", help_text: nil },
           { name: "Requerimento de empresário / CCMEI", help_text: nil },
@@ -27,6 +29,7 @@ module Onboarding
       },
       "migration" => {
         name: "Migração de contabilidade",
+        description: "Documentos padrão mais balancete, ECD/ECF, IRPJ e situação fiscal da contabilidade anterior",
         items: [
           { name: "Contrato social", help_text: nil },
           { name: "Requerimento de empresário / CCMEI", help_text: nil },
@@ -65,6 +68,7 @@ module Onboarding
 
     def seed_template!(template, config:, position:)
       template.name = config[:name] if template.new_record? || template.name.blank?
+      template.description = config[:description] if template.new_record? || template.description.blank?
       template.position = position if template.new_record?
       template.system = true
       template.save!

@@ -14,7 +14,7 @@ module Periods
       @plan = Plan.create!(name: "Teste", price: 0)
       @account = Account.create!(name: "Conta", plan: @plan, active: true)
       ActsAsTenant.with_tenant(@account) do
-        @client = Client.create!(account: @account, name: "Cliente")
+        @client = Client.create!(account: @account, name: "Cliente", tax_id: unique_valid_test_tax_id(account: @account), email: valid_test_client_email)
       end
     end
 

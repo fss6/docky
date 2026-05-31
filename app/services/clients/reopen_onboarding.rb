@@ -16,9 +16,10 @@ module Clients
       Client.transaction do
         checklist = @client.onboarding_checklist
         unless checklist
+          template = resolve_template
           checklist = Onboarding::BuildFromTemplate.call(
             client: @client,
-            onboarding_kind: @client.onboarding_kind.presence || "new_client",
+            template: template,
             account: @account
           )
         end
@@ -43,6 +44,14 @@ module Clients
 
         @client
       end
+    end
+
+    private
+
+    def resolve_template
+      @client.onboarding_template ||
+        OnboardingTemplate.default_for_client_creation(@account) ||
+        raise(ActiveRecord::RecordNotFound, "Nenhum template de onboarding disponível")
     end
   end
 end

@@ -4,14 +4,15 @@
 #
 # Table name: onboarding_templates
 #
-#  id         :bigint           not null, primary key
-#  kind       :string           not null
-#  name       :string           not null
-#  position   :integer          default(0), not null
-#  system     :boolean          default(FALSE), not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  account_id :bigint           not null
+#  id          :bigint           not null, primary key
+#  description :text
+#  kind        :string           not null
+#  name        :string           not null
+#  position    :integer          default(0), not null
+#  system      :boolean          default(FALSE), not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  account_id  :bigint           not null
 #
 # Indexes
 #
@@ -26,10 +27,13 @@ class OnboardingTemplate < ApplicationRecord
   acts_as_tenant(:account)
 
   DEFAULT_KINDS = %w[mei new_company migration].freeze
-  CLIENT_LINKED_KINDS = %w[new_company migration].freeze
+  DESCRIPTION_MAX_LENGTH = 500
 
   belongs_to :account
   has_many :items, class_name: "OnboardingTemplateItem", dependent: :destroy, inverse_of: :onboarding_template
+  has_many :clients, dependent: :restrict_with_error
+  has_many :onboarding_checklists, dependent: :restrict_with_error
+
   accepts_nested_attributes_for :items,
                                 allow_destroy: true,
                                 reject_if: ->(attributes) { attributes["name"].blank? && attributes["id"].blank? }
@@ -39,20 +43,22 @@ class OnboardingTemplate < ApplicationRecord
 
   validates :name, presence: true
   validates :kind, presence: true, uniqueness: { scope: :account_id }
+  validates :description, length: { maximum: DESCRIPTION_MAX_LENGTH }, allow_blank: true
 
   scope :ordered, -> { order(:position, :id) }
 
-  def self.kind_for_onboarding_kind(onboarding_kind)
-    case onboarding_kind.to_s
-    when "migration" then "migration"
-    when "new_client" then "new_company"
-    else "new_company"
-    end
+  def self.default_for_client_creation(account = ActsAsTenant.current_tenant)
+    scope = account.onboarding_templates.ordered
+    scope.find_by(kind: "new_company") || scope.first
+  end
+
+  def help_text_for_select
+    description.presence || "#{items.size} #{items.size == 1 ? 'item' : 'itens'}"
   end
 
   def destroy_confirm_message
-    if system? && CLIENT_LINKED_KINDS.include?(kind)
-      I18n.t("settings.onboarding_templates.destroy_confirm.linked_to_client_flow", name: name)
+    if clients.exists?
+      I18n.t("settings.onboarding_templates.destroy_confirm.in_use", name: name)
     elsif system?
       I18n.t("settings.onboarding_templates.destroy_confirm.system", name: name)
     else
@@ -61,8 +67,8 @@ class OnboardingTemplate < ApplicationRecord
   end
 
   def destroy_modal_variant
-    if system? && CLIENT_LINKED_KINDS.include?(kind)
-      :linked_to_client_flow
+    if clients.exists?
+      :in_use
     elsif system?
       :system
     else

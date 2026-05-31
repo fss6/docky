@@ -159,7 +159,13 @@ module AuditEvents
     def client_created_description
       parts = []
       parts << "Status: #{@metadata['status']}" if @metadata["status"].present?
-      parts << onboarding_kind_label(@metadata["onboarding_kind"]) if @metadata["onboarding_kind"].present?
+      if @metadata["onboarding_skipped"] == true
+        parts << "Onboarding pulado"
+      elsif @metadata["onboarding_template_name"].present?
+        parts << "Template: #{@metadata['onboarding_template_name']}"
+      elsif @metadata["onboarding_kind"].present?
+        parts << onboarding_kind_label(@metadata["onboarding_kind"])
+      end
       parts.presence&.join(" · ") || client_name_from_subject
     end
 

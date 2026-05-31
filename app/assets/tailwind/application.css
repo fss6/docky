@@ -274,6 +274,19 @@ body[data-toast-layout="minimal"] .notyf {
     @apply border border-zinc-200 bg-white hover:border-zinc-300;
   }
 
+  .onboarding-radio-indicator {
+    @apply mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-zinc-300;
+  }
+
+  .onboarding-radio-selected .onboarding-radio-indicator {
+    @apply border-client-accent;
+  }
+
+  .onboarding-radio-selected .onboarding-radio-indicator::after {
+    content: "";
+    @apply block h-2 w-2 rounded-full bg-client-accent;
+  }
+
   .client-tab-badge--pulse {
     @apply relative;
   }

@@ -23,7 +23,7 @@
             <td class="px-5 py-3 sm:px-6">
               <span class="block truncate font-semibold text-zinc-900 group-hover:text-accent"><%= client.name %></span>
             </td>
-            <td class="hidden px-5 py-3 text-zinc-600 sm:table-cell sm:px-6"><%= client.tax_id.presence || "—" %></td>
+            <td class="hidden px-5 py-3 text-zinc-600 sm:table-cell sm:px-6"><%= format_tax_id(client.tax_id) %></td>
             <td class="hidden px-5 py-3 text-zinc-600 md:table-cell md:px-6"><%= client.email.presence || "—" %></td>
             <td class="px-5 py-3 sm:px-6">
               <%= client_index_status_badge(client) %>

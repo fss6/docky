@@ -38,10 +38,6 @@
           <div class="my-1 border-t border-zinc-100" role="separator"></div>
           <%= render "clients/show/configure_menu_group_label", label: t("clients.configure_menu.groups.onboarding") %>
           <%= render "clients/show/configure_menu_item",
-                title: t("clients.configure_menu.onboarding_start.title"),
-                description: t("clients.configure_menu.onboarding_start.description"),
-                confirm_modal: client_onboarding_start_confirm_modal_data(client: client) %>
-          <%= render "clients/show/configure_menu_item",
                 title: t("clients.configure_menu.onboarding_reopen.title"),
                 description: t("clients.configure_menu.onboarding_reopen.description"),
                 confirm_modal: client_onboarding_reopen_confirm_modal_data(client: client) %>

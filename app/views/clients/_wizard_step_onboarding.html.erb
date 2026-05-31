@@ -1,0 +1,73 @@
+<%# locals: (onboarding_templates: [], client: Client.new, wizard_step: 1) %>
+<div data-client-wizard-target="step" data-step="2" class="space-y-4<%= ' hidden' unless wizard_step.to_i == 2 %>">
+  <div class="app-card p-5 space-y-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("clients.wizard.step_onboarding") %></p>
+      <p class="mt-1 text-sm text-zinc-600">Escolha o checklist inicial ou pule se o cliente já tiver toda a documentação.</p>
+    </div>
+
+    <% if client.errors[:base].any? %>
+      <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" data-client-wizard-target="onboardingError">
+        <%= client.errors[:base].first %>
+      </div>
+    <% else %>
+      <div class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" data-client-wizard-target="onboardingError"></div>
+    <% end %>
+
+    <% if onboarding_templates.any? %>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <% onboarding_templates.each do |template| %>
+          <label class="flex cursor-pointer items-start gap-3 rounded-lg border p-4 text-left onboarding-radio-default"
+                 data-client-wizard-target="templateCard"
+                 data-template-id="<%= template.id %>">
+            <input type="radio"
+                   name="onboarding_template_id"
+                   value="<%= template.id %>"
+                   class="sr-only"
+                   data-client-wizard-target="onboardingInput"
+                   data-action="change->client-wizard#onboardingChanged">
+            <span class="onboarding-radio-indicator"></span>
+            <span>
+              <span class="block text-sm font-semibold text-zinc-900"><%= template.name %></span>
+              <% if template.description.present? %>
+                <span class="mt-1 block text-xs text-zinc-500"><%= template.description %></span>
+              <% else %>
+                <span class="mt-1 block text-xs text-zinc-500"><%= t("clients.wizard.items_count", count: template.items.size) %></span>
+              <% end %>
+              <% unless template.system? %>
+                <span class="mt-1 inline-flex rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600">Personalizado</span>
+              <% end %>
+            </span>
+          </label>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-zinc-600">
+        <%= t("clients.wizard.no_templates") %>
+        <%= link_to t("clients.wizard.no_templates_link"), settings_onboarding_templates_path, class: "font-medium text-accent no-underline hover:underline" %>.
+      </p>
+    <% end %>
+
+    <label class="flex w-full cursor-pointer items-start gap-3 rounded-lg border p-4 text-left onboarding-radio-default"
+           data-client-wizard-target="skipCard">
+      <input type="radio"
+             name="onboarding_template_id"
+             value="skipped"
+             class="sr-only"
+             data-client-wizard-target="onboardingInput"
+             data-action="change->client-wizard#onboardingChanged">
+      <span class="onboarding-radio-indicator"></span>
+      <span>
+        <span class="block text-sm font-semibold text-zinc-900"><%= t("clients.wizard.skip_title") %></span>
+        <span class="mt-1 block text-xs text-zinc-500"><%= t("clients.wizard.skip_description") %></span>
+      </span>
+    </label>
+  </div>
+
+  <div data-client-wizard-target="previewPanel" class="hidden app-card p-5">
+    <p data-client-wizard-target="previewHeading" class="text-sm font-semibold text-zinc-900"><%= t("clients.wizard.preview_heading") %></p>
+    <p data-client-wizard-target="previewEmpty" class="mt-3 text-sm text-zinc-500"><%= t("clients.wizard.preview_empty") %></p>
+    <p data-client-wizard-target="previewSkip" class="mt-3 hidden text-sm text-zinc-600"><%= t("clients.wizard.preview_skip") %></p>
+    <ol data-client-wizard-target="previewList" class="mt-3 divide-y divide-zinc-100"></ol>
+  </div>
+</div>

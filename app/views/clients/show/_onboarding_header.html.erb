@@ -20,7 +20,7 @@
           <span class="<%= client_onboarding_badge_classes %>">Em onboarding</span>
         </div>
         <p class="mt-1 text-sm text-zinc-500">
-          <% if client.tax_id.present? %>CNPJ <%= client.tax_id %><% end %>
+          <% if client.tax_id.present? %><%= format_tax_id(client.tax_id) %><% end %>
           <% if client.email.present? %> · <%= client.email %><% end %>
         </p>
       </div>

@@ -30,4 +30,13 @@ class OnboardingTemplateTest < ActiveSupport::TestCase
 
     assert_equal max_position + 1, template.position
   end
+
+  test "cannot destroy template linked to clients" do
+    seed_onboarding_templates!(@account)
+    template = @account.onboarding_templates.find_by!(kind: "new_company")
+    create_onboarding_client(onboarding_template: template, account: @account)
+
+    assert_not template.destroy
+    assert template.persisted?
+  end
 end

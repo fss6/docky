@@ -23,7 +23,7 @@ module Clients
         password_confirmation: "password123"
       )
       ActsAsTenant.with_tenant(@account) do
-        @client = Client.create!(account: @account, name: "Cliente Arquivado", status: :active)
+        @client = Client.create!(account: @account, name: "Cliente Arquivado", status: :active, tax_id: unique_valid_test_tax_id(account: @account), email: valid_test_client_email)
         @period = Date.current.beginning_of_month
         CompetencyChecklist.create!(account: @account, client: @client, period: @period)
         Clients::Archive.call(client: @client, user: @user)

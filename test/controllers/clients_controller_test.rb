@@ -22,7 +22,7 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index filters by tax_id in unified search" do
-    get clients_url, params: { q: "11.222.333/0001-81" }
+    get clients_url, params: { q: "19.131.243/0001-97" }
     assert_response :success
     assert_select "table tbody tr", count: 1
     assert_select "tr[data-clickable-row-url-value=?]", client_path(clients(:alpha))
@@ -49,19 +49,26 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Nenhum cliente cadastrado ainda", response.body
   end
 
-  test "should get new" do
+  test "should get new wizard" do
+    seed_onboarding_templates!
     get new_client_url
     assert_response :success
+    assert_select "[data-controller=?]", "client-wizard"
+    assert_match I18n.t("clients.wizard.step_dados"), response.body
+    assert_match I18n.t("clients.wizard.step_onboarding"), response.body
+    assert_select "[data-client-wizard-target=?]", "templateCard", minimum: 1
+    assert_select "input[name=?]", "client[tax_id]"
   end
 
   test "should create client" do
     seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
     assert_difference("Client.count") do
       post clients_url, params: {
-        onboarding_kind: "new_client",
+        onboarding_template_id: template.id,
         client: {
           name: "Novo cliente Ltda",
-          tax_id: "99888777000166",
+          tax_id: "52998224725",
           email: "novo@example.com",
           phone: "",
           notes: ""
@@ -71,6 +78,122 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
 
     created = Client.find_by!(name: "Novo cliente Ltda")
     assert created.onboarding?
+    assert_equal "52998224725", created.tax_id
+    assert_equal template.id, created.onboarding_template_id
+    assert_redirected_to client_url(created)
+  end
+
+  test "rejects create without tax_id" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+
+    assert_no_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: { name: "Sem CNPJ", email: "test@example.com" }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_match "Informe o CNPJ ou CPF", response.body
+  end
+
+  test "rejects create without email" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+
+    assert_no_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: { name: "Sem E-mail", tax_id: "52998224725" }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_match "Informe o e-mail do responsável", response.body
+  end
+
+  test "rejects create with invalid email" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+
+    assert_no_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: { name: "E-mail Inválido", tax_id: "52998224725", email: "nao-e-email" }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_match "E-mail inválido", response.body
+  end
+
+  test "rejects create with invalid tax_id" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+
+    assert_no_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: { name: "CNPJ Inválido", tax_id: "12345678901", email: "test@example.com" }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_match "CNPJ ou CPF inválido", response.body
+  end
+
+  test "re-render wizard on step 1 when tax_id missing after onboarding selection" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+
+    post clients_url, params: {
+      onboarding_template_id: template.id,
+      client: { name: "Cliente Sem CNPJ", email: "test@example.com" }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "div[data-step='1']:not(.hidden)"
+    assert_select "div[data-step='2'].hidden"
+    assert_match "Informe o CNPJ ou CPF", response.body
+  end
+
+  test "re-render wizard on step 2 when onboarding not selected" do
+    seed_onboarding_templates!
+
+    post clients_url, params: {
+      onboarding_template_id: "",
+      client: {
+        name: "Cliente Sem Onboarding",
+        email: "sem-onboarding@example.com",
+        tax_id: "52998224725"
+      }
+    }
+
+    assert_response :unprocessable_entity
+    assert_select "div[data-step='1'].hidden"
+    assert_select "div[data-step='2']:not(.hidden)"
+    assert_match "Selecione o tipo de onboarding", response.body
+  end
+
+  test "creates client with full wizard params" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "mei")
+
+    assert_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: {
+          name: "MEI Wizard Test",
+          tax_id: unique_valid_test_tax_id(account: accounts(:one)),
+          email: "mei-wizard@example.com"
+        }
+      }
+    end
+
+    created = Client.find_by!(name: "MEI Wizard Test")
+    assert created.onboarding?
+    assert_equal template.id, created.onboarding_template_id
     assert_redirected_to client_url(created)
   end
 
@@ -123,6 +246,7 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit" do
     get edit_client_url(@client)
     assert_response :success
+    assert_select "[data-controller=?]", "tax-id-input"
   end
 
   test "should update client" do

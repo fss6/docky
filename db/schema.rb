@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -132,13 +132,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
     t.datetime "updated_at", null: false
     t.integer "monthly_deadline_day", default: 10, null: false
     t.string "status", default: "active", null: false
-    t.string "onboarding_kind"
     t.datetime "archived_at"
     t.bigint "archived_by_user_id"
+    t.bigint "onboarding_template_id"
     t.index ["account_id", "tax_id"], name: "index_clients_on_account_id_and_tax_id", unique: true, where: "((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))"
     t.index ["account_id"], name: "index_clients_on_account_id"
     t.index ["archived_at"], name: "index_clients_on_archived_at"
     t.index ["archived_by_user_id"], name: "index_clients_on_archived_by_user_id"
+    t.index ["onboarding_template_id"], name: "index_clients_on_onboarding_template_id"
     t.index ["status"], name: "index_clients_on_status"
   end
 
@@ -306,13 +307,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
     t.bigint "account_id", null: false
     t.bigint "client_id", null: false
     t.string "status", default: "in_progress", null: false
-    t.string "onboarding_kind", null: false
     t.datetime "started_at", null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "onboarding_template_id"
     t.index ["account_id"], name: "index_onboarding_checklists_on_account_id"
     t.index ["client_id"], name: "index_onboarding_checklists_on_client_id", unique: true
+    t.index ["onboarding_template_id"], name: "index_onboarding_checklists_on_onboarding_template_id"
   end
 
   create_table "onboarding_template_items", force: :cascade do |t|
@@ -333,6 +335,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "system", default: false, null: false
+    t.text "description"
     t.index ["account_id", "kind"], name: "index_onboarding_templates_on_account_id_and_kind", unique: true
     t.index ["account_id"], name: "index_onboarding_templates_on_account_id"
   end
@@ -476,6 +479,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
   add_foreign_key "client_checklist_items", "accounts"
   add_foreign_key "client_checklist_items", "clients"
   add_foreign_key "clients", "accounts"
+  add_foreign_key "clients", "onboarding_templates"
   add_foreign_key "clients", "users", column: "archived_by_user_id"
   add_foreign_key "competency_checklist_items", "client_checklist_items"
   add_foreign_key "competency_checklist_items", "competency_checklists"
@@ -504,6 +508,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
   add_foreign_key "onboarding_checklist_items", "users", column: "validated_by_user_id"
   add_foreign_key "onboarding_checklists", "accounts"
   add_foreign_key "onboarding_checklists", "clients"
+  add_foreign_key "onboarding_checklists", "onboarding_templates"
   add_foreign_key "onboarding_template_items", "onboarding_templates"
   add_foreign_key "onboarding_templates", "accounts"
   add_foreign_key "settings", "accounts"

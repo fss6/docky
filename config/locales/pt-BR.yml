@@ -113,6 +113,9 @@ pt-BR:
         name: Nome
         description: Descrição
         contact_email: E-mail de contato
+      client:
+        tax_id: CNPJ / CPF
+        email: E-mail do responsável
       user:
         name: Nome
         email: E-mail
@@ -140,6 +143,16 @@ pt-BR:
           expired: Expirada
     errors:
       models:
+        client:
+          attributes:
+            tax_id:
+              blank: Informe o CNPJ ou CPF
+              invalid: CNPJ ou CPF inválido
+              invalid_format: Informe um CPF (11 dígitos) ou CNPJ (14 dígitos)
+            email:
+              blank: Informe o e-mail do responsável
+              invalid: E-mail inválido
+              taken: já está em uso nesta conta
         user:
           attributes:
             role:
@@ -322,7 +335,7 @@ pt-BR:
       destroy_confirm:
         custom: "Excluir o template \"%{name}\"? Esta ação não pode ser desfeita."
         system: "Excluir o template padrão \"%{name}\"? Esta ação não pode ser desfeita."
-        linked_to_client_flow: "Excluir o template padrão \"%{name}\"? Novos clientes com onboarding deste tipo deixarão de funcionar até um template equivalente existir."
+        in_use: "Excluir o template \"%{name}\"? Ele está vinculado a clientes e não pode ser removido."
       destroy_modal:
         heading: Excluir template?
         confirm: Excluir template
@@ -332,9 +345,12 @@ pt-BR:
         system:
           body_prefix: "Você está prestes a excluir o template padrão "
           body_suffix: ". Esta ação não pode ser desfeita."
-        linked_to_client_flow:
-          body_prefix: "Você está prestes a excluir o template padrão "
-          body_suffix: ". Novos clientes com onboarding deste tipo deixarão de funcionar até um template equivalente existir."
+        in_use:
+          body_prefix: "Você está prestes a excluir o template "
+          body_suffix: ". Ele está vinculado a clientes e não pode ser removido."
+      description_label: Texto de ajuda
+      description_placeholder: "Ex.: Documentos para empresa recém-constituída"
+      description_hint: Aparece no cadastro de cliente ao escolher o template. Se vazio, mostra a quantidade de itens.
       new:
         title: Novo template
         description: Dê um nome ao template. Na sequência, você poderá adicionar os itens de onboarding.
@@ -344,7 +360,7 @@ pt-BR:
         cancel: Cancelar
         back: "← Voltar aos templates"
       show:
-        custom_template_note: Templates personalizados ainda não aparecem na criação de cliente. Eles ficam disponíveis para gestão nesta área.
+        custom_template_note: Templates personalizados aparecem no cadastro de novos clientes.
       edit:
         items_column: Documento
         actions_column: Ações
@@ -440,6 +456,23 @@ pt-BR:
         body: O assunto e o corpo serão substituídos pelo padrão. Clique em Salvar para gravar as alterações.
 
   clients:
+    wizard:
+      step_dados: Dados do cliente
+      step_onboarding: Checklist inicial
+      continue: Continuar
+      back: Voltar
+      skip_title: Pular onboarding
+      skip_description: Cliente entra direto como ativo, sem checklist inicial
+      preview_heading: Documentos deste checklist
+      preview_empty: Selecione um template para ver os documentos
+      preview_skip: Onboarding não será iniciado. O cliente ficará ativo imediatamente.
+      no_templates: Nenhum template disponível.
+      no_templates_link: Crie um em Configurações
+      items_count:
+        one: "%{count} item"
+        other: "%{count} itens"
+      submit_onboarding: Cadastrar e iniciar onboarding
+      submit_skip: Cadastrar cliente
     configure_menu:
       trigger: Configurar
       groups:

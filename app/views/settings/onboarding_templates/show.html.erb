@@ -8,10 +8,8 @@
       <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
         Itens que serão copiados para novos checklists criados com este template.
       </p>
-      <% unless @template.system? %>
-        <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-500">
-          <%= t("settings.onboarding_templates.show.custom_template_note") %>
-        </p>
+      <% if @template.description.present? %>
+        <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-500"><%= @template.description %></p>
       <% end %>
     </div>
     <div class="flex flex-wrap gap-2">

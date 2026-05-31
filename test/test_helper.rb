@@ -28,6 +28,7 @@ Warden.test_mode!
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
   include OnboardingTestHelper
+  include TestTaxIds
 
   setup do
     owner = users(:owner) rescue nil
@@ -39,6 +40,7 @@ module ActiveSupport
   class TestCase
     include OnboardingTestHelper
     include PermissionTestHelper
+    include TestTaxIds
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 

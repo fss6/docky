@@ -1,0 +1,40 @@
+<%# locals: (client:, onboarding_templates: [], wizard_step: 1, selected_onboarding_template_id: nil) %>
+<%= form_with(model: client, html: { novalidate: true }, class: "space-y-6", data: {
+      controller: "client-wizard",
+      client_wizard_templates_value: onboarding_templates_wizard_json(onboarding_templates),
+      client_wizard_initial_step_value: wizard_step,
+      client_wizard_selected_template_id_value: selected_onboarding_template_id.to_s,
+      action: "submit->client-wizard#submit"
+    }) do |form| %>
+  <%= render "shared/record_errors_toast", record: client %>
+
+  <%= render "wizard_stepper", wizard_step: wizard_step %>
+
+  <%= render "wizard_step_dados", form: form, wizard_step: wizard_step %>
+  <%= render "wizard_step_onboarding", onboarding_templates: onboarding_templates, client: client, wizard_step: wizard_step %>
+
+  <div class="flex flex-col-reverse gap-3 border-t border-zinc-100 pt-6 sm:flex-row sm:justify-between">
+    <%= link_to "Cancelar", clients_path, class: "app-btn-secondary text-center sm:text-left" %>
+    <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button type="button"
+              class="app-btn-secondary <%= wizard_step.to_i == 2 ? 'cursor-pointer' : 'hidden cursor-pointer' %>"
+              data-client-wizard-target="backButton"
+              data-action="click->client-wizard#back">
+        <%= t("clients.wizard.back") %>
+      </button>
+      <button type="button"
+              class="app-btn-primary <%= wizard_step.to_i == 1 ? 'cursor-pointer border-0' : 'hidden cursor-pointer border-0' %>"
+              data-client-wizard-target="nextButton"
+              data-action="click->client-wizard#next">
+        <%= t("clients.wizard.continue") %> →
+      </button>
+      <%= form.submit t("clients.wizard.submit_skip"),
+            class: "app-btn-primary #{wizard_step.to_i == 2 ? 'cursor-pointer border-0' : 'hidden cursor-pointer border-0'}",
+            data: {
+              client_wizard_target: "submitButton",
+              skip_label: t("clients.wizard.submit_skip"),
+              onboarding_label: "#{t('clients.wizard.submit_onboarding')} →"
+            } %>
+    </div>
+  </div>
+<% end %>

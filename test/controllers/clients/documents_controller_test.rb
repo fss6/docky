@@ -23,7 +23,7 @@ module Clients
         password_confirmation: "password123"
       )
       ActsAsTenant.with_tenant(@account) do
-        @client = Client.create!(account: @account, name: "Cliente Teste")
+        @client = Client.create!(account: @account, name: "Cliente Teste", tax_id: unique_valid_test_tax_id(account: @account), email: valid_test_client_email)
         month = Date.current.beginning_of_month
         @period = month.strftime("%Y-%m")
         Period.create!(account: @account, client: @client, period: month)

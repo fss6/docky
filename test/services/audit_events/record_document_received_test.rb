@@ -23,7 +23,7 @@ module AuditEvents
         password_confirmation: "password123"
       )
       ActsAsTenant.with_tenant(@account) do
-        @client = Client.create!(account: @account, name: "Cliente")
+        @client = Client.create!(account: @account, name: "Cliente", tax_id: unique_valid_test_tax_id(account: @account), email: valid_test_client_email)
         @period_record = Period.create!(account: @account, client: @client, period: Date.current.beginning_of_month)
         @folder = Folder.create!(account: @account, client: @client, name: Date.current.strftime("%Y-%m"), visible: false)
       end

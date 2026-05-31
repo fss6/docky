@@ -4,35 +4,39 @@
 #
 # Table name: clients
 #
-#  id                   :bigint           not null, primary key
-#  archived_at          :datetime
-#  email                :string
-#  monthly_deadline_day :integer          default(10), not null
-#  name                 :string           not null
-#  notes                :text
-#  onboarding_kind      :string
-#  phone                :string
-#  status               :string           default("active"), not null
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  account_id           :bigint           not null
-#  archived_by_user_id  :bigint
-#  tax_id               :string
+#  id                     :bigint           not null, primary key
+#  archived_at            :datetime
+#  email                  :string
+#  monthly_deadline_day   :integer          default(10), not null
+#  name                   :string           not null
+#  notes                  :text
+#  phone                  :string
+#  status                 :string           default("active"), not null
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  account_id             :bigint           not null
+#  archived_by_user_id    :bigint
+#  onboarding_template_id :bigint
+#  tax_id                 :string
 #
 # Indexes
 #
-#  index_clients_on_account_id             (account_id)
-#  index_clients_on_account_id_and_tax_id  (account_id,tax_id) UNIQUE WHERE ((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))
-#  index_clients_on_archived_at            (archived_at)
-#  index_clients_on_archived_by_user_id    (archived_by_user_id)
-#  index_clients_on_status                 (status)
+#  index_clients_on_account_id              (account_id)
+#  index_clients_on_account_id_and_tax_id   (account_id,tax_id) UNIQUE WHERE ((tax_id IS NOT NULL) AND ((tax_id)::text <> ''::text))
+#  index_clients_on_archived_at             (archived_at)
+#  index_clients_on_archived_by_user_id     (archived_by_user_id)
+#  index_clients_on_onboarding_template_id  (onboarding_template_id)
+#  index_clients_on_status                  (status)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (account_id => accounts.id)
 #  fk_rails_...  (archived_by_user_id => users.id)
+#  fk_rails_...  (onboarding_template_id => onboarding_templates.id)
 #
 class Client < ApplicationRecord
+  include TaxIdValidatable
+
   acts_as_tenant(:account)
 
   enum :status, {
@@ -40,9 +44,8 @@ class Client < ApplicationRecord
     active: "active"
   }, default: :active
 
-  ONBOARDING_KINDS = %w[new_client migration skipped].freeze
-
   belongs_to :archived_by_user, class_name: "User", optional: true
+  belongs_to :onboarding_template, optional: true
 
   has_many :folders, dependent: :nullify
   has_many :client_checklist_items, dependent: :destroy
@@ -55,15 +58,15 @@ class Client < ApplicationRecord
   has_many :upload_invites, dependent: :destroy
   has_many :collection_documents, class_name: "Document", dependent: :nullify
 
-  normalizes :tax_id, with: ->(v) { v.to_s.strip.presence }
+  normalizes :tax_id, with: ->(v) { Client.digits_only(v).presence }
   normalizes :name, with: ->(v) { v.to_s.strip }
   normalizes :email, with: ->(v) { v.to_s.strip.presence }
   normalizes :phone, with: ->(v) { v.to_s.strip.presence }
 
   validates :name, presence: true
+  validates :tax_id, presence: true, uniqueness: { scope: :account_id }
+  validates :email, presence: true, format: { with: Devise.email_regexp }
   validates :monthly_deadline_day, inclusion: { in: 1..28 }
-  validates :tax_id, uniqueness: { scope: :account_id }, allow_blank: true
-  validates :onboarding_kind, inclusion: { in: ONBOARDING_KINDS }, allow_nil: true
 
   scope :kept, -> { where(archived_at: nil) }
 
@@ -108,6 +111,10 @@ class Client < ApplicationRecord
 
   def kept?
     !archived?
+  end
+
+  def onboarding_skipped?
+    active? && onboarding_template_id.nil?
   end
 
   def onboarding_in_progress?

@@ -1,14 +1,18 @@
 <% content_for :title, "Novo cliente · Dokivo" %>
 
-<div class="mx-auto max-w-xl space-y-6">
+<div class="mx-auto max-w-3xl space-y-6">
   <header>
     <p class="text-xs font-semibold uppercase tracking-wide text-accent">Clientes</p>
     <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Novo cliente</h1>
-    <p class="mt-2 text-sm leading-relaxed text-zinc-600">Cadastre uma empresa ou pessoa física atendida pelo escritório.</p>
+    <p class="mt-2 text-sm leading-relaxed text-zinc-600">Cadastre em duas etapas: dados do cliente e checklist inicial.</p>
   </header>
 
   <div class="app-card p-6 sm:p-8">
-    <%= render "form", client: @client, onboarding_template_counts: @onboarding_template_counts || {} %>
+    <%= render "wizard_form",
+          client: @client,
+          onboarding_templates: @onboarding_templates || [],
+          wizard_step: @wizard_step || 1,
+          selected_onboarding_template_id: @selected_onboarding_template_id %>
   </div>
 
   <p>

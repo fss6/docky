@@ -37,7 +37,7 @@ class ClientsController < ApplicationController
 
   def new
     @client = Client.new
-    load_onboarding_template_counts
+    load_onboarding_templates
   end
 
   def edit
@@ -45,13 +45,13 @@ class ClientsController < ApplicationController
 
   def create
     @client = Client.new(client_params)
-    onboarding_kind = params.fetch(:onboarding_kind, "new_client")
+    onboarding_template_id = params[:onboarding_template_id]
 
     respond_to do |format|
       begin
         Clients::CreateWithOnboarding.call(
           client: @client,
-          onboarding_kind: onboarding_kind,
+          onboarding_template_id: onboarding_template_id,
           user: current_user
         )
         notice = if @client.onboarding?
@@ -62,7 +62,8 @@ class ClientsController < ApplicationController
         format.html { redirect_to @client, notice: notice }
         format.json { render :show, status: :created, location: @client }
       rescue ActiveRecord::RecordInvalid
-        load_onboarding_template_counts
+        load_onboarding_templates
+        assign_wizard_error_state
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @client.errors, status: :unprocessable_entity }
       end
@@ -256,9 +257,18 @@ class ClientsController < ApplicationController
     @active_onboarding_invite = UploadInvite.purpose_onboarding.where(client: @client).newest_first.find(&:active?)
   end
 
-  def load_onboarding_template_counts
-    @onboarding_template_counts = OnboardingTemplate.ordered.each_with_object({}) do |template, counts|
-      counts[template.kind] = template.items.count
-    end
+  def load_onboarding_templates
+    @onboarding_templates = OnboardingTemplate.ordered.includes(:items)
+  end
+
+  def assign_wizard_error_state
+    @selected_onboarding_template_id = params[:onboarding_template_id]
+    @wizard_step = if @client.errors[:name].any? || @client.errors[:tax_id].any? || @client.errors[:email].any?
+                     1
+                   elsif @client.errors[:base].any?
+                     2
+                   else
+                     2
+                   end
   end
 end

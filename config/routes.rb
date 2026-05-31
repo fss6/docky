@@ -28,7 +28,6 @@ Rails.application.routes.draw do
     end
     resource :onboarding_activation, only: :create, module: :clients
     resource :onboarding_reopen, only: :create, module: :clients
-    resource :onboarding_start, only: :create, module: :clients
     resources :onboarding_checklist_items, only: %i[index create update destroy], module: :clients do
       member do
         patch :mark_received

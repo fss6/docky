@@ -45,10 +45,6 @@ class ClientPolicy < ApplicationPolicy
     show? && record_kept?
   end
 
-  def start_onboarding?
-    show? && record_kept?
-  end
-
   def manage_onboarding_checklist?
     show? && record_kept?
   end

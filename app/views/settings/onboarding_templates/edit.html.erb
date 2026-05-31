@@ -27,9 +27,16 @@
             <h2 class="mt-1 text-lg font-semibold text-zinc-900">Dados principais</h2>
           </header>
 
-          <div class="mt-4">
+          <div class="mt-4 space-y-4">
             <%= form.label :name, "Nome do template", class: "app-label" %>
             <%= form.text_field :name, class: "app-input mt-1.5" %>
+
+            <%= form.label :description, t("settings.onboarding_templates.description_label"), class: "app-label" %>
+            <%= form.text_area :description,
+                  class: "app-input mt-1.5 min-h-[5rem]",
+                  rows: 3,
+                  placeholder: t("settings.onboarding_templates.description_placeholder") %>
+            <p class="text-xs leading-relaxed text-zinc-500"><%= t("settings.onboarding_templates.description_hint") %></p>
           </div>
         </section>
 

@@ -1,0 +1,21 @@
+<%# locals: (wizard_step: 1) %>
+<% active_step = wizard_step.to_i %>
+<nav aria-label="Progresso do cadastro" class="mb-6">
+  <ol class="flex items-center gap-3 text-sm">
+    <li data-client-wizard-target="stepIndicator"
+        data-step="1"
+        aria-current="<%= active_step == 1 ? 'step' : 'false' %>"
+        class="flex items-center gap-2 <%= active_step == 1 ? 'font-semibold text-accent' : 'text-zinc-500' %>">
+      <span class="inline-flex h-7 w-7 items-center justify-center rounded-full <%= active_step == 1 ? 'bg-accent text-white' : 'bg-zinc-100 text-zinc-600' %> text-xs font-bold">1</span>
+      <%= t("clients.wizard.step_dados") %>
+    </li>
+    <li class="text-zinc-300" aria-hidden="true">→</li>
+    <li data-client-wizard-target="stepIndicator"
+        data-step="2"
+        aria-current="<%= active_step == 2 ? 'step' : 'false' %>"
+        class="flex items-center gap-2 <%= active_step == 2 ? 'font-semibold text-accent' : 'text-zinc-500' %>">
+      <span class="inline-flex h-7 w-7 items-center justify-center rounded-full <%= active_step == 2 ? 'bg-accent text-white' : 'bg-zinc-100 text-zinc-600' %> text-xs font-bold">2</span>
+      <%= t("clients.wizard.step_onboarding") %>
+    </li>
+  </ol>
+</nav>

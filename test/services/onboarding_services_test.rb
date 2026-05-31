@@ -39,7 +39,8 @@ class OnboardingServicesTest < ActiveSupport::TestCase
   end
 
   test "migration template has more items" do
-    client = create_onboarding_client(onboarding_kind: "migration")
+    migration_template = accounts(:one).onboarding_templates.find_by!(kind: "migration")
+    client = create_onboarding_client(onboarding_template: migration_template)
     assert_equal 12, client.onboarding_checklist.items.count
   end
 

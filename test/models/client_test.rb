@@ -5,8 +5,55 @@ require "test_helper"
 class ClientTest < ActiveSupport::TestCase
   test "requires name" do
     ActsAsTenant.with_tenant(accounts(:one)) do
-      c = Client.new(name: "   ")
+      c = Client.new(name: "   ", tax_id: "39053344705", email: "test@example.com")
       assert_not c.valid?
+    end
+  end
+
+  test "requires tax_id" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "", email: "test@example.com")
+      assert_not c.valid?
+      assert_includes c.errors[:tax_id], "Informe o CNPJ ou CPF"
+    end
+  end
+
+  test "requires email" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "39053344705", email: "")
+      assert_not c.valid?
+      assert_includes c.errors[:email], "Informe o e-mail do responsável"
+    end
+  end
+
+  test "rejects invalid email" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "39053344705", email: "invalido")
+      assert_not c.valid?
+      assert_includes c.errors[:email], "E-mail inválido"
+    end
+  end
+
+  test "accepts valid email" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "52998224725", email: "contato@empresa.com")
+      assert c.valid?
+    end
+  end
+
+  test "normalizes tax_id to digits only" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "390.533.447-05", email: "test@example.com")
+      c.valid?
+      assert_equal "39053344705", c.tax_id
+    end
+  end
+
+  test "rejects invalid tax_id" do
+    ActsAsTenant.with_tenant(accounts(:one)) do
+      c = Client.new(name: "Cliente Teste", tax_id: "12345678901", email: "test@example.com")
+      assert_not c.valid?
+      assert_includes c.errors[:tax_id], "CNPJ ou CPF inválido"
     end
   end
 
@@ -29,7 +76,7 @@ class ClientTest < ActiveSupport::TestCase
       assert_includes results, alpha
       assert_not_includes results, beta
 
-      results = Client.filtered_by_index_params({ q: "11222333000181" })
+      results = Client.filtered_by_index_params({ q: "19131243000197" })
       assert_includes results, alpha
       assert_not_includes results, beta
 

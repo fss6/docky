@@ -6,33 +6,80 @@ class ClientsOnboardingTest < ActionDispatch::IntegrationTest
   setup do
     sign_in users(:owner)
     seed_onboarding_templates!
+    @new_company_template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+    @migration_template = accounts(:one).onboarding_templates.find_by!(kind: "migration")
   end
 
   test "creates client in onboarding with checklist" do
     assert_difference("Client.count") do
       post clients_url, params: {
-        onboarding_kind: "new_client",
-        client: { name: "Padaria Nova", email: "padaria@example.com" }
+        onboarding_template_id: @new_company_template.id,
+        client: {
+          name: "Padaria Nova",
+          email: "padaria@example.com",
+          tax_id: unique_valid_test_tax_id(account: accounts(:one))
+        }
       }
     end
 
     client = Client.find_by!(name: "Padaria Nova")
     assert client.onboarding?
+    assert_equal @new_company_template.id, client.onboarding_template_id
     assert client.onboarding_checklist.present?
     assert client.onboarding_checklist.items.count.positive?
     assert_nil client.competency_checklists.find_by(period: Date.current.beginning_of_month)
     assert_redirected_to client_url(client)
   end
 
+  test "creates client with custom template" do
+    custom = accounts(:one).onboarding_templates.create!(name: "Clínica odontológica", system: false)
+    custom.items.create!(name: "Alvará sanitário", position: 0)
+
+    post clients_url, params: {
+      onboarding_template_id: custom.id,
+      client: {
+        name: "Clínica Sorriso",
+        email: "clinica@example.com",
+        tax_id: unique_valid_test_tax_id(account: accounts(:one))
+      }
+    }
+
+    client = Client.find_by!(name: "Clínica Sorriso")
+    assert client.onboarding?
+    assert_equal custom.id, client.onboarding_template_id
+    assert_equal 1, client.onboarding_checklist.items.count
+  end
+
   test "creates active client when skipping onboarding" do
     post clients_url, params: {
-      onboarding_kind: "skipped",
-      client: { name: "Cliente Pronto" }
+      onboarding_template_id: "skipped",
+      client: {
+        name: "Cliente Pronto",
+        email: "pronto@example.com",
+        tax_id: unique_valid_test_tax_id(account: accounts(:one))
+      }
     }
 
     client = Client.find_by!(name: "Cliente Pronto")
     assert client.active?
+    assert_nil client.onboarding_template_id
     assert client.competency_checklists.where(period: Date.current.beginning_of_month).exists?
+  end
+
+  test "requires onboarding template selection" do
+    assert_no_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: "",
+        client: {
+          name: "Cliente Sem Onboarding",
+          email: "sem-onboarding@example.com",
+          tax_id: OnboardingTestHelper::VALID_TEST_CPF
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_match "Selecione o tipo de onboarding", response.body
   end
 
   test "shows onboarding layout for onboarding client" do
@@ -107,5 +154,16 @@ class ClientsOnboardingTest < ActionDispatch::IntegrationTest
     get public_onboarding_upload_url(token: invite.token)
     assert_response :success
     assert_match "Vamos configurar sua conta?", response.body
+  end
+
+  test "migration template has more items than new company" do
+    client = create_onboarding_client(onboarding_template: @migration_template, tax_id: "52998224725")
+    new_company_client = create_onboarding_client(
+      name: "Empresa Nova",
+      onboarding_template: @new_company_template,
+      tax_id: "15350946056"
+    )
+
+    assert_operator client.onboarding_checklist.items.count, :>, new_company_client.onboarding_checklist.items.count
   end
 end

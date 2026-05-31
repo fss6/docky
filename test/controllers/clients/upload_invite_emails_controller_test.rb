@@ -38,6 +38,7 @@ module Clients
 
     test "send_email returns unprocessable when client email is blank" do
       client_without_email = clients(:beta)
+      client_without_email.update_column(:email, nil)
 
       invite = ActsAsTenant.with_tenant(accounts(:one)) do
         UploadInvite.create!(

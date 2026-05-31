@@ -65,7 +65,7 @@ module Settings
     end
 
     def create_template_params
-      params.require(:onboarding_template).permit(:name)
+      params.require(:onboarding_template).permit(:name, :description)
     end
 
     def template_params
@@ -73,6 +73,7 @@ module Settings
         .require(:onboarding_template)
         .permit(
           :name,
+          :description,
           items_attributes: %i[id name help_text position _destroy]
         )
     end

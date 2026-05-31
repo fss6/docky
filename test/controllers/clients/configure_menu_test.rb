@@ -23,7 +23,7 @@ module Clients
         password_confirmation: "password123"
       )
       ActsAsTenant.with_tenant(@account) do
-        @active_client = Client.create!(account: @account, name: "Cliente Ativo", status: :active)
+        @active_client = Client.create!(account: @account, name: "Cliente Ativo", status: :active, tax_id: OnboardingTestHelper::VALID_TEST_CNPJ, email: valid_test_client_email)
         @period_param = Date.current.strftime("%Y-%m")
         CompetencyChecklist.create!(
           account: @account,
@@ -32,11 +32,12 @@ module Clients
         )
       end
       seed_onboarding_templates!(@account)
+      template = @account.onboarding_templates.find_by!(kind: "new_company")
       ActsAsTenant.with_tenant(@account) do
-        onboarding_client = Client.new(name: "Cliente Onboarding", email: "onb@example.com")
+        onboarding_client = Client.new(name: "Cliente Onboarding", email: "onb@example.com", tax_id: unique_valid_test_tax_id(account: @account))
         @onboarding_client = Clients::CreateWithOnboarding.call(
           client: onboarding_client,
-          onboarding_kind: "new_client",
+          onboarding_template_id: template.id,
           user: @user,
           account: @account
         )
@@ -52,16 +53,15 @@ module Clients
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.checklist_template.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.client_data.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.checklist_template.title"))}/
-        assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_start.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_reopen.title"))}/
         assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.archive_client.title"))}/
-        assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.onboarding_start_confirm_modal.heading")
         assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.onboarding_reopen_confirm_modal.heading")
         assert_select "button[data-app-confirm-modal-heading-param=?]", I18n.t("clients.archive_confirm_modal.heading")
         assert_select "*", text: /Excluir cliente/, count: 0
         assert_select "button[data-app-confirm-modal-item-label-param=?]", @active_client.name
         assert_select "a[href=?]", settings_path, count: 0
         assert_select "*", text: /Mensagens de compartilhamento/, count: 0
+        assert_select "*", text: /#{Regexp.escape(I18n.t("clients.configure_menu.onboarding_start.title"))}/, count: 0
       end
     end
 

@@ -1,0 +1,5 @@
+<%# locals: (form:, wizard_step: 1) %>
+<div data-client-wizard-target="step" data-step="1" class="app-card p-5 space-y-4<%= ' hidden' unless wizard_step.to_i == 1 %>">
+  <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("clients.wizard.step_dados") %></p>
+  <%= render "form_fields", form: form, client: form.object %>
+</div>

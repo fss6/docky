@@ -28,6 +28,33 @@ module ClientsHelper
     tab.to_s == active_tab.to_s
   end
 
+  def format_tax_id(tax_id)
+    digits = Client.digits_only(tax_id)
+    return "—" if digits.blank?
+
+    if digits.length == 11
+      digits.gsub(/(\d{3})(\d{3})(\d{3})(\d{2})/, '\1.\2.\3-\4')
+    elsif digits.length == 14
+      digits.gsub(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '\1.\2.\3/\4-\5')
+    else
+      digits
+    end
+  end
+
+  def onboarding_templates_wizard_json(templates)
+    templates.map do |template|
+      {
+        id: template.id,
+        name: template.name,
+        description: template.description,
+        system: template.system?,
+        items: template.items.ordered.map do |item|
+          { name: item.name, help_text: item.help_text }
+        end
+      }
+    end.to_json
+  end
+
   def client_tab_classes(tab, active_tab)
     base = "inline-flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-medium no-underline transition-colors"
     if client_tab_active?(tab, active_tab)
@@ -258,19 +285,6 @@ module ClientsHelper
 
   def client_onboarding_badge_classes
     "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold client-onboarding-badge ring-1 ring-inset ring-violet-600/20"
-  end
-
-  def client_onboarding_start_confirm_modal_data(client:)
-    app_confirm_modal_open_data(
-      url: client_onboarding_start_path(client),
-      item_label: client.name,
-      http_method: "post",
-      heading: I18n.t("clients.onboarding_start_confirm_modal.heading"),
-      body_prefix: I18n.t("clients.onboarding_start_confirm_modal.body_prefix"),
-      body_suffix: I18n.t("clients.onboarding_start_confirm_modal.body_suffix"),
-      confirm_text: I18n.t("clients.onboarding_start_confirm_modal.confirm"),
-      confirm_variant: "primary"
-    )
   end
 
   def client_onboarding_reopen_confirm_modal_data(client:)

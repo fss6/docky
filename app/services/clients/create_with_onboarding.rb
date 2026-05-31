@@ -2,22 +2,26 @@
 
 module Clients
   class CreateWithOnboarding
-    def self.call(client:, onboarding_kind:, user:, account: ActsAsTenant.current_tenant)
-      new(client: client, onboarding_kind: onboarding_kind, user: user, account: account).call
+    SKIPPED_VALUE = "skipped"
+
+    def self.call(client:, onboarding_template_id:, user:, account: ActsAsTenant.current_tenant)
+      new(client: client, onboarding_template_id: onboarding_template_id, user: user, account: account).call
     end
 
-    def initialize(client:, onboarding_kind:, user:, account:)
+    def initialize(client:, onboarding_template_id:, user:, account:)
       @client = client
-      @onboarding_kind = onboarding_kind.to_s
+      @onboarding_template_id = onboarding_template_id.to_s
       @user = user
       @account = account
     end
 
     def call
+      validate_onboarding_selection!
+
       Client.transaction do
-        if @onboarding_kind == "skipped"
+        if skip_onboarding?
           @client.status = :active
-          @client.onboarding_kind = "skipped"
+          @client.onboarding_template = nil
           @client.save!
           Periods::OpenForClient.call(
             client: @client,
@@ -25,12 +29,13 @@ module Clients
             account: @account
           )
         else
+          template = @account.onboarding_templates.find(@onboarding_template_id)
           @client.status = :onboarding
-          @client.onboarding_kind = @onboarding_kind
+          @client.onboarding_template = template
           @client.save!
           Onboarding::BuildFromTemplate.call(
             client: @client,
-            onboarding_kind: @onboarding_kind,
+            template: template,
             account: @account
           )
         end
@@ -40,10 +45,36 @@ module Clients
           user: @user,
           event_type: "client.created",
           subject: @client,
-          metadata: { status: @client.status, onboarding_kind: @onboarding_kind }
+          metadata: audit_metadata
         )
 
         @client
+      end
+    end
+
+    private
+
+    def skip_onboarding?
+      @onboarding_template_id == SKIPPED_VALUE
+    end
+
+    def validate_onboarding_selection!
+      return if skip_onboarding?
+      return if @onboarding_template_id.present? && @account.onboarding_templates.exists?(@onboarding_template_id)
+
+      @client.errors.add(:base, "Selecione o tipo de onboarding")
+      raise ActiveRecord::RecordInvalid, @client
+    end
+
+    def audit_metadata
+      if skip_onboarding?
+        { status: @client.status, onboarding_skipped: true }
+      else
+        {
+          status: @client.status,
+          onboarding_template_id: @client.onboarding_template_id,
+          onboarding_template_name: @client.onboarding_template.name
+        }
       end
     end
   end

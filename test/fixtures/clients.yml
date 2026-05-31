@@ -3,7 +3,7 @@
 alpha:
   account: one
   name: Cliente Alpha
-  tax_id: "11222333000181"
+  tax_id: "19131243000197"
   email: alpha@example.com
   phone: ""
   status: active
@@ -11,7 +11,7 @@ alpha:
 beta:
   account: one
   name: Cliente Beta
-  tax_id: ""
-  email: ""
+  tax_id: "39053344705"
+  email: beta@example.com
   phone: ""
   status: active

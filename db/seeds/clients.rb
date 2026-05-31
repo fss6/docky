@@ -27,7 +27,7 @@ module Seeds
       "Dados bancarios da empresa",
       "Documentos dos socios"
     ].freeze
-    ONBOARDING_KINDS = Client::ONBOARDING_KINDS.freeze
+    ONBOARDING_TEMPLATE_KINDS = %w[new_company migration mei].freeze
 
     def run!(total_clients: TOTAL_CLIENTS)
       ensure_default_plan!
@@ -40,6 +40,7 @@ module Seeds
 
       ActsAsTenant.with_tenant(account) do
         owner = ensure_owner_user!(account)
+        Onboarding::SeedDefaultTemplates.call(account: account)
 
         total_clients.times do |index|
           sequence = index + 1
@@ -104,6 +105,8 @@ module Seeds
     def upsert_client!(account:, sequence:, onboarding:)
       suffix = format("%02d", sequence)
       tax_id = format("9000000000%04d", sequence)
+      template_kind = ONBOARDING_TEMPLATE_KINDS[sequence % ONBOARDING_TEMPLATE_KINDS.size]
+      template = account.onboarding_templates.find_by(kind: template_kind) if onboarding
 
       client = Client.find_or_initialize_by(account: account, tax_id: tax_id)
       client.assign_attributes(
@@ -113,7 +116,7 @@ module Seeds
         notes: build_notes(sequence: sequence, onboarding: onboarding),
         monthly_deadline_day: (sequence % 28) + 1,
         status: onboarding ? :onboarding : :active,
-        onboarding_kind: onboarding ? ONBOARDING_KINDS[sequence % ONBOARDING_KINDS.size] : nil
+        onboarding_template: onboarding ? template : nil
       )
       client.save!
       client
@@ -249,7 +252,7 @@ module Seeds
         client_id: client.id
       )
       checklist.assign_attributes(
-        onboarding_kind: client.onboarding_kind || ONBOARDING_KINDS.first,
+        onboarding_template: client.onboarding_template,
         status: :in_progress,
         started_at: checklist.started_at || rand(5..40).days.ago
       )
