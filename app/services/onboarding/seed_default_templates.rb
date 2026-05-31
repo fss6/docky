@@ -66,6 +66,7 @@ module Onboarding
     def seed_template!(template, config:, position:)
       template.name = config[:name] if template.new_record? || template.name.blank?
       template.position = position if template.new_record?
+      template.system = true
       template.save!
 
       return if template.items.exists?

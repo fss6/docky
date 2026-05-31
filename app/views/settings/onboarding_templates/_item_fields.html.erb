@@ -13,22 +13,27 @@
       <span class="text-sm font-semibold leading-none">::</span>
     </button>
 
-    <div class="space-y-3">
+    <div class="space-y-4">
       <div>
-      <%= form.label :name, "Nome do item", class: "app-label lg:sr-only" %>
-      <%= form.text_field :name, class: "app-input mt-1.5" %>
+        <%= form.label :name, t("settings.onboarding_templates.items.name_label"), class: "app-label" %>
+        <%= form.text_field :name,
+              class: "app-input mt-1.5",
+              placeholder: t("settings.onboarding_templates.items.name_placeholder") %>
+        <p class="mt-1.5 text-xs leading-relaxed text-zinc-500"><%= t("settings.onboarding_templates.items.name_hint") %></p>
       </div>
       <div>
-      <%= form.label :help_text, "Texto de ajuda", class: "app-label lg:sr-only" %>
-      <%= form.text_area :help_text,
-            rows: 1,
-            class: "app-input mt-1.5 resize-none",
-            data: { controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
+        <%= form.label :help_text, t("settings.onboarding_templates.items.help_text_label"), class: "app-label" %>
+        <%= form.text_area :help_text,
+              rows: 1,
+              class: "app-input mt-1.5 resize-none",
+              placeholder: t("settings.onboarding_templates.items.help_text_placeholder"),
+              data: { controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
+        <p class="mt-1.5 text-xs leading-relaxed text-zinc-500"><%= t("settings.onboarding_templates.items.help_text_hint") %></p>
       </div>
     </div>
 
     <button type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 lg:mt-7 lg:justify-self-end"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-200 text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 lg:justify-self-end"
             title="Remover item"
             aria-label="Remover item"
             data-action="nested-sortable-list#remove">

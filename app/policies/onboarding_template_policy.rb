@@ -21,6 +21,10 @@ class OnboardingTemplatePolicy < ApplicationPolicy
     update?
   end
 
+  def new?
+    create?
+  end
+
   def destroy?
     update?
   end

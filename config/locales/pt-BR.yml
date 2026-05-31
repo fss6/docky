@@ -308,6 +308,53 @@ pt-BR:
         other: "%{count} erros impediram salvar este %{resource}:"
 
   settings:
+    onboarding_templates:
+      actions:
+        new: Novo template
+        destroy: Excluir
+      origin:
+        system: Padrão
+        custom: Personalizado
+      flashes:
+        created: Template de onboarding criado com sucesso.
+        updated: Template de onboarding atualizado com sucesso.
+        destroyed: Template de onboarding excluído com sucesso.
+      destroy_confirm:
+        custom: "Excluir o template \"%{name}\"? Esta ação não pode ser desfeita."
+        system: "Excluir o template padrão \"%{name}\"? Esta ação não pode ser desfeita."
+        linked_to_client_flow: "Excluir o template padrão \"%{name}\"? Novos clientes com onboarding deste tipo deixarão de funcionar até um template equivalente existir."
+      destroy_modal:
+        heading: Excluir template?
+        confirm: Excluir template
+        custom:
+          body_prefix: "Você está prestes a excluir o template "
+          body_suffix: ". Esta ação não pode ser desfeita."
+        system:
+          body_prefix: "Você está prestes a excluir o template padrão "
+          body_suffix: ". Esta ação não pode ser desfeita."
+        linked_to_client_flow:
+          body_prefix: "Você está prestes a excluir o template padrão "
+          body_suffix: ". Novos clientes com onboarding deste tipo deixarão de funcionar até um template equivalente existir."
+      new:
+        title: Novo template
+        description: Dê um nome ao template. Na sequência, você poderá adicionar os itens de onboarding.
+        name_label: Nome do template
+        name_placeholder: "Ex.: Clínica médica"
+        submit: Criar e adicionar itens
+        cancel: Cancelar
+        back: "← Voltar aos templates"
+      show:
+        custom_template_note: Templates personalizados ainda não aparecem na criação de cliente. Eles ficam disponíveis para gestão nesta área.
+      edit:
+        items_column: Documento
+        actions_column: Ações
+      items:
+        name_label: Nome do documento
+        name_hint: Título que o cliente verá no checklist.
+        name_placeholder: "Ex.: Contrato social, RG / CPF dos sócios"
+        help_text_label: Instrução (opcional)
+        help_text_hint: Orientação extra sobre formato, prazo ou onde encontrar o documento.
+        help_text_placeholder: "Ex.: Versão assinada, conta de luz dos últimos 3 meses"
     permissions:
       title: Permissões da equipe
       eyebrow: Acesso

@@ -8,20 +8,38 @@
       <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">
         Itens que serão copiados para novos checklists criados com este template.
       </p>
+      <% unless @template.system? %>
+        <p class="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-500">
+          <%= t("settings.onboarding_templates.show.custom_template_note") %>
+        </p>
+      <% end %>
     </div>
     <div class="flex flex-wrap gap-2">
       <% if policy(@template).edit? %>
         <%= link_to "Editar", edit_settings_onboarding_template_path(@template), class: "app-btn-primary" %>
+      <% end %>
+      <% if policy(@template).destroy? %>
+        <%= button_to t("settings.onboarding_templates.actions.destroy"),
+              settings_onboarding_template_path(@template),
+              method: :delete,
+              form: { data: { turbo_confirm: @template.destroy_confirm_message } },
+              class: "app-btn-secondary border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50" %>
       <% end %>
       <%= link_to "Voltar", settings_onboarding_templates_path, class: "app-btn-secondary" %>
     </div>
   </header>
 
   <section class="app-card p-5 sm:p-6">
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-3">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tipo</p>
-        <p class="mt-1 text-sm font-medium text-zinc-900"><%= @template.kind.humanize %></p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Origem</p>
+        <p class="mt-1 text-sm font-medium text-zinc-900">
+          <%= @template.system? ? t("settings.onboarding_templates.origin.system") : t("settings.onboarding_templates.origin.custom") %>
+        </p>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Identificador</p>
+        <p class="mt-1 text-sm font-medium text-zinc-900"><%= @template.kind %></p>
       </div>
       <div>
         <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Itens</p>

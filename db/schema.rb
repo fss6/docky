@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_29_210000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_31_114718) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -332,6 +332,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_29_210000) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "system", default: false, null: false
     t.index ["account_id", "kind"], name: "index_onboarding_templates_on_account_id_and_kind", unique: true
     t.index ["account_id"], name: "index_onboarding_templates_on_account_id"
   end

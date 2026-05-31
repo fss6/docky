@@ -88,7 +88,7 @@ Rails.application.routes.draw do
     resource :ai_settings, only: %i[edit update]
     resource :upload_share, only: %i[edit update], controller: "upload_shares"
     resource :onboarding_share, only: %i[edit update], controller: "onboarding_shares"
-    resources :onboarding_templates, only: %i[index show edit update]
+    resources :onboarding_templates, only: %i[index show new create edit update destroy]
   end
 
   get "folders", to: "legacy_folders_redirect#index", as: :folders
