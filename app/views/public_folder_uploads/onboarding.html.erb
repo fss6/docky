@@ -1,20 +1,17 @@
 <% content_for :title, "Onboarding · #{@client.name}" %>
 
 <div class="mx-auto w-full max-w-xl space-y-6">
-  <div class="rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-[var(--shadow-card)] sm:px-6">
-    <%= render "public_folder_uploads/portal_header", account: @account %>
-  </div>
-
-  <header class="space-y-2 text-center">
-    <p class="text-sm text-zinc-600">Bem-vindo · <strong class="text-zinc-900"><%= @client.name %></strong></p>
-  </header>
-
   <div class="portal-onboarding-hero">
-    <h1 class="text-lg font-semibold">Vamos configurar sua conta?</h1>
-    <p class="mt-2 text-sm text-white/90">
-      Precisamos de alguns documentos para configurar tudo direitinho.<br>
-      São poucos itens — depois disso, é só usar.
-    </p>
+    <%= render "public_folder_uploads/portal_header", account: @account, variant: :on_hero %>
+
+    <div class="pt-4 text-center">
+      <p class="text-sm text-white/80">Bem-vindo, <%= @client.name %>.</p>
+      <h1 class="mt-1.5 text-xl font-semibold sm:text-2xl">Vamos configurar sua conta?</h1>
+      <p class="mt-2 text-sm text-white/90">
+        Precisamos de alguns documentos para configurar tudo direitinho.<br>
+        São poucos itens — depois disso, é só usar.
+      </p>
+    </div>
   </div>
 
   <% if @progress.present? %>

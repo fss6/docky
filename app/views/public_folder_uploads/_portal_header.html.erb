@@ -1,4 +1,15 @@
-<div class="flex items-center justify-center gap-2.5">
-  <%= client_facing_account_logo(account) %>
-  <p class="text-base font-semibold text-zinc-900"><%= account.name %></p>
-</div>
+<% variant ||= :default %>
+
+<% if variant == :on_hero %>
+  <div class="flex items-center justify-center gap-2.5 border-b border-white/15 pb-4">
+    <span class="inline-flex rounded-md bg-white/15 p-1">
+      <%= client_facing_account_logo(account) %>
+    </span>
+    <p class="text-sm font-medium text-white/75"><%= account.name %></p>
+  </div>
+<% else %>
+  <div class="flex items-center justify-center gap-2.5">
+    <%= client_facing_account_logo(account) %>
+    <p class="text-base font-semibold text-zinc-900"><%= account.name %></p>
+  </div>
+<% end %>

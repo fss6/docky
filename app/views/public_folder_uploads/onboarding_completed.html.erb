@@ -1,20 +1,19 @@
 <% content_for :title, t("public_folder_uploads.onboarding_completed.title", client: @client.name) %>
 
 <div class="mx-auto w-full max-w-xl space-y-6">
-  <div class="rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-[var(--shadow-card)] sm:px-6">
-    <%= render "public_folder_uploads/portal_header", account: @account %>
-  </div>
-
-  <header class="space-y-2 text-center">
-    <p class="text-sm text-zinc-600"><%= @client.name %></p>
-  </header>
-
   <div class="portal-onboarding-completed-hero">
-    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-lg" aria-hidden="true">✓</span>
-    <h1 class="mt-3 text-lg font-semibold"><%= t("public_folder_uploads.onboarding_completed.heading") %></h1>
-    <p class="mt-2 text-sm text-white/90">
-      <%= t("public_folder_uploads.onboarding_completed.body") %>
-    </p>
+    <%= render "public_folder_uploads/portal_header", account: @account, variant: :on_hero %>
+
+    <div class="pt-4 text-center">
+      <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-lg" aria-hidden="true">✓</span>
+      <p class="mt-3 text-sm text-white/80">
+        <strong class="font-semibold text-white"><%= @client.name %></strong>
+      </p>
+      <h1 class="mt-2 text-lg font-semibold"><%= t("public_folder_uploads.onboarding_completed.heading") %></h1>
+      <p class="mt-2 text-sm text-white/90">
+        <%= t("public_folder_uploads.onboarding_completed.body") %>
+      </p>
+    </div>
   </div>
 
   <% if @progress.present? %>
