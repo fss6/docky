@@ -18,11 +18,13 @@
     <p class="text-sm text-zinc-600">
       Quando todos os itens forem recebidos, o cliente será marcado como <strong class="text-zinc-900">Ativo</strong> automaticamente.
     </p>
-    <button type="button"
-            class="app-btn-secondary shrink-0"
-            data-action="click->app-confirm-modal#open"
-            <%= onboarding_activate_confirm_modal_data(url: client_onboarding_activation_path(client), client_name: client.name) %>>
+    <%= button_tag type: "button",
+          class: "app-btn-secondary shrink-0",
+          data: onboarding_activate_confirm_modal_data(
+            url: client_onboarding_activation_path(client),
+            client_name: client.name
+          ) do %>
       Marcar como ativo manualmente
-    </button>
+    <% end %>
   </div>
 </section>

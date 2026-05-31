@@ -44,6 +44,22 @@ class ClientsOnboardingTest < ActionDispatch::IntegrationTest
     assert_no_match "Status do mês", response.body
   end
 
+  test "onboarding page activate button has correct confirm modal data" do
+    client = create_onboarding_client
+    get client_url(client)
+
+    assert_response :success
+    assert_select "button", text: "Marcar como ativo manualmente" do |buttons|
+      btn = buttons.first
+      assert_equal "Marcar como ativo?", btn["data-app-confirm-modal-heading-param"]
+      assert_equal client_onboarding_activation_path(client), btn["data-app-confirm-modal-url-param"]
+      assert_equal client.name, btn["data-app-confirm-modal-item-label-param"]
+      assert_equal "post", btn["data-app-confirm-modal-http-method-param"]
+      assert_equal "Marcar como ativo", btn["data-app-confirm-modal-confirm-text-param"]
+      assert_equal "primary", btn["data-app-confirm-modal-confirm-variant-param"]
+    end
+  end
+
   test "manual activation marks client active and opens period" do
     client = create_onboarding_client
     post client_onboarding_activation_url(client)
