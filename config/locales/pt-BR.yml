@@ -467,7 +467,7 @@ pt-BR:
     onboarding_completed:
       title: "Configuração concluída · %{client}"
       heading: Configuração concluída!
-      body: Sua contabilidade finalizou a configuração da sua conta.
+      body: Obrigado pelo envio! Recebemos seus documentos e sua conta já está pronta para uso.
       progress_label: Documentos recebidos
       email_notice: Enviamos uma confirmação para %{email}.
       close_hint: Pode fechar esta página.
