@@ -29,16 +29,7 @@ module ClientsHelper
   end
 
   def format_tax_id(tax_id)
-    digits = Client.digits_only(tax_id)
-    return "—" if digits.blank?
-
-    if digits.length == 11
-      digits.gsub(/(\d{3})(\d{3})(\d{3})(\d{2})/, '\1.\2.\3-\4')
-    elsif digits.length == 14
-      digits.gsub(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '\1.\2.\3/\4-\5')
-    else
-      digits
-    end
+    TaxId.format(tax_id)
   end
 
   def onboarding_templates_wizard_json(templates)

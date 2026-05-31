@@ -127,8 +127,8 @@ export default class extends Controller {
     const taxHidden = this._step1Field("client[tax_id]")
     const taxDisplay = this.element.querySelector("[data-tax-id-input-target='display']")
     if (taxHidden) {
-      const digits = taxHidden.value.replace(/\D/g, "")
-      if (digits.length !== 11 && digits.length !== 14) {
+      const taxId = taxHidden.value.trim()
+      if (taxId.length !== 11 && taxId.length !== 14) {
         valid = false
         firstInvalid = firstInvalid || taxDisplay || taxHidden
       }

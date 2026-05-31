@@ -1,16 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
+import { formatTaxId, normalizeTaxId } from "tax_id"
 
 export default class extends Controller {
   static targets = ["display", "hidden"]
+  static values = { prefer: { type: String, default: "auto" } }
 
   connect() {
     this._syncDisplayFromHidden()
   }
 
   onInput() {
-    const digits = this._digitsOnly(this.displayTarget.value).slice(0, 14)
-    this.hiddenTarget.value = digits
-    this.displayTarget.value = this._format(digits)
+    this._applyMask()
   }
 
   onBlur() {
@@ -18,37 +18,22 @@ export default class extends Controller {
   }
 
   sync() {
-    const digits = this._digitsOnly(this.displayTarget.value).slice(0, 14)
-    this.hiddenTarget.value = digits
-    this.displayTarget.value = this._format(digits)
+    this._applyMask()
+  }
+
+  _applyMask() {
+    const normalized = normalizeTaxId(this.displayTarget.value)
+    const formatted = formatTaxId(normalized, { prefer: this.preferValue })
+
+    this.hiddenTarget.value = normalized
+    this.displayTarget.value = formatted
   }
 
   _syncDisplayFromHidden() {
-    const digits = this._digitsOnly(this.hiddenTarget.value)
-    this.hiddenTarget.value = digits
-    if (digits) {
-      this.displayTarget.value = this._format(digits)
+    const normalized = normalizeTaxId(this.hiddenTarget.value)
+    this.hiddenTarget.value = normalized
+    if (normalized) {
+      this.displayTarget.value = formatTaxId(normalized, { prefer: this.preferValue })
     }
-  }
-
-  _digitsOnly(value) {
-    return value.toString().replace(/\D/g, "")
-  }
-
-  _format(digits) {
-    if (!digits) return ""
-
-    if (digits.length <= 11) {
-      return digits
-        .replace(/^(\d{3})(\d)/, "$1.$2")
-        .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-        .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4")
-    }
-
-    return digits
-      .replace(/^(\d{2})(\d)/, "$1.$2")
-      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
-      .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5")
   }
 }

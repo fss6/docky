@@ -3,6 +3,8 @@
 module OnboardingTestHelper
   VALID_TEST_CPF = "39053344705"
   VALID_TEST_CNPJ = "19131243000197"
+  # CNPJ alfanumérico (DV módulo 11, base 12ABC34501DE — Receita Federal)
+  VALID_TEST_ALPHANUMERIC_CNPJ = "12ABC34501DE35"
 
   def seed_onboarding_templates!(account = accounts(:one))
     Onboarding::SeedDefaultTemplates.call(account: account)

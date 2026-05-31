@@ -128,6 +128,29 @@ class ClientsControllerTest < ActionDispatch::IntegrationTest
     assert_match "E-mail inválido", response.body
   end
 
+  test "should create client with alphanumeric cnpj" do
+    seed_onboarding_templates!
+    template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")
+    tax_id = OnboardingTestHelper::VALID_TEST_ALPHANUMERIC_CNPJ
+
+    assert_difference("Client.count") do
+      post clients_url, params: {
+        onboarding_template_id: template.id,
+        client: {
+          name: "Empresa Alfanumérica Ltda",
+          tax_id: "12.abc.345/01de-35",
+          email: "alfanumerica@example.com",
+          phone: "",
+          notes: ""
+        }
+      }
+    end
+
+    created = Client.find_by!(name: "Empresa Alfanumérica Ltda")
+    assert_equal tax_id, created.tax_id
+    assert_redirected_to client_url(created)
+  end
+
   test "rejects create with invalid tax_id" do
     seed_onboarding_templates!
     template = accounts(:one).onboarding_templates.find_by!(kind: "new_company")

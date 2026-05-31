@@ -11,14 +11,15 @@
   <% end %>
 </div>
 <div class="grid gap-4 sm:grid-cols-2">
-  <div data-controller="tax-id-input">
+  <div data-controller="tax-id-input" data-tax-id-input-prefer-value="cnpj">
     <%= form.label :tax_id, "CNPJ / CPF", class: "app-label" %>
     <%= text_field_tag nil,
           (client.tax_id.present? ? format_tax_id(client.tax_id) : nil),
           class: "app-input #{'border-red-300' if client.errors[:tax_id].any?}",
           autocomplete: "off",
           placeholder: "00.000.000/0000-00",
-          inputmode: "numeric",
+          inputmode: "text",
+          autocapitalize: "characters",
           data: {
             tax_id_input_target: "display",
             client_wizard_target: "step1Field",
@@ -27,6 +28,7 @@
     <%= form.hidden_field :tax_id,
           value: client.tax_id,
           data: { tax_id_input_target: "hidden", client_wizard_target: "step1Field" } %>
+    <p class="mt-1 text-xs text-zinc-500">CPF: 000.000.000-00 · CNPJ: 00.000.000/0000-00 (aceita letras nas 12 primeiras posições)</p>
     <% if client.errors[:tax_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= client.errors[:tax_id].first %></p>
     <% end %>

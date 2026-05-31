@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { formatTaxId, searchNormalizeTaxId } from "tax_id"
 
 // Combobox de atalho para abrir a página do cliente (/clients/:id).
 export default class extends Controller {
@@ -36,11 +37,11 @@ export default class extends Controller {
     const term = raw.toLowerCase()
     if (client.name.toLowerCase().includes(term)) return true
 
-    const digits = raw.replace(/\D/g, "")
-    if (!digits) return false
+    const taxTerm = searchNormalizeTaxId(raw)
+    if (!taxTerm) return false
 
-    const taxDigits = (client.tax_id || "").replace(/\D/g, "")
-    return taxDigits.includes(digits)
+    const storedTax = searchNormalizeTaxId(client.tax_id || "")
+    return storedTax.includes(taxTerm)
   }
 
   open() {
@@ -136,7 +137,7 @@ export default class extends Controller {
     this.listTarget.innerHTML = filtered
       .map((c) => {
         const taxLine = c.tax_id
-          ? `<span class="block text-xs text-zinc-500">${this._escapeHtml(c.tax_id)}</span>`
+          ? `<span class="block text-xs text-zinc-500">${this._escapeHtml(formatTaxId(c.tax_id))}</span>`
           : ""
         return `<li role="option" data-id="${c.id}" class="cursor-pointer px-3 py-2 text-sm text-zinc-800 hover:bg-zinc-50"><span class="block">${this._escapeHtml(c.name)}</span>${taxLine}</li>`
       })

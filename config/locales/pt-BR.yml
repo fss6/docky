@@ -148,7 +148,7 @@ pt-BR:
             tax_id:
               blank: Informe o CNPJ ou CPF
               invalid: CNPJ ou CPF inválido
-              invalid_format: Informe um CPF (11 dígitos) ou CNPJ (14 dígitos)
+              invalid_format: Informe um CPF (11 dígitos) ou CNPJ (14 caracteres)
             email:
               blank: Informe o e-mail do responsável
               invalid: E-mail inválido

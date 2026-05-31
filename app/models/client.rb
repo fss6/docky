@@ -58,7 +58,7 @@ class Client < ApplicationRecord
   has_many :upload_invites, dependent: :destroy
   has_many :collection_documents, class_name: "Document", dependent: :nullify
 
-  normalizes :tax_id, with: ->(v) { Client.digits_only(v).presence }
+  normalizes :tax_id, with: ->(v) { TaxId.normalize(v).presence }
   normalizes :name, with: ->(v) { v.to_s.strip }
   normalizes :email, with: ->(v) { v.to_s.strip.presence }
   normalizes :phone, with: ->(v) { v.to_s.strip.presence }
@@ -75,12 +75,13 @@ class Client < ApplicationRecord
     next all if term.blank?
 
     like = "%#{ActiveRecord::Base.sanitize_sql_like(term)}%"
-    digits = digits_only(term)
-    if digits.present?
+    tax_term = TaxId.search_normalize(term)
+    if tax_term.present?
       where(
-        "clients.name ILIKE :like OR clients.email ILIKE :like OR regexp_replace(clients.tax_id, '[^0-9]', '', 'g') LIKE :digits",
+        "clients.name ILIKE :like OR clients.email ILIKE :like OR " \
+        "UPPER(regexp_replace(clients.tax_id, '[^0-9A-Z]', '', 'g')) LIKE :tax_term",
         like: like,
-        digits: "%#{ActiveRecord::Base.sanitize_sql_like(digits)}%"
+        tax_term: "%#{ActiveRecord::Base.sanitize_sql_like(tax_term)}%"
       )
     else
       where("clients.name ILIKE :like OR clients.email ILIKE :like", like: like)
@@ -102,7 +103,7 @@ class Client < ApplicationRecord
   end
 
   def self.digits_only(str)
-    str.to_s.gsub(/\D/, "")
+    TaxId.normalize(str)
   end
 
   def archived?
