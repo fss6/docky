@@ -159,4 +159,77 @@ class PublicFolderUploadsControllerTest < ActionDispatch::IntegrationTest
     assert document.content_sha256.present?
     assert_equal "pending", document.status
   end
+
+  test "onboarding upload of intermediate item redirects back to portal" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+    item = client.onboarding_checklist.items.ordered.first
+    file = fixture_file_upload("minimal.pdf", "application/pdf")
+
+    post public_onboarding_upload_path(token: invite.token),
+         params: { onboarding_checklist_item_id: item.id, document: { file: file } }
+
+    assert_redirected_to public_onboarding_upload_path(token: invite.token)
+    assert invite.reload.active?
+    assert client.reload.onboarding?
+  end
+
+  test "onboarding upload of last item renders completion screen" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+    items = client.onboarding_checklist.items.ordered.to_a
+    items[0...-1].each do |item|
+      Onboarding::MarkItemReceived.call(item: item, user: @user, account: @account)
+    end
+    last_item = items.last
+    file = fixture_file_upload("minimal.pdf", "application/pdf")
+
+    post public_onboarding_upload_path(token: invite.token),
+         params: { onboarding_checklist_item_id: last_item.id, document: { file: file } }
+
+    assert_redirected_to public_onboarding_upload_path(token: invite.token)
+    follow_redirect!
+
+    assert_response :success
+    assert_match I18n.t("public_folder_uploads.onboarding_completed.heading"), response.body
+    assert_no_match "Este link não está mais disponível", response.body
+    assert client.reload.active?
+    assert_not invite.reload.active?
+  end
+
+  test "onboarding GET after completion renders completion screen" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+    ActsAsTenant.with_tenant(@account) do
+      Clients::ActivateFromOnboarding.call(client: client, user: @user, automatic: false)
+    end
+
+    get public_onboarding_upload_url(token: invite.token)
+
+    assert_response :success
+    assert_match I18n.t("public_folder_uploads.onboarding_completed.heading"), response.body
+    assert_no_match "Este link não está mais disponível", response.body
+  end
+
+  test "onboarding GET with revoked invite before completion renders expired" do
+    client = create_onboarding_client
+    invite = ActsAsTenant.with_tenant(@account) do
+      Clients::CreateOnboardingUploadInvite.call(client: client, user: @user, account: @account)
+    end
+    ActsAsTenant.with_tenant(@account) do
+      invite.revoke!
+    end
+
+    get public_onboarding_upload_url(token: invite.token)
+
+    assert_response :gone
+    assert_match I18n.t("public_folder_uploads.onboarding_expired"), response.body
+    assert_match "Este link não está mais disponível", response.body
+  end
 end

@@ -462,6 +462,16 @@ pt-BR:
       email_status_fallback: "Envio em andamento."
       email_error_fallback: "Não foi possível enviar o e-mail."
 
+  public_folder_uploads:
+    onboarding_expired: Este link de onboarding não está mais disponível.
+    onboarding_completed:
+      title: "Configuração concluída · %{client}"
+      heading: Configuração concluída!
+      body: Sua contabilidade finalizou a configuração da sua conta.
+      progress_label: Documentos recebidos
+      email_notice: Enviamos uma confirmação para %{email}.
+      close_hint: Pode fechar esta página.
+
   mailers:
     layout:
       tagline: Menos trabalho manual, mais produtividade

@@ -258,6 +258,10 @@ body[data-toast-layout="minimal"] .notyf {
     @apply rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 px-6 py-5 text-center text-white shadow-sm;
   }
 
+  .portal-onboarding-completed-hero {
+    @apply rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 px-6 py-5 text-center text-white shadow-sm;
+  }
+
   .portal-upload-dropzone {
     @apply transition-[border-color,background-color,box-shadow] duration-150;
   }

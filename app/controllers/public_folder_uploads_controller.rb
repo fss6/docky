@@ -82,6 +82,10 @@ class PublicFolderUploadsController < ApplicationController
       upload_owner_user: upload_owner_user
     )
 
+    if @client.reload.active?
+      return redirect_to public_onboarding_upload_path(token: @upload_token), status: :see_other
+    end
+
     redirect_to public_onboarding_upload_path(token: @upload_token),
                 notice: "Documento enviado com sucesso.",
                 status: :see_other
@@ -176,20 +180,41 @@ class PublicFolderUploadsController < ApplicationController
 
   def resolve_onboarding_invite!
     @upload_invite = UploadInvite.purpose_onboarding.find_by(token: params[:token])
-    unless @upload_invite&.active?
-      @expired_message = "Este link de onboarding não está mais disponível."
-      return render_expired_link(status: :gone)
+    unless @upload_invite
+      @upload_token = params[:token]
+      return render_expired_link(status: :not_found)
     end
 
     @client = @upload_invite.client
     @upload_token = @upload_invite.token
     @account = @upload_invite.account
+
+    if !@upload_invite.active? && onboarding_portal_completed?
+      return render_onboarding_completed
+    end
+
+    unless @upload_invite.active?
+      @expired_message = I18n.t("public_folder_uploads.onboarding_expired")
+      return render_expired_link(status: :gone)
+    end
   end
 
   def ensure_onboarding_invite_active!
-    return unless performed?
+    return if performed?
 
     render_expired_link(status: :gone) unless @upload_invite&.active?
+  end
+
+  def onboarding_portal_completed?
+    @upload_invite.present? &&
+      !@upload_invite.active? &&
+      @client.active? &&
+      @client.onboarding_checklist&.completed?
+  end
+
+  def render_onboarding_completed
+    load_onboarding_portal_context
+    render :onboarding_completed, status: :ok
   end
 
   def load_onboarding_portal_context
