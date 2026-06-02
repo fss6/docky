@@ -55,6 +55,12 @@ class Period < ApplicationRecord
 
   scope :open_periods, -> { where(status: :open) }
   scope :for_month, ->(date) { where(period: date.to_date.beginning_of_month) }
+  scope :with_pending_receipts, lambda {
+    open_periods
+      .joins(:items)
+      .where(competency_checklist_items: { state: "pending", last_document_id: nil })
+      .distinct
+  }
 
   def closed?
     status == "closed"

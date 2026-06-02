@@ -1,0 +1,18 @@
+# Copie para credentials ou defina via ENV (prioridade: ENV > credentials > este arquivo não é carregado automaticamente).
+#
+# rails credentials:edit
+# whatsapp:
+#   access_token: "EAA..."
+#   phone_number_id: "123456789"
+#   waba_id: "987654321"
+#   app_secret: "..."
+#   verify_token: "seu-token-de-verificacao"
+#   api_version: "v21.0"
+#
+# ENV:
+#   WHATSAPP_ACCESS_TOKEN
+#   WHATSAPP_PHONE_NUMBER_ID
+#   WHATSAPP_WABA_ID
+#   WHATSAPP_APP_SECRET
+#   WHATSAPP_VERIFY_TOKEN
+#   WHATSAPP_API_VERSION (opcional, default v21.0)

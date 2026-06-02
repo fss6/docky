@@ -1,0 +1,138 @@
+<% content_for :title, "Painel de cobrança · Dokivo" %>
+
+<div class="space-y-6">
+  <header class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-accent">Cobrança</p>
+        <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Painel de cobrança</h1>
+        <p class="mt-2 text-sm text-zinc-600">
+          Pendências em competências abertas, ordenadas por atraso.
+          <% if @collection_enabled %>
+            Régua ativa<% if @email_configured %> · E-mail configurado<% end %><% if @whatsapp_configured %> · WhatsApp conectado<% end %>.
+          <% else %>
+            <%= link_to "Ativar régua", edit_settings_collection_ladder_path, class: "text-accent font-medium" %>.
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <div class="app-card px-4 py-4 sm:px-5">
+      <div class="mb-3 flex flex-wrap gap-2" role="group" aria-label="Situação do prazo">
+        <%= collection_panel_status_chip("Todos", nil) %>
+        <%= collection_panel_status_chip("Em atraso", "late") %>
+        <%= collection_panel_status_chip("Vence hoje", "due") %>
+        <%= collection_panel_status_chip("Em breve", "soon") %>
+      </div>
+      <%= form_with url: collection_panel_path, method: :get, class: "flex flex-col gap-3 sm:flex-row sm:items-end" do %>
+        <%= hidden_field_tag :status, @status_filter if @status_filter.present? %>
+        <div class="min-w-0 flex-1">
+          <label for="collection-panel-q" class="sr-only">Buscar cliente</label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400" aria-hidden="true">
+              <%= heroicon "magnifying-glass", variant: :outline, options: { class: "h-4 w-4" } %>
+            </span>
+            <%= text_field_tag :q, @search_query,
+                  id: "collection-panel-q",
+                  class: "app-input w-full pl-10",
+                  placeholder: "Buscar por nome do cliente…" %>
+          </div>
+        </div>
+        <div class="flex shrink-0 items-center justify-end gap-2">
+          <% if @search_query.present? %>
+            <%= link_to "Limpar", collection_panel_path(status: @status_filter), class: "app-btn-secondary no-underline" %>
+          <% end %>
+          <%= submit_tag "Filtrar", class: "app-btn-primary cursor-pointer border-0" %>
+        </div>
+      <% end %>
+    </div>
+  </header>
+
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="app-card p-4 border-l-4 border-red-500">
+      <p class="text-xs text-zinc-500">Em atraso</p>
+      <p class="mt-1 text-2xl font-semibold text-zinc-900"><%= @kpis[:late] %></p>
+    </div>
+    <div class="app-card p-4 border-l-4 border-amber-500">
+      <p class="text-xs text-zinc-500">Vence hoje</p>
+      <p class="mt-1 text-2xl font-semibold text-zinc-900"><%= @kpis[:due_today] %></p>
+    </div>
+    <div class="app-card p-4 border-l-4 border-emerald-500">
+      <p class="text-xs text-zinc-500">Em dia (sem pendência)</p>
+      <p class="mt-1 text-2xl font-semibold text-zinc-900"><%= @kpis[:on_track] %></p>
+    </div>
+    <div class="app-card p-4 border-l-4 border-blue-500">
+      <p class="text-xs text-zinc-500">Mensagens enviadas (mês)</p>
+      <p class="mt-1 text-2xl font-semibold text-zinc-900"><%= @kpis[:messages_month] %></p>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-5">
+    <section class="app-card lg:col-span-3 overflow-hidden">
+      <div class="border-b border-zinc-200 px-4 py-3 flex justify-between items-center">
+        <h2 class="font-semibold text-zinc-900">Pendências por cliente</h2>
+        <span class="text-xs font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full"><%= @rows.size %></span>
+      </div>
+      <% if @rows.empty? %>
+        <p class="p-6 text-sm text-zinc-500">Nenhuma pendência em competências abertas<%= @status_filter.present? ? " com este filtro" : "" %>.</p>
+      <% else %>
+        <ul>
+          <% @rows.each do |row| %>
+            <% selected = @selected_row&.period_record&.id == row.period_record.id %>
+            <li>
+              <%= link_to collection_panel_path_with_filters(period_id: row.period_record.id),
+                    class: "flex items-center gap-3 px-4 py-3 border-b border-zinc-100 no-underline hover:bg-zinc-50 #{selected ? 'bg-zinc-50 border-l-4 border-l-accent' : ''}" do %>
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-sm font-semibold text-zinc-700"><%= client_initials(row.client) %></span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-zinc-900 truncate"><%= row.client.name %></p>
+                  <p class="text-xs text-zinc-500 truncate">
+                    <span class="font-medium text-zinc-600"><%= row.period_label %></span>
+                    · <%= row.pending_items.map(&:name_snapshot).join(", ") %>
+                  </p>
+                </div>
+                <div class="text-right shrink-0">
+                  <% badge = row.badge %>
+                  <span class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold <%= badge[:key] == :late ? 'bg-red-50 text-red-800' : badge[:key] == :due ? 'bg-amber-50 text-amber-900' : 'bg-blue-50 text-blue-800' %>"><%= badge[:label] %></span>
+                  <p class="text-[10px] text-zinc-500 mt-1 max-w-[140px]"><%= row.next_action_label %></p>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+
+    <section class="app-card lg:col-span-2">
+      <% if @selected_row %>
+        <div class="border-b border-zinc-200 px-4 py-4">
+          <h2 class="font-semibold text-zinc-900"><%= @selected_row.client.name %></h2>
+          <p class="text-xs text-zinc-500 mt-1">
+            <%= @selected_row.period_label %> · Prazo <%= l(@selected_row.deadline_date, format: :short) %>
+          </p>
+          <div class="mt-2 flex flex-wrap gap-1">
+            <% @selected_row.pending_items.each do |item| %>
+              <span class="text-xs font-medium bg-red-50 text-red-800 px-2 py-0.5 rounded"><%= item.name_snapshot %></span>
+            <% end %>
+          </div>
+        </div>
+        <div class="px-4 py-4 max-h-[32rem] overflow-y-auto space-y-4">
+          <% @timeline&.each do |ev| %>
+            <div class="flex gap-3">
+              <div class="shrink-0 w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-xs">•</div>
+              <div>
+                <p class="text-sm font-semibold text-zinc-900"><%= ev.title %></p>
+                <% if ev.description.present? %><p class="text-xs text-zinc-500 mt-0.5"><%= ev.description %></p><% end %>
+                <p class="text-[11px] text-zinc-400 mt-1">
+                  <%= l(ev.occurred_at, format: :short) %>
+                  <% if ev.delivery_label.present? %> · <%= ev.delivery_label %><% end %>
+                </p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="p-6 text-sm text-zinc-500">Selecione uma linha para ver a linha do tempo.</p>
+      <% end %>
+    </section>
+  </div>
+</div>

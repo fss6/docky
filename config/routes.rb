@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get "privacidade", to: "landing#privacy", as: :privacy
   get "dashboard", to: "dashboard#index", as: :dashboard
   get "wallet", to: "wallets#index", as: :wallet
+  get "collection", to: "collection_panel#index", as: :collection_panel
   resources :clients, except: [:destroy] do
     member do
       get :summary
@@ -80,6 +81,9 @@ Rails.application.routes.draw do
   delete "wiki/:slug", to: "wiki_pages#destroy", constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   get "wiki/:slug", to: "wiki_pages#show", as: :wiki_page, constraints: { slug: /[^\/]+(?:\/[^\/]+)*/ }
   resource :settings, only: :show
+  resource :platform_settings, only: %i[show update], path: "sistema/plataforma" do
+    post :regenerate_whatsapp_verify_token
+  end
   resource :profile, only: %i[edit update]
   resource :account_profile, only: %i[edit update]
   namespace :settings do
@@ -87,6 +91,7 @@ Rails.application.routes.draw do
     resource :ai_settings, only: %i[edit update]
     resource :upload_share, only: %i[edit update], controller: "upload_shares"
     resource :onboarding_share, only: %i[edit update], controller: "onboarding_shares"
+    resource :collection_ladder, only: %i[edit update], controller: "collection_ladders"
     resources :onboarding_templates, only: %i[index show new create edit update destroy]
   end
 
@@ -108,6 +113,9 @@ Rails.application.routes.draw do
   get "portal/:token/onboarding", to: "public_folder_uploads#onboarding", as: :public_onboarding_upload
   post "portal/:token/onboarding", to: "public_folder_uploads#onboarding_upload"
   post "portal/:token/onboarding/extra", to: "public_folder_uploads#onboarding_extra_upload", as: :public_onboarding_extra_upload
+  get "collection/unsubscribe", to: "collection/unsubscribes#show", as: :collection_unsubscribe
+  get "webhooks/whatsapp", to: "whatsapp/webhooks#verify"
+  post "webhooks/whatsapp", to: "whatsapp/webhooks#receive"
   resources :groups do
     resources :memberships, controller: "group_memberships", only: %i[create destroy]
   end

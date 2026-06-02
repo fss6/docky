@@ -1,0 +1,155 @@
+<% content_for :title, "Plataforma · Dokivo" %>
+
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent">Sistema</p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Configurações da plataforma</h1>
+    <p class="mt-2 max-w-2xl text-sm text-zinc-600">SMTP e WhatsApp (Meta Cloud API) usados por toda a plataforma Dokivo. Valores salvos aqui têm prioridade sobre variáveis de ambiente.</p>
+  </header>
+
+  <%= render "shared/record_errors_toast", record: @platform_setting %>
+
+  <% if @platform_setting.errors.any? %>
+    <div class="app-card border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" role="alert">
+      <p class="font-semibold">Não foi possível salvar:</p>
+      <ul class="mt-2 list-disc pl-5 space-y-1">
+        <% @platform_setting.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @platform_setting, url: platform_settings_path, method: :patch, class: "space-y-6" do |form| %>
+    <section class="app-card p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-zinc-900">E-mail (SMTP)</h2>
+          <p class="mt-1 text-xs text-zinc-500">Envio de convites, régua de cobrança e alertas internos. Equivalente às variáveis <code class="text-xs">MAIL_DELIVERY</code>, <code class="text-xs">SMTP_*</code> e <code class="text-xs">MAILER_FROM</code> do <code class="text-xs">.env</code>.</p>
+        </div>
+        <% if @smtp_configured %>
+          <span class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Configurado</span>
+        <% else %>
+          <span class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">Incompleto</span>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :mail_delivery, class: "app-label" do %>
+          Modo de envio <span class="font-normal text-zinc-500">(<code class="text-xs">MAIL_DELIVERY</code>)</span>
+        <% end %>
+        <%= form.select :mail_delivery,
+              options_for_select([["— Desativado —", ""], ["Gmail — MAIL_DELIVERY=gmail", "gmail"], ["SMTP personalizado — MAIL_DELIVERY=smtp", "smtp"]], @platform_setting.mail_delivery),
+              {},
+              class: "app-input mt-1 w-full max-w-md" %>
+        <p class="mt-1 text-xs text-zinc-500">Vazio = sem SMTP explícito (fallback ENV). Valores: <code class="text-xs">gmail</code> ou <code class="text-xs">smtp</code>.</p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="sm:col-span-2 <%= @platform_setting.mail_delivery == "smtp" ? "" : "hidden" %>">
+          <%= form.label :smtp_address, "Servidor SMTP", class: "app-label" %>
+          <%= form.text_field :smtp_address, class: "app-input mt-1 w-full", placeholder: "smtp.example.com" %>
+        </div>
+        <div>
+          <%= form.label :smtp_port, "Porta", class: "app-label" %>
+          <%= form.number_field :smtp_port, class: "app-input mt-1 w-full", placeholder: "587" %>
+        </div>
+        <div>
+          <%= form.label :smtp_domain, "Domínio HELO", class: "app-label" %>
+          <%= form.text_field :smtp_domain, class: "app-input mt-1 w-full", placeholder: "gmail.com" %>
+        </div>
+        <div>
+          <%= form.label :smtp_username, class: "app-label" do %>
+            Usuário <span class="font-normal text-zinc-500">(<code class="text-xs">SMTP_USERNAME</code>)</span>
+          <% end %>
+          <%= form.text_field :smtp_username, class: "app-input mt-1 w-full", autocomplete: "off" %>
+        </div>
+        <div>
+          <%= form.label :smtp_password, class: "app-label" do %>
+            Senha <span class="font-normal text-zinc-500">(<code class="text-xs">SMTP_PASSWORD</code>)</span>
+          <% end %>
+          <%= form.password_field :smtp_password, class: "app-input mt-1 w-full", autocomplete: "new-password", placeholder: "Deixe em branco para manter" %>
+        </div>
+        <div>
+          <%= form.label :smtp_authentication, "Autenticação", class: "app-label" %>
+          <%= form.select :smtp_authentication, %w[plain login cram_md5], {}, class: "app-input mt-1 w-full" %>
+        </div>
+        <div>
+          <%= form.label :mailer_from, class: "app-label" do %>
+            Remetente (From) <span class="font-normal text-zinc-500">(<code class="text-xs">MAILER_FROM</code>)</span>
+          <% end %>
+          <%= form.text_field :mailer_from, class: "app-input mt-1 w-full", placeholder: "Dokivo <noreply@dokivo.com>" %>
+          <p class="mt-1 text-xs text-zinc-500">Se vazio, usa <code class="text-xs">SMTP_USERNAME</code> como remetente.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-card p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-zinc-900">WhatsApp (Meta Cloud API)</h2>
+          <p class="mt-1 text-xs text-zinc-500">Cobrança automática e webhooks. Ver também <code class="text-xs">config/whatsapp.yml.example</code>.</p>
+        </div>
+        <% if @whatsapp_configured %>
+          <span class="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Conectado</span>
+        <% else %>
+          <span class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">Incompleto</span>
+        <% end %>
+      </div>
+
+      <% if @whatsapp_missing_keys.any? %>
+        <p class="text-sm text-amber-800">Campos pendentes: <%= @whatsapp_missing_keys.map { |k| k.to_s.humanize }.join(", ") %>.</p>
+      <% end %>
+
+      <div>
+        <p class="app-label">URL do webhook (Meta)</p>
+        <div class="mt-1 flex gap-2">
+          <input type="text" readonly value="<%= @webhook_url %>" class="app-input w-full font-mono text-xs bg-zinc-50" />
+        </div>
+        <p class="mt-1 text-xs text-zinc-500">Configure este URL no app Meta com o método GET (verificação) e POST (eventos).</p>
+      </div>
+
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="flex-1 min-w-[200px]">
+          <%= form.label :whatsapp_verify_token, "Verify token", class: "app-label" %>
+          <%= form.text_field :whatsapp_verify_token, class: "app-input mt-1 w-full font-mono text-sm" %>
+        </div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div>
+          <%= form.label :whatsapp_phone_number_id, "Phone number ID", class: "app-label" %>
+          <%= form.text_field :whatsapp_phone_number_id, class: "app-input mt-1 w-full font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :whatsapp_waba_id, "WABA ID (opcional)", class: "app-label" %>
+          <%= form.text_field :whatsapp_waba_id, class: "app-input mt-1 w-full font-mono text-sm" %>
+        </div>
+        <div>
+          <%= form.label :whatsapp_api_version, "API version", class: "app-label" %>
+          <%= form.text_field :whatsapp_api_version, class: "app-input mt-1 w-full", placeholder: "v21.0" %>
+        </div>
+        <div class="sm:col-span-2">
+          <%= form.label :whatsapp_access_token, "Access token", class: "app-label" %>
+          <%= form.password_field :whatsapp_access_token, class: "app-input mt-1 w-full font-mono text-sm", autocomplete: "new-password", placeholder: "Deixe em branco para manter" %>
+        </div>
+        <div class="sm:col-span-2">
+          <%= form.label :whatsapp_app_secret, "App secret", class: "app-label" %>
+          <%= form.password_field :whatsapp_app_secret, class: "app-input mt-1 w-full font-mono text-sm", autocomplete: "new-password", placeholder: "Deixe em branco para manter" %>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <%= form.submit "Salvar configurações", class: "app-btn-primary" %>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end">
+    <%= button_to "Gerar novo token do webhook",
+          regenerate_whatsapp_verify_token_platform_settings_path,
+          method: :post,
+          class: "app-btn-secondary text-sm",
+          form: { data: { turbo_confirm: "Regenerar o token exige atualizar o app na Meta. Continuar?" } } %>
+  </div>
+</div>

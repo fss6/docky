@@ -2,9 +2,15 @@
 
 Rails app run via Docker Compose (`web` + `worker` services).
 
+## Configurações da plataforma (administrator)
+
+Usuários com papel **`administrator`** acessam **Sistema → Plataforma** (`/sistema/plataforma`) para definir SMTP e WhatsApp da Dokivo. Os valores salvos na tabela `platform_settings` têm **prioridade** sobre variáveis de ambiente e `credentials`; ENV/credentials servem como **fallback** quando o banco estiver vazio. Senhas e tokens são armazenados criptografados (chaves derivadas do `secret_key_base` em dev, ou `active_record_encryption` em `credentials` em produção); o registro é cacheado no Redis por 1 minuto.
+
+---
+
 ## Configuração de e-mail (SMTP)
 
-A entrega de e-mail é controlada por [`config/initializers/action_mailer_delivery.rb`](config/initializers/action_mailer_delivery.rb). Copie [`.env.example`](.env.example) para `.env` e preencha as variáveis abaixo.
+A entrega de e-mail é controlada por [`PlatformSettings::SmtpConfig`](app/services/platform_settings/smtp_config.rb) e [`config/initializers/action_mailer_delivery.rb`](config/initializers/action_mailer_delivery.rb). Em produção, prefira configurar em **Plataforma**; copie [`.env.example`](.env.example) para `.env` apenas como fallback ou bootstrap.
 
 ### Variáveis
 
@@ -226,3 +232,40 @@ Métodos úteis no model:
 | `role: member` + grants | Acesso configurável em `/settings/permissions` |
 
 Um usuário pode ser `owner` sem ser fundador (co-admin convidado depois). O fundador é sempre `owner`, mas nem todo `owner` é fundador.
+
+## Cobrança automática e WhatsApp (Meta Cloud)
+
+A régua de cobrança (`/settings/collection_ladder`) dispara lembretes para pendências de checklist conforme o prazo (`monthly_deadline_day` do cliente). O painel operacional fica em `/collection`.
+
+### WhatsApp — plataforma Dokivo (v1)
+
+Todos os escritórios usam o **mesmo número** configurado na plataforma. Credenciais em **Sistema → Plataforma** (recomendado) ou via ENV / `rails credentials:edit` (`whatsapp:`) como fallback. Exemplo em [`config/whatsapp.yml.example`](config/whatsapp.yml.example). A tela exibe a URL do webhook e o verify token (estilo Chatwoot inbox configuration).
+
+| Variável | Obrigatória | Descrição |
+|----------|-------------|-----------|
+| `WHATSAPP_ACCESS_TOKEN` | Sim | Token permanente da Graph API |
+| `WHATSAPP_PHONE_NUMBER_ID` | Sim | ID do número de envio |
+| `WHATSAPP_APP_SECRET` | Sim | Validação do webhook (`X-Hub-Signature-256`) |
+| `WHATSAPP_VERIFY_TOKEN` | Sim | Token do handshake GET do webhook |
+| `WHATSAPP_WABA_ID` | Não | ID da conta Business (gestão de templates) |
+| `WHATSAPP_API_VERSION` | Não | Padrão `v21.0` |
+
+**Webhook Meta:** `GET/POST https://seu-dominio/webhooks/whatsapp`
+
+Mensagens proativas exigem **templates aprovados** na WABA; informe o nome em cada degrau da régua (`whatsapp_template_name`).
+
+Verificar configuração:
+
+```bash
+docker compose run web rails whatsapp:test
+```
+
+### Jobs
+
+- `Collection::DailyTickJob` — cron Sidekiq às 08:00 (`America/Sao_Paulo`)
+- Manual: `docker compose run web rails collection:tick`
+
+### Opt-out
+
+- E-mail: link «Cancelar lembretes» (`/collection/unsubscribe?token=...`)
+- WhatsApp: cliente responde `PARAR` (ou `STOP`) — obrigatório antes de produção

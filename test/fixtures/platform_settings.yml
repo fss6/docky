@@ -1,0 +1,16 @@
+default:
+  singleton_key: default
+  mail_delivery: smtp
+  smtp_address: smtp.example.com
+  smtp_port: 587
+  smtp_domain: example.com
+  smtp_username: platform@example.com
+  smtp_password: secret-password
+  smtp_authentication: plain
+  mailer_from: noreply@example.com
+  whatsapp_phone_number_id: "123456789"
+  whatsapp_waba_id: "987654321"
+  whatsapp_api_version: v21.0
+  whatsapp_verify_token: test-verify-token
+  whatsapp_access_token: test-access-token
+  whatsapp_app_secret: test-app-secret

@@ -56,6 +56,8 @@ class Client < ApplicationRecord
     competency_checklists
   end
   has_many :upload_invites, dependent: :destroy
+  has_one :collection_preference, class_name: "ClientCollectionPreference", dependent: :destroy
+  has_many :collection_dispatches, dependent: :destroy
   has_many :collection_documents, class_name: "Document", dependent: :nullify
 
   normalizes :tax_id, with: ->(v) { TaxId.normalize(v).presence }

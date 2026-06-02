@@ -20,6 +20,8 @@ module Clients
           return
         end
 
+        PlatformSettings::Delivery.apply!
+
         OnboardingMailer.client_activated(client).deliver_now
 
         record_audit(

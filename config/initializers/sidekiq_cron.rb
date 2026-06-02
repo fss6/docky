@@ -9,6 +9,11 @@ if defined?(Sidekiq::Cron) && Sidekiq.server?
       "class" => "Periods::OpenMonthJob",
       "cron" => "30 0 1 * * America/Sao_Paulo",
       "queue" => "default"
+    },
+    "collection_daily_tick" => {
+      "class" => "Collection::DailyTickJob",
+      "cron" => "0 8 * * * America/Sao_Paulo",
+      "queue" => "default"
     }
   )
 end

@@ -30,6 +30,8 @@ module Clients
           period: invite.period
         )
 
+        PlatformSettings::Delivery.apply!
+
         UploadInviteMailer.share_link(
           client: client,
           invite: invite,

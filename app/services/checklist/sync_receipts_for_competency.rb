@@ -17,10 +17,29 @@ module Checklist
       return if matched_document.blank?
       return if item.validated?
 
+      was_pending = item.awaiting_receipt?
       item.update!(
         state: :received,
         received_at: item.received_at || Time.current,
         last_document: matched_document
+      )
+      record_auto_matched!(item, matched_document) if was_pending
+    end
+
+    def record_auto_matched!(item, document)
+      checklist = @checklist
+      AuditEvents::Recorder.call(
+        account: checklist.account,
+        user: nil,
+        event_type: "checklist_item.auto_matched",
+        subject: item,
+        metadata: {
+          client_id: checklist.client_id,
+          period: checklist.period.strftime("%Y-%m"),
+          item_name: item.name_snapshot,
+          document_id: document.id,
+          filename: document.file.attached? ? document.file.filename.to_s : nil
+        }
       )
     end
 

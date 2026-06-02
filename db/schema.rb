@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_02_205834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -121,6 +121,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
     t.index ["client_id"], name: "index_client_checklist_items_on_client_id"
   end
 
+  create_table "client_collection_preferences", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.datetime "email_opted_out_at"
+    t.datetime "whatsapp_opted_out_at"
+    t.string "whatsapp_opt_out_source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_client_collection_preferences_on_client_id", unique: true
+  end
+
   create_table "clients", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "name", null: false
@@ -141,6 +151,74 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
     t.index ["archived_by_user_id"], name: "index_clients_on_archived_by_user_id"
     t.index ["onboarding_template_id"], name: "index_clients_on_onboarding_template_id"
     t.index ["status"], name: "index_clients_on_status"
+  end
+
+  create_table "collection_delivery_events", force: :cascade do |t|
+    t.bigint "collection_dispatch_id", null: false
+    t.string "event", null: false
+    t.datetime "occurred_at", null: false
+    t.string "reliability_tier", default: "strong", null: false
+    t.jsonb "raw_payload", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_dispatch_id", "event", "occurred_at"], name: "index_collection_delivery_events_on_dispatch_event"
+    t.index ["collection_dispatch_id"], name: "index_collection_delivery_events_on_collection_dispatch_id"
+  end
+
+  create_table "collection_dispatches", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "period_id", null: false
+    t.bigint "collection_step_id", null: false
+    t.string "channel", null: false
+    t.string "status", default: "scheduled", null: false
+    t.string "skip_reason"
+    t.string "rendered_subject"
+    t.text "rendered_body"
+    t.string "provider_message_id"
+    t.datetime "sent_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status", "created_at"], name: "idx_on_account_id_status_created_at_e8df138900"
+    t.index ["account_id"], name: "index_collection_dispatches_on_account_id"
+    t.index ["client_id", "period_id", "collection_step_id", "channel"], name: "index_collection_dispatches_unique_per_cycle", unique: true
+    t.index ["client_id"], name: "index_collection_dispatches_on_client_id"
+    t.index ["collection_step_id"], name: "index_collection_dispatches_on_collection_step_id"
+    t.index ["period_id"], name: "index_collection_dispatches_on_period_id"
+    t.index ["provider_message_id"], name: "index_collection_dispatches_on_provider_message_id"
+  end
+
+  create_table "collection_settings", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "enabled", default: false, null: false
+    t.boolean "auto_confirm_receipt", default: true, null: false
+    t.time "quiet_hours_start", default: "2000-01-01 08:00:00", null: false
+    t.time "quiet_hours_end", default: "2000-01-01 19:00:00", null: false
+    t.integer "max_messages_per_client_per_day", default: 1, null: false
+    t.string "timezone", default: "America/Sao_Paulo", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_collection_settings_on_account_id", unique: true
+  end
+
+  create_table "collection_steps", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "offset_days", null: false
+    t.string "name", null: false
+    t.string "kind", default: "client_reminder", null: false
+    t.boolean "email_enabled", default: false, null: false
+    t.boolean "whatsapp_enabled", default: false, null: false
+    t.string "email_subject_template"
+    t.text "email_body_template"
+    t.text "whatsapp_body_template"
+    t.string "whatsapp_template_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "offset_days"], name: "index_collection_steps_on_account_id_and_offset_days", unique: true
+    t.index ["account_id", "position"], name: "index_collection_steps_on_account_id_and_position"
+    t.index ["account_id"], name: "index_collection_steps_on_account_id"
   end
 
   create_table "competency_checklist_items", force: :cascade do |t|
@@ -233,6 +311,67 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
     t.index ["recordable_type", "recordable_id"], name: "index_embedding_records_on_wiki_page_unique", unique: true, where: "((recordable_type)::text = 'WikiPage'::text)"
   end
 
+  create_table "fiscal_certificates", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.text "cert_password_ciphertext"
+    t.string "holder_name"
+    t.string "cnpj", null: false
+    t.string "issuer"
+    t.datetime "valid_from"
+    t.datetime "valid_until", null: false
+    t.string "fingerprint_sha1"
+    t.string "cert_type", default: "A1", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "cnpj"], name: "index_fiscal_certificates_on_account_id_and_cnpj"
+    t.index ["account_id"], name: "index_fiscal_certificates_on_account_id"
+    t.index ["client_id", "status"], name: "index_fiscal_certificates_on_client_id_and_status"
+    t.index ["client_id"], name: "index_fiscal_certificates_on_client_id"
+  end
+
+  create_table "fiscal_documents", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.string "chave", limit: 44, null: false
+    t.string "nsu", null: false
+    t.string "emit_name"
+    t.string "emit_cnpj"
+    t.string "numero"
+    t.string "serie"
+    t.string "modelo", default: "55"
+    t.datetime "emitted_at"
+    t.decimal "valor_total", precision: 15, scale: 2
+    t.string "lifecycle_state", default: "resumo_recebido", null: false
+    t.datetime "received_at"
+    t.datetime "manifested_at"
+    t.datetime "classified_at"
+    t.string "provider_document_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "chave"], name: "index_fiscal_documents_on_account_id_and_chave", unique: true
+    t.index ["account_id"], name: "index_fiscal_documents_on_account_id"
+    t.index ["client_id", "lifecycle_state"], name: "index_fiscal_documents_on_client_id_and_lifecycle_state"
+    t.index ["client_id", "nsu"], name: "index_fiscal_documents_on_client_id_and_nsu"
+    t.index ["client_id"], name: "index_fiscal_documents_on_client_id"
+  end
+
+  create_table "fiscal_sync_runs", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.datetime "started_at", null: false
+    t.datetime "finished_at"
+    t.integer "docs_fetched", default: 0, null: false
+    t.string "result"
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_fiscal_sync_runs_on_account_id"
+    t.index ["client_id", "started_at"], name: "index_fiscal_sync_runs_on_client_id_and_started_at"
+    t.index ["client_id"], name: "index_fiscal_sync_runs_on_client_id"
+  end
+
   create_table "folders", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "name"
@@ -285,6 +424,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+  end
+
+  create_table "nfe_sync_states", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.string "last_nsu", default: "000000000000", null: false
+    t.string "max_nsu_seen"
+    t.datetime "last_sync_at"
+    t.string "sync_status", default: "ok", null: false
+    t.text "last_error"
+    t.integer "consecutive_failures", default: 0, null: false
+    t.boolean "auto_manifest", default: true, null: false
+    t.boolean "fetch_history_on_first_sync", default: true, null: false
+    t.boolean "first_sync_completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_nfe_sync_states_on_account_id"
+    t.index ["client_id"], name: "index_nfe_sync_states_on_client_id", unique: true
   end
 
   create_table "onboarding_checklist_items", force: :cascade do |t|
@@ -344,6 +501,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
     t.string "name"
     t.integer "price"
     t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "platform_settings", primary_key: "singleton_key", id: :string, default: "default", force: :cascade do |t|
+    t.string "mail_delivery"
+    t.string "smtp_address"
+    t.integer "smtp_port"
+    t.string "smtp_domain"
+    t.string "smtp_username"
+    t.string "smtp_authentication", default: "plain"
+    t.string "mailer_from"
+    t.text "smtp_password"
+    t.string "whatsapp_phone_number_id"
+    t.string "whatsapp_waba_id"
+    t.string "whatsapp_api_version", default: "v21.0"
+    t.string "whatsapp_verify_token"
+    t.text "whatsapp_access_token"
+    t.text "whatsapp_app_secret"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -478,9 +654,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
   add_foreign_key "audits", "accounts"
   add_foreign_key "client_checklist_items", "accounts"
   add_foreign_key "client_checklist_items", "clients"
+  add_foreign_key "client_collection_preferences", "clients"
   add_foreign_key "clients", "accounts"
   add_foreign_key "clients", "onboarding_templates"
   add_foreign_key "clients", "users", column: "archived_by_user_id"
+  add_foreign_key "collection_delivery_events", "collection_dispatches"
+  add_foreign_key "collection_dispatches", "accounts"
+  add_foreign_key "collection_dispatches", "clients"
+  add_foreign_key "collection_dispatches", "collection_steps"
+  add_foreign_key "collection_dispatches", "competency_checklists", column: "period_id"
+  add_foreign_key "collection_settings", "accounts"
+  add_foreign_key "collection_steps", "accounts"
   add_foreign_key "competency_checklist_items", "client_checklist_items"
   add_foreign_key "competency_checklist_items", "competency_checklists"
   add_foreign_key "competency_checklist_items", "documents", column: "last_document_id"
@@ -496,6 +680,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
   add_foreign_key "documents", "folders"
   add_foreign_key "documents", "users"
   add_foreign_key "embedding_records", "accounts"
+  add_foreign_key "fiscal_certificates", "accounts"
+  add_foreign_key "fiscal_certificates", "clients"
+  add_foreign_key "fiscal_documents", "accounts"
+  add_foreign_key "fiscal_documents", "clients"
+  add_foreign_key "fiscal_sync_runs", "accounts"
+  add_foreign_key "fiscal_sync_runs", "clients"
   add_foreign_key "folders", "accounts"
   add_foreign_key "folders", "clients"
   add_foreign_key "group_memberships", "groups"
@@ -503,6 +693,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_31_143249) do
   add_foreign_key "groups", "accounts"
   add_foreign_key "institutions", "accounts"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "nfe_sync_states", "accounts"
+  add_foreign_key "nfe_sync_states", "clients"
   add_foreign_key "onboarding_checklist_items", "documents", column: "last_document_id"
   add_foreign_key "onboarding_checklist_items", "onboarding_checklists"
   add_foreign_key "onboarding_checklist_items", "users", column: "validated_by_user_id"

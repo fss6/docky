@@ -29,6 +29,9 @@ class Account < ApplicationRecord
   has_many :conversations, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
   has_one :setting, dependent: :destroy
+  has_one :collection_setting, dependent: :destroy
+  has_many :collection_steps, dependent: :destroy
+  has_many :collection_dispatches, dependent: :destroy
   has_many :wiki_pages, dependent: :destroy
   has_many :wiki_logs, dependent: :destroy
   has_one :wiki_schema, dependent: :destroy
@@ -50,6 +53,7 @@ class Account < ApplicationRecord
   validate :acceptable_logo, if: -> { logo.attached? && logo.changed? }
 
   after_create :create_default_setting!
+  after_create :create_default_collection_setting!
   after_create :seed_default_permission_grants!
   after_create :seed_default_institutions!
   after_create :seed_onboarding_templates!, unless: :skip_onboarding_template_seed?
@@ -76,6 +80,16 @@ class Account < ApplicationRecord
 
   def create_default_setting!
     create_setting! unless setting
+  end
+
+  def create_default_collection_setting!
+    return if skip_collection_setting_seed?
+
+    create_collection_setting! unless collection_setting
+  end
+
+  def skip_collection_setting_seed?
+    Rails.env.test?
   end
 
   def seed_default_permission_grants!

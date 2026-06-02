@@ -52,4 +52,10 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.active_job.queue_adapter = :test
+
+  # Active Record encryption (platform_settings secrets in fixtures)
+  config.active_record.encryption.primary_key = "test-primary-key-32-bytes!!"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key-32b!"
+  config.active_record.encryption.key_derivation_salt = "test-salt-32-bytes-here!!!!!!"
+  config.active_record.encryption.support_unencrypted_data = true
 end

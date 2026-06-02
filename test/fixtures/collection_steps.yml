@@ -1,0 +1,25 @@
+friendly:
+  account: one
+  position: 0
+  offset_days: -3
+  name: Lembrete amigável
+  kind: client_reminder
+  email_enabled: true
+  whatsapp_enabled: false
+  email_subject_template: Faltam documentos
+  email_body_template: "Oi {cliente}, faltam: {documentos_faltantes}. {link_upload}"
+  whatsapp_body_template: ""
+  whatsapp_template_name:
+
+firm:
+  account: one
+  position: 1
+  offset_days: 0
+  name: Lembrete firme
+  kind: client_reminder
+  email_enabled: true
+  whatsapp_enabled: true
+  email_subject_template: Prazo hoje
+  email_body_template: "{cliente}, prazo hoje. {link_upload}"
+  whatsapp_body_template: "Prazo hoje {cliente}"
+  whatsapp_template_name: cobranca_firme
