@@ -15,7 +15,7 @@ class Settings::AiSettingsControllerTest < ActionDispatch::IntegrationTest
     get edit_settings_ai_settings_path
 
     assert_response :success
-    assert_select "h1", text: "IA / Tags automáticas"
+    assert_select "h1", text: "Automações com IA"
   end
 
   test "update persists ai toggle" do

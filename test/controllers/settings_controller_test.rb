@@ -15,7 +15,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     get settings_path
 
     assert_response :success
-    assert_select "h2", text: "Templates de itens"
+    assert_select "h2", text: "Controle de acesso"
     assert_select "a[href=?]", settings_onboarding_templates_path
     assert_select "a[href=?]", edit_settings_ai_settings_path
     assert_select "a[href=?]", edit_settings_upload_share_path
