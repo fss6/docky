@@ -26,22 +26,22 @@ services:
     #   - redis
     networks:
       - app
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    command: server /data --console-address ":9001"
-    ports:
-      - "9000:9000"  # API S3-compatible
-      - "9001:9001"  # Web UI
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-      MINIO_SERVER_URL: http://localhost:9000
-      S3_BUCKET: docfy-development
-    volumes:
-      - minio-data:/data
-    networks:
-      - app
+  # minio:
+  #   image: minio/minio:latest
+  #   container_name: minio
+  #   command: server /data --console-address ":9001"
+  #   ports:
+  #     - "9000:9000"  # API S3-compatible
+  #     - "9001:9001"  # Web UI
+  #   environment:
+  #     MINIO_ROOT_USER: minioadmin
+  #     MINIO_ROOT_PASSWORD: minioadmin
+  #     MINIO_SERVER_URL: http://localhost:9000
+  #     S3_BUCKET: docfy-development
+  #   volumes:
+  #     - minio-data:/data
+  #   networks:
+  #     - app
   worker:
     image: docfy-web:latest
     command: bash -c "bundle exec sidekiq -C config/sidekiq.yml"
@@ -77,7 +77,7 @@ services:
     networks:
       - app
 volumes:
-  minio-data:
+  # minio-data:
   redis-data:
 networks:
   app:

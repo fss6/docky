@@ -11,6 +11,10 @@ export default class extends Controller {
     this.resizeField(event.currentTarget)
   }
 
+  resizeAll() {
+    this.fields().forEach((field) => this.resizeField(field))
+  }
+
   fields() {
     if (this.hasFieldTarget) return this.fieldTargets
     if (this.element.tagName === "TEXTAREA") return [this.element]

@@ -107,7 +107,7 @@ module Collection
     end
 
     def next_action(days_offset:, step:)
-      return "Nenhum degrau para hoje" unless step
+      return "Nenhuma etapa para hoje" unless step
 
       channels = step.channels_enabled
       return "Aviso interno ao gestor" if step.kind_internal_alert?
@@ -115,9 +115,9 @@ module Collection
       labels = []
       labels << "e-mail" if channels.include?(:email)
       labels << "WhatsApp" if channels.include?(:whatsapp)
-      return "Aguardando próximo degrau" if labels.empty?
+      return "Aguardando próxima etapa" if labels.empty?
 
-      "Próxima: #{labels.join(' + ')} (degrau: #{step.name})"
+      "Próxima: #{labels.join(' + ')} (etapa: #{step.name})"
     end
 
     def build_kpis(all_rows)

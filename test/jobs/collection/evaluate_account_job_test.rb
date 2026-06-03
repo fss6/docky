@@ -25,7 +25,7 @@ module Collection
       )
       retro.items.create!(name_snapshot: "Extrato", match_terms: ["extrato"], state: :pending)
 
-      # Prazo 10/04; no dia do prazo (degrau 0d do fixture "firm") dispara e-mail
+      # Prazo 10/04; no dia do prazo (etapa 0d do fixture "firm") dispara e-mail
       travel_to Time.zone.local(2026, 4, 10, 10, 0, 0) do
         ActionMailerDelivery.stub(:enabled?, true) do
           Whatsapp::PlatformConfig.stub(:configured?, false) do

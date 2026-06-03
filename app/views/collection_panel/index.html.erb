@@ -1,17 +1,17 @@
-<% content_for :title, "Painel de cobrança · Dokivo" %>
+<% content_for :title, "Painel de pendências · Dokivo" %>
 
 <div class="space-y-6">
   <header class="flex flex-col gap-4">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p class="text-xs font-semibold uppercase tracking-wide text-accent">Cobrança</p>
-        <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Painel de cobrança</h1>
+        <p class="text-xs font-semibold uppercase tracking-wide text-accent">Pendências</p>
+        <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Painel de pendências</h1>
         <p class="mt-2 text-sm text-zinc-600">
           Pendências em competências abertas, ordenadas por atraso.
           <% if @collection_enabled %>
-            Régua ativa<% if @email_configured %> · E-mail configurado<% end %><% if @whatsapp_configured %> · WhatsApp conectado<% end %>.
+            Lembretes ativos<% if @email_configured %> · E-mail configurado<% end %><% if @whatsapp_configured %> · WhatsApp conectado<% end %>.
           <% else %>
-            <%= link_to "Ativar régua", edit_settings_collection_ladder_path, class: "text-accent font-medium" %>.
+            <%= link_to "Ativar lembretes", edit_settings_collection_ladder_path, class: "text-accent font-medium" %>.
           <% end %>
         </p>
       </div>

@@ -1,182 +1,100 @@
-<% content_for :title, "Régua de cobrança · Dokivo" %>
+<% content_for :title, "Lembretes automáticos · Dokivo" %>
+<% client_reminder_steps = @steps.reject(&:kind_internal_alert?) %>
 
 <div class="space-y-6">
   <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Cobrança</p>
-      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Régua de cobrança automática</h1>
-      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">Defina os degraus, canais e mensagens. O sistema cobra pendências de checklist conforme o prazo de cada cliente.</p>
+      <p class="text-xs font-semibold uppercase tracking-wide text-accent">Pendências</p>
+      <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Lembretes automáticos</h1>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600">Defina as etapas, canais e mensagens. O sistema cobra pendências de checklist conforme o prazo de cada cliente.</p>
     </div>
     <%= link_to "Voltar para o hub", settings_path, class: "app-btn-secondary" %>
   </header>
 
-  <div class="grid gap-4 sm:grid-cols-2">
-    <div class="app-card p-4 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <p class="text-sm font-semibold text-zinc-900">E-mail (SMTP)</p>
-        <p class="text-xs text-zinc-500 mt-1">Configurado em Sistema → Plataforma ou via ENV (<code class="text-xs">MAIL_DELIVERY</code>).</p>
-      </div>
-      <% if @email_configured %>
-        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Configurado</span>
-      <% else %>
-        <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">Não configurado</span>
-      <% end %>
-    </div>
-    <div class="app-card p-4 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <p class="text-sm font-semibold text-zinc-900">WhatsApp (Dokivo)</p>
-        <p class="text-xs text-zinc-500 mt-1">Número e credenciais da plataforma via Meta Cloud API.</p>
-      </div>
-      <% if @whatsapp_configured %>
-        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Conectado</span>
-      <% else %>
-        <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">Não configurado</span>
-      <% end %>
-    </div>
-  </div>
-
   <%= render "shared/record_errors_toast", record: @collection_setting %>
 
-  <%= form_with model: @collection_setting, url: settings_collection_ladder_path, method: :patch, class: "grid gap-6 lg:grid-cols-2" do |form| %>
-    <%= hidden_field_tag :selected_step_id, @selected_step&.id %>
+  <%= form_with model: @collection_setting, url: settings_collection_ladder_path, method: :patch do |form| %>
+    <%= hidden_field_tag :section, "behavior" %>
+    <section class="app-card space-y-5 p-5 sm:p-6">
+      <h2 class="text-lg font-semibold text-zinc-900">Comportamento</h2>
 
-    <div class="space-y-4">
-      <section class="app-card p-5">
-        <h2 class="text-lg font-semibold text-zinc-900">Degraus da régua</h2>
-        <p class="mt-1 text-xs text-zinc-500">Disparados automaticamente conforme o prazo do checklist.</p>
-        <ul class="mt-4 space-y-3">
-          <% @steps.each do |step| %>
-            <li>
-              <%= link_to edit_settings_collection_ladder_path(step_id: step.id),
-                    class: "block rounded-lg border p-3 no-underline transition #{@selected_step&.id == step.id ? 'border-accent bg-accent/5' : 'border-zinc-200 hover:border-zinc-300'}" do %>
-                <p class="text-xs font-semibold uppercase text-zinc-500"><%= step.offset_days.positive? ? "+#{step.offset_days}d" : "#{step.offset_days}d" %></p>
-                <p class="font-semibold text-zinc-900"><%= step.name %></p>
-                <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                  <% if step.email_enabled? %><span class="rounded bg-blue-50 px-2 py-0.5 text-blue-800">E-mail</span><% end %>
-                  <% if step.whatsapp_enabled? %><span class="rounded bg-green-50 px-2 py-0.5 text-green-800">WhatsApp</span><% end %>
-                  <% if step.kind_internal_alert? %><span class="rounded bg-zinc-100 px-2 py-0.5 text-zinc-700">Interno</span><% end %>
-                </div>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      </section>
-
-      <section class="app-card p-5 space-y-4">
-        <h2 class="text-lg font-semibold text-zinc-900">Comportamento</h2>
-        <label class="flex items-center justify-between gap-3">
-          <span class="text-sm font-medium text-zinc-800">Régua ativa</span>
-          <%= form.check_box :enabled, class: "rounded border-zinc-300" %>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+          <%= form.check_box :enabled, class: "mt-0.5 h-4 w-4 shrink-0 rounded border-zinc-300 text-accent focus:ring-accent" %>
+          <span class="min-w-0">
+            <span class="block text-sm font-medium text-zinc-800">Lembretes ativos</span>
+            <span class="mt-0.5 block text-xs leading-relaxed text-zinc-500">Dispara e-mail e WhatsApp nas etapas configuradas, conforme o prazo de cada cliente. Desligado, nenhuma mensagem automática é enviada.</span>
+          </span>
         </label>
-        <label class="flex items-center justify-between gap-3">
-          <span class="text-sm font-medium text-zinc-800">Confirmar recebimento automático</span>
-          <%= form.check_box :auto_confirm_receipt, class: "rounded border-zinc-300" %>
+        <label class="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
+          <%= form.check_box :auto_confirm_receipt, class: "mt-0.5 h-4 w-4 shrink-0 rounded border-zinc-300 text-accent focus:ring-accent" %>
+          <span class="min-w-0">
+            <span class="block text-sm font-medium text-zinc-800">Confirmar recebimento automático</span>
+            <span class="mt-0.5 block text-xs leading-relaxed text-zinc-500">Quando o cliente envia pelo link público, os itens do checklist da competência passam a recebido sem ação manual da equipe.</span>
+          </span>
         </label>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <%= form.label :quiet_hours_start, "Silêncio desde", class: "app-label" %>
-            <%= form.time_field :quiet_hours_start, class: "app-input mt-1" %>
-          </div>
-          <div>
-            <%= form.label :quiet_hours_end, "Silêncio até", class: "app-label" %>
-            <%= form.time_field :quiet_hours_end, class: "app-input mt-1" %>
-          </div>
-        </div>
-        <div>
-          <%= form.label :max_messages_per_client_per_day, "Limite de mensagens por cliente/dia", class: "app-label" %>
-          <%= form.select :max_messages_per_client_per_day, (1..3).map { |n| [n, n] }, {}, class: "app-input mt-1" %>
-        </div>
-      </section>
-    </div>
+      </div>
 
-    <% if @selected_step %>
-      <% step_prefix = "collection_steps[#{@selected_step.id}]" %>
-      <% email_enabled = @selected_step.kind_internal_alert? || @selected_step.email_enabled? %>
-      <% whatsapp_enabled = !@selected_step.kind_internal_alert? && @selected_step.whatsapp_enabled? %>
-      <section class="app-card p-5 space-y-4" data-controller="auto-resize-textarea">
-        <div>
-          <h2 class="text-lg font-semibold text-zinc-900"><%= @selected_step.name %></h2>
-          <p class="mt-1 text-xs text-zinc-500">Variáveis: {cliente}, {documentos_faltantes}, {prazo}, {link_upload}, {escritorio}</p>
-        </div>
-
-        <% unless @selected_step.kind_internal_alert? %>
-          <div class="flex flex-wrap gap-6 border-b border-zinc-200 pb-4">
-            <label class="flex items-center gap-2 text-sm font-medium text-zinc-800">
-              <%= check_box_tag "#{step_prefix}[email_enabled]", "1", @selected_step.email_enabled?, disabled: !@email_configured, class: "rounded border-zinc-300" %>
-              Ativar e-mail neste degrau
-              <% unless @email_configured %><span class="text-xs font-normal text-amber-700">(SMTP indisponível)</span><% end %>
-            </label>
-            <label class="flex items-center gap-2 text-sm font-medium text-zinc-800">
-              <%= check_box_tag "#{step_prefix}[whatsapp_enabled]", "1", @selected_step.whatsapp_enabled?, disabled: !@whatsapp_configured, class: "rounded border-zinc-300" %>
-              Ativar WhatsApp neste degrau
-              <% unless @whatsapp_configured %><span class="text-xs font-normal text-amber-700">(plataforma indisponível)</span><% end %>
-            </label>
-          </div>
-        <% else %>
-          <%= hidden_field_tag "#{step_prefix}[email_enabled]", "1" %>
-        <% end %>
-
-        <div class="rounded-lg border border-blue-200/80 bg-blue-50/40 p-4 space-y-3 <%= "opacity-60" if !@selected_step.kind_internal_alert? && !email_enabled %>">
-          <div class="flex flex-wrap items-center gap-2">
-            <h3 class="text-sm font-semibold text-zinc-900">E-mail</h3>
-            <% if @selected_step.kind_internal_alert? %>
-              <span class="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">Interno</span>
-            <% else %>
-              <span class="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">Cliente</span>
-            <% end %>
-          </div>
-          <% if @selected_step.kind_internal_alert? %>
-            <p class="text-xs text-zinc-600">Enviado para o e-mail de contato do escritório (não para o cliente).</p>
-          <% end %>
-          <div>
-            <%= label_tag "#{step_prefix}[email_subject_template]", "Assunto", class: "app-label" %>
-            <%= text_field_tag "#{step_prefix}[email_subject_template]", @selected_step.email_subject_template, class: "app-input mt-1 w-full" %>
-          </div>
-          <div>
-            <%= label_tag "#{step_prefix}[email_body_template]", "Corpo da mensagem", class: "app-label" %>
-            <%= text_area_tag "#{step_prefix}[email_body_template]",
-                  @selected_step.email_body_template,
-                  rows: 1,
-                  class: "app-input mt-1 w-full resize-none",
-                  data: {
-                    auto_resize_textarea_target: "field",
-                    action: "input->auto-resize-textarea#resize"
-                  } %>
-          </div>
-        </div>
-
-        <% unless @selected_step.kind_internal_alert? %>
-          <div class="rounded-lg border border-green-200/80 bg-green-50/40 p-4 space-y-3 <%= "opacity-60" unless whatsapp_enabled %>">
-            <div class="flex flex-wrap items-center gap-2">
-              <h3 class="text-sm font-semibold text-zinc-900">WhatsApp</h3>
-              <span class="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">Cliente</span>
-            </div>
-            <p class="text-xs text-zinc-600">Template aprovado na Meta; o texto de referência ajuda a revisar a mensagem no painel.</p>
+      <div class="grid gap-4 lg:grid-cols-3 lg:items-stretch">
+        <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-4 lg:col-span-2">
+          <p class="text-sm font-medium text-zinc-800">Horário de silêncio</p>
+          <p class="mt-0.5 text-xs text-zinc-500">Nenhuma mensagem é enviada neste intervalo.</p>
+          <div class="mt-3 grid grid-cols-2 gap-3">
             <div>
-              <%= label_tag "#{step_prefix}[whatsapp_template_name]", "Nome do template (Meta)", class: "app-label" %>
-              <%= text_field_tag "#{step_prefix}[whatsapp_template_name]",
-                    @selected_step.whatsapp_template_name,
-                    class: "app-input mt-1 w-full font-mono text-sm",
-                    placeholder: "cobranca_lembrete_firme" %>
+              <%= form.label :quiet_hours_start, "Desde", class: "app-label" %>
+              <%= form.time_field :quiet_hours_start, class: "app-input mt-1 w-full" %>
             </div>
             <div>
-              <%= label_tag "#{step_prefix}[whatsapp_body_template]", "Texto de referência", class: "app-label" %>
-              <%= text_area_tag "#{step_prefix}[whatsapp_body_template]",
-                    @selected_step.whatsapp_body_template,
-                    rows: 1,
-                    class: "app-input mt-1 w-full resize-none font-mono text-sm",
-                    data: {
-                      auto_resize_textarea_target: "field",
-                      action: "input->auto-resize-textarea#resize"
-                    } %>
+              <%= form.label :quiet_hours_end, "Até", class: "app-label" %>
+              <%= form.time_field :quiet_hours_end, class: "app-input mt-1 w-full" %>
             </div>
           </div>
-        <% end %>
-      </section>
-    <% end %>
+        </div>
+        <div class="flex flex-col rounded-lg border border-zinc-200 bg-zinc-50/60 p-4">
+          <p class="text-sm font-medium text-zinc-800">Limite por cliente/dia</p>
+          <p class="mt-0.5 text-xs text-zinc-500">Máximo de mensagens automáticas no mesmo dia.</p>
+          <%= form.select :max_messages_per_client_per_day,
+                (1..3).map { |n| [n, n] },
+                {},
+                class: "app-input mt-3 w-full" %>
+        </div>
+      </div>
 
-    <div class="lg:col-span-2">
-      <%= form.submit "Salvar régua", class: "app-btn-primary" %>
-    </div>
+      <div class="flex justify-end border-t border-zinc-100 pt-4">
+        <%= form.submit "Salvar comportamento", class: "app-btn-primary" %>
+      </div>
+    </section>
   <% end %>
+
+  <div class="space-y-3">
+    <div>
+      <h2 class="text-lg font-semibold text-zinc-900">Etapas dos lembretes</h2>
+      <p class="mt-1 text-xs text-zinc-500">Disparados automaticamente conforme o prazo do checklist.</p>
+      <p class="mt-2 text-xs text-zinc-500">Cada etapa dispara em relação ao prazo mensal do cliente (dia definido no cadastro do cliente).</p>
+      <%= render "step_timing_timeline", steps: @steps %>
+      <p class="mt-3 text-xs text-zinc-500">Variáveis nos templates: {cliente}, {documentos_faltantes}, {prazo}, {link_upload}, {escritorio}</p>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="space-y-3">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+          <%= heroicon "envelope", variant: :outline, options: { class: "h-5 w-5 shrink-0 text-blue-600", "aria-hidden": "true" } %>
+          E-mail
+        </h3>
+        <% @steps.each do |step| %>
+          <%= render "step_email_accordion", step: step %>
+        <% end %>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+          <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-5 w-5 shrink-0 text-[#25D366]", "aria-hidden": "true" } %>
+          WhatsApp
+        </h3>
+        <% client_reminder_steps.each do |step| %>
+          <%= render "step_whatsapp_accordion", step: step %>
+        <% end %>
+      </div>
+    </div>
+  </div>
 </div>

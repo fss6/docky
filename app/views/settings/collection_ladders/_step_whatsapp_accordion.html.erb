@@ -1,0 +1,61 @@
+<% step_prefix = "collection_steps[#{step.id}]" %>
+<% whatsapp_active = step.whatsapp_enabled? %>
+<% accordion_open = @open_whatsapp_step_id == step.id %>
+
+<details class="app-card group"
+         data-controller="auto-resize-textarea"
+         data-action="toggle->auto-resize-textarea#resizeAll"
+         <%= "open" if accordion_open %>>
+  <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left [&::-webkit-details-marker]:hidden">
+    <div class="min-w-0 flex-1">
+      <%= render "step_timing_badge", step: step %>
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      <% if whatsapp_active %>
+        <span class="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-800">Ativo</span>
+      <% else %>
+        <span class="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Inativo</span>
+      <% end %>
+      <svg class="h-4 w-4 shrink-0 text-zinc-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+      </svg>
+    </div>
+  </summary>
+
+  <div class="border-t border-zinc-100 px-4 py-4 <%= "opacity-60" unless whatsapp_active %>">
+    <%= form_with url: settings_collection_ladder_path, method: :patch, class: "space-y-4" do %>
+      <%= hidden_field_tag :section, "step_whatsapp" %>
+      <%= hidden_field_tag :step_id, step.id %>
+
+      <%= hidden_field_tag "#{step_prefix}[whatsapp_enabled]", "0" %>
+      <label class="flex items-center gap-2 text-sm font-medium text-zinc-800">
+        <%= check_box_tag "#{step_prefix}[whatsapp_enabled]", "1", step.whatsapp_enabled?, disabled: !@whatsapp_configured, class: "rounded border-zinc-300" %>
+        Ativar WhatsApp nesta etapa
+        <% unless @whatsapp_configured %><span class="text-xs font-normal text-amber-700">(indisponível)</span><% end %>
+      </label>
+
+      <p class="text-xs text-zinc-600">Template aprovado na Meta; o texto de referência ajuda a revisar a mensagem no painel.</p>
+
+      <div>
+        <%= label_tag "#{step_prefix}[whatsapp_template_name]", "Nome do template (Meta)", class: "app-label" %>
+        <%= text_field_tag "#{step_prefix}[whatsapp_template_name]",
+              step.whatsapp_template_name,
+              class: "app-input mt-1 w-full font-mono text-sm",
+              placeholder: "cobranca_lembrete_firme" %>
+      </div>
+      <div>
+        <%= label_tag "#{step_prefix}[whatsapp_body_template]", "Texto de referência", class: "app-label" %>
+        <%= text_area_tag "#{step_prefix}[whatsapp_body_template]",
+              step.whatsapp_body_template,
+              rows: 1,
+              class: "app-input mt-1 w-full resize-none font-mono text-sm",
+              data: {
+                auto_resize_textarea_target: "field",
+                action: "input->auto-resize-textarea#resize"
+              } %>
+      </div>
+
+      <%= submit_tag "Salvar WhatsApp", class: "app-btn-primary" %>
+    <% end %>
+  </div>
+</details>

@@ -5,22 +5,23 @@ module Settings
     before_action :set_collection_setting
     before_action :load_steps
     before_action :authorize_policy
+    before_action :assign_channel_config, only: %i[edit update]
 
     def edit
-      @selected_step = @steps.find { |s| s.id == params[:step_id].to_i } || @steps.first
-      @email_configured = ActionMailerDelivery.enabled?
-      @whatsapp_configured = Whatsapp::PlatformConfig.configured?
+      @open_email_step_id = params[:open_email].presence&.to_i
+      @open_whatsapp_step_id = params[:open_whatsapp].presence&.to_i
     end
 
     def update
-      if update_collection!
-        redirect_to edit_settings_collection_ladder_path(step_id: params[:selected_step_id]),
-                    notice: "Régua de cobrança atualizada com sucesso."
+      case params[:section]
+      when "behavior"
+        update_behavior
+      when "step_email"
+        update_step_email
+      when "step_whatsapp"
+        update_step_whatsapp
       else
-        @selected_step = @steps.find { |s| s.id == params[:selected_step_id].to_i } || @steps.first
-        @email_configured = ActionMailerDelivery.enabled?
-        @whatsapp_configured = Whatsapp::PlatformConfig.configured?
-        render :edit, status: :unprocessable_entity
+        head :bad_request
       end
     end
 
@@ -38,14 +39,79 @@ module Settings
       authorize current_user.account.setting || Setting.new(account: current_user.account)
     end
 
-    def update_collection!
-      ActiveRecord::Base.transaction do
-        @collection_setting.update!(collection_setting_params)
-        update_steps!
+    def assign_channel_config
+      @email_configured = ActionMailerDelivery.enabled?
+      @whatsapp_configured = Whatsapp::PlatformConfig.configured?
+    end
+
+    def update_behavior
+      if @collection_setting.update(collection_setting_params)
+        redirect_to edit_settings_collection_ladder_path, notice: "Comportamento atualizado."
+      else
+        render :edit, status: :unprocessable_entity
       end
-      true
-    rescue ActiveRecord::RecordInvalid
-      false
+    end
+
+    def update_step_email
+      step = find_step_for_update!
+      return if performed?
+
+      attrs = step_attrs_for(step.id)
+      return render_step_failure(:email, step) if attrs.nil?
+
+      permitted = apply_email_channel_guards(email_step_params(attrs), step: step)
+      permitted[:email_enabled] = true if step.kind_internal_alert?
+
+      if step.update(permitted)
+        redirect_to edit_settings_collection_ladder_path(open_email: step.id),
+                    notice: "E-mail da etapa atualizado."
+      else
+        render_step_failure(:email, step)
+      end
+    end
+
+    def update_step_whatsapp
+      step = find_step_for_update!
+      return if performed?
+
+      if step.kind_internal_alert?
+        head :not_found
+        return
+      end
+
+      attrs = step_attrs_for(step.id)
+      return render_step_failure(:whatsapp, step) if attrs.nil?
+
+      permitted = apply_whatsapp_channel_guards(whatsapp_step_params(attrs))
+
+      if step.update(permitted)
+        redirect_to edit_settings_collection_ladder_path(open_whatsapp: step.id),
+                    notice: "WhatsApp da etapa atualizado."
+      else
+        render_step_failure(:whatsapp, step)
+      end
+    end
+
+    def find_step_for_update!
+      step = @steps.find { |s| s.id == params[:step_id].to_i }
+      unless step
+        head :not_found
+        return nil
+      end
+      step
+    end
+
+    def step_attrs_for(step_id)
+      params[:collection_steps]&.[](step_id.to_s) || params[:collection_steps]&.[](step_id)
+    end
+
+    def render_step_failure(channel, step)
+      if channel == :email
+        @open_email_step_id = step.id
+      else
+        @open_whatsapp_step_id = step.id
+      end
+      render :edit, status: :unprocessable_entity
     end
 
     def collection_setting_params
@@ -59,29 +125,22 @@ module Settings
       ])
     end
 
-    def update_steps!
-      return unless params[:collection_steps]
-
-      params[:collection_steps].each do |id, attrs|
-        step = @steps.find { |s| s.id.to_s == id.to_s }
-        next unless step
-
-        step.update!(step_params(attrs))
-      end
+    def email_step_params(attrs)
+      attrs.permit(:email_enabled, :email_subject_template, :email_body_template)
     end
 
-    def step_params(attrs)
-      permitted = attrs.permit(
-        :email_enabled,
-        :whatsapp_enabled,
-        :email_subject_template,
-        :email_body_template,
-        :whatsapp_body_template,
-        :whatsapp_template_name
-      )
-      if permitted[:email_enabled] == "1" && !ActionMailerDelivery.enabled?
+    def whatsapp_step_params(attrs)
+      attrs.permit(:whatsapp_enabled, :whatsapp_template_name, :whatsapp_body_template)
+    end
+
+    def apply_email_channel_guards(permitted, step:)
+      if permitted[:email_enabled] == "1" && !ActionMailerDelivery.enabled? && !step.kind_internal_alert?
         permitted[:email_enabled] = "0"
       end
+      permitted
+    end
+
+    def apply_whatsapp_channel_guards(permitted)
       if permitted[:whatsapp_enabled] == "1" && !Whatsapp::PlatformConfig.configured?
         permitted[:whatsapp_enabled] = "0"
       end

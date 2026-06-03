@@ -233,9 +233,9 @@ Métodos úteis no model:
 
 Um usuário pode ser `owner` sem ser fundador (co-admin convidado depois). O fundador é sempre `owner`, mas nem todo `owner` é fundador.
 
-## Cobrança automática e WhatsApp (Meta Cloud)
+## Pendências e lembretes automáticos (WhatsApp Meta Cloud)
 
-A régua de cobrança (`/settings/collection_ladder`) dispara lembretes para pendências de checklist conforme o prazo (`monthly_deadline_day` do cliente). O painel operacional fica em `/collection`.
+Os lembretes automáticos (`/settings/collection_ladder`) disparam mensagens para pendências de checklist conforme o prazo (`monthly_deadline_day` do cliente). O painel operacional fica em `/collection`.
 
 ### WhatsApp — plataforma Dokivo (v1)
 
@@ -252,7 +252,7 @@ Todos os escritórios usam o **mesmo número** configurado na plataforma. Creden
 
 **Webhook Meta:** `GET/POST https://seu-dominio/webhooks/whatsapp`
 
-Mensagens proativas exigem **templates aprovados** na WABA; informe o nome em cada degrau da régua (`whatsapp_template_name`).
+Mensagens proativas exigem **templates aprovados** na WABA; informe o nome em cada etapa dos lembretes (`whatsapp_template_name`).
 
 Verificar configuração:
 

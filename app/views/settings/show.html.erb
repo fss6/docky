@@ -72,14 +72,14 @@
           <%= heroicon "bell-alert", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
         </div>
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Cobrança</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Régua automática</h2>
+          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pendências</p>
+          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Lembretes automáticos</h2>
         </div>
       </div>
-      <p class="mt-2 text-sm text-zinc-600">Degraus, canais e mensagens para cobrar pendências de documentos.</p>
+      <p class="mt-2 text-sm text-zinc-600">Etapas, canais e mensagens para cobrar pendências de documentos.</p>
       <% if policy(@setting).update? %>
         <div class="mt-4">
-          <%= link_to "Configurar régua", edit_settings_collection_ladder_path, class: "app-btn-primary" %>
+          <%= link_to "Configurar lembretes", edit_settings_collection_ladder_path, class: "app-btn-primary" %>
         </div>
       <% end %>
     </article>

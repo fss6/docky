@@ -1,0 +1,30 @@
+<% compact = local_assigns.fetch(:compact, false) %>
+<% tone = collection_step_timing_tone(step) %>
+<% icon_styles = collection_step_timing_styles(step, variant: :icon_circle) %>
+<% badge_styles = collection_step_timing_styles(step, variant: :badge) %>
+
+<div class="flex min-w-0 items-center gap-3"
+     aria-label="<%= collection_step_timing_aria_label(step) %>">
+  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-1 ring-inset <%= icon_styles %>">
+    <%= heroicon collection_step_timing_icon(step),
+          variant: :outline,
+          options: { class: "h-5 w-5", "aria-hidden": "true" } %>
+  </div>
+
+  <div class="min-w-0">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="inline-flex rounded-md border px-2 py-0.5 text-sm font-bold tabular-nums leading-tight <%= badge_styles %>">
+        <%= collection_step_offset_code(step) %>
+      </span>
+      <% unless compact %>
+        <span class="text-sm font-semibold text-zinc-900 truncate"><%= step.name %></span>
+      <% end %>
+    </div>
+    <p class="<%= compact ? "mt-0.5 text-[11px] leading-snug" : "mt-0.5 text-xs" %> text-zinc-600">
+      <%= collection_step_timing_phrase(step) %>
+    </p>
+    <% if compact %>
+      <p class="mt-0.5 text-[11px] font-medium text-zinc-800 truncate"><%= step.name %></p>
+    <% end %>
+  </div>
+</div>

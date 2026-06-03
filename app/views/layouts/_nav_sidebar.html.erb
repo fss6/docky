@@ -13,7 +13,7 @@
         items: [
           { key: :dashboard, label: "Dashboard", path: dashboard_path, icon: :home, policy_ok: policy(:dashboard).index? },
           { key: :wallet, label: "Carteira", path: wallet_path, icon: :credit_card, policy_ok: policy(Client).index? },
-          { key: :collection, label: "Cobrança", path: collection_panel_path, icon: :bell_alert, policy_ok: policy(Client).index? },
+          { key: :collection, label: "Pendências", path: collection_panel_path, icon: :bell_alert, policy_ok: policy(Client).index? },
           { key: :clients, label: "Clientes", path: clients_path, icon: :clients, policy_ok: policy(Client).index? },
           { key: :institutions, label: "Instituições", path: institutions_path, icon: :institutions, policy_ok: policy(Institution).index? }
         ]

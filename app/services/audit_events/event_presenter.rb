@@ -21,8 +21,8 @@ module AuditEvents
       "upload_invite.revoked" => "Link de upload revogado",
       "upload_invite.email_sent" => "Convite enviado por e-mail",
       "upload_invite.email_failed" => "Falha ao enviar convite por e-mail",
-      "collection.email_sent" => "Cobrança enviada por e-mail",
-      "collection.whatsapp_sent" => "Cobrança enviada por WhatsApp",
+      "collection.email_sent" => "Lembrete enviado por e-mail",
+      "collection.whatsapp_sent" => "Lembrete enviado por WhatsApp",
       "collection.internal_alert_sent" => "Alerta interno ao gestor",
       "checklist_item.auto_matched" => "Documento reconhecido automaticamente",
       "client.created" => "Cliente criado",
@@ -160,7 +160,7 @@ module AuditEvents
       parts << @metadata["step_name"] if @metadata["step_name"].present?
       parts << @metadata["channel"] if @metadata["channel"].present?
       parts << month_label if @metadata["period"].present?
-      parts.presence&.join(" · ") || "Cobrança automática"
+      parts.presence&.join(" · ") || "Lembretes automáticos"
     end
 
     def upload_invite_email_failed_description

@@ -23,3 +23,16 @@ firm:
   email_body_template: "{cliente}, prazo hoje. {link_upload}"
   whatsapp_body_template: "Prazo hoje {cliente}"
   whatsapp_template_name: cobranca_firme
+
+manager_alert:
+  account: one
+  position: 3
+  offset_days: 5
+  name: Avisar o gestor do escritório
+  kind: internal_alert
+  email_enabled: true
+  whatsapp_enabled: false
+  email_subject_template: Cliente com pendências
+  email_body_template: "Cliente {cliente} pendente: {documentos_faltantes}"
+  whatsapp_body_template:
+  whatsapp_template_name:
