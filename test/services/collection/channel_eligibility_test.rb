@@ -37,6 +37,47 @@ module Collection
       end
     end
 
+    test "daily_limit when sent dispatches reach max per day" do
+      ActionMailerDelivery.stub(:enabled?, true) do
+        period = Period.create!(
+          account: @account,
+          client: @client,
+          period: Date.current.beginning_of_month,
+          status: :open,
+          opened_at: Time.current
+        )
+        firm = collection_steps(:firm)
+
+        CollectionDispatch.create!(
+          account: @account,
+          client: @client,
+          period: period,
+          collection_step: @step,
+          channel: :email,
+          status: :sent,
+          sent_at: Time.current
+        )
+        CollectionDispatch.create!(
+          account: @account,
+          client: @client,
+          period: period,
+          collection_step: firm,
+          channel: :whatsapp,
+          status: :sent,
+          sent_at: Time.current
+        )
+
+        reason = ChannelEligibility.skip_reason(
+          channel: :email,
+          client: @client,
+          account: @account,
+          step: @step,
+          settings: @settings
+        )
+        assert_equal "daily_limit", reason
+      end
+    end
+
     test "no_phone blocks whatsapp channel" do
       Whatsapp::PlatformConfig.stub(:configured?, true) do
         step = collection_steps(:firm)

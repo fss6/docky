@@ -41,7 +41,29 @@ class Settings::CollectionLaddersControllerTest < ActionDispatch::IntegrationTes
     }
     assert_redirected_to edit_settings_collection_ladder_path
     assert_equal "Comportamento atualizado.", flash[:notice]
-    assert collection_settings(:one).reload.enabled?
+
+    setting = collection_settings(:one).reload
+    assert setting.enabled?
+    assert setting.auto_confirm_receipt?
+    assert_equal "08:00", setting.quiet_hours_start.strftime("%H:%M")
+    assert_equal "19:00", setting.quiet_hours_end.strftime("%H:%M")
+    assert_equal 2, setting.max_messages_per_client_per_day
+  end
+
+  test "update behavior rejects invalid max messages" do
+    patch settings_collection_ladder_path, params: {
+      section: "behavior",
+      collection_setting: {
+        enabled: true,
+        auto_confirm_receipt: true,
+        quiet_hours_start: "08:00",
+        quiet_hours_end: "19:00",
+        max_messages_per_client_per_day: 99,
+        timezone: "America/Sao_Paulo"
+      }
+    }
+    assert_response :unprocessable_entity
+    assert_equal 2, collection_settings(:one).reload.max_messages_per_client_per_day
   end
 
   test "update step email only" do

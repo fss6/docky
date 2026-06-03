@@ -102,15 +102,58 @@ module Collection
       end
     end
 
+    test "returns empty when lembretes are disabled" do
+      @settings.update!(enabled: false)
+
+      with_deliverable_email do
+        Whatsapp::PlatformConfig.stub(:configured?, false) do
+          travel_to Deadline.for(client: @client, period: @period) - 3.days do
+            assert_no_difference -> { CollectionDispatch.count } do
+              dispatches = EvaluateClientPeriod.call(
+                client: @client,
+                period_record: @period_record,
+                settings: @settings
+              )
+              assert_empty dispatches
+            end
+          end
+        end
+      end
+    end
+
+    test "does not enqueue send job during quiet hours" do
+      @settings.update!(
+        enabled: true,
+        timezone: "America/Sao_Paulo",
+        quiet_hours_start: Time.zone.parse("2000-01-01 08:00:00"),
+        quiet_hours_end: Time.zone.parse("2000-01-01 19:00:00")
+      )
+
+      with_deliverable_email do
+        Whatsapp::PlatformConfig.stub(:configured?, false) do
+          eval_day = Deadline.for(client: @client, period: @period) - 3.days
+          at = eval_day.in_time_zone(@settings.timezone).change(hour: 22, min: 0)
+
+          travel_to at do
+            assert_enqueued_jobs 0, only: Collection::SendDispatchJob do
+              dispatches = EvaluateClientPeriod.call(
+                client: @client,
+                period_record: @period_record,
+                settings: @settings
+              )
+              email = dispatches.find { |d| d.channel_email? }
+              assert email
+              assert email.status_scheduled?
+            end
+          end
+        end
+      end
+    end
+
     test "internal alert runs without client phone" do
       @account.update!(contact_email: "gestor@escritorio.com")
-      @account.collection_steps.create!(
-        position: 60,
-        offset_days: 5,
-        name: "Alerta gestor",
-        kind: :internal_alert,
+      collection_steps(:manager_alert).update!(
         email_enabled: true,
-        whatsapp_enabled: false,
         email_subject_template: "Cliente pendente",
         email_body_template: "Pendente: {documentos_faltantes}"
       )
