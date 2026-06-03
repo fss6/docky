@@ -372,9 +372,9 @@ pt-BR:
         help_text_hint: Orientação extra sobre formato, prazo ou onde encontrar o documento.
         help_text_placeholder: "Ex.: Versão assinada, conta de luz dos últimos 3 meses"
     permissions:
-      title: Permissões da equipe
-      eyebrow: Acesso
-      heading: Permissões da equipe
+      title: Controle de acesso
+      eyebrow: Premissões
+      heading: Controle de acesso
       subtitle: Defina o que membros da conta podem ver e fazer. Administradores da conta (owners) sempre têm acesso total.
       back: Voltar às configurações
       cancel: Cancelar
@@ -383,9 +383,9 @@ pt-BR:
       flashes:
         updated: Permissões atualizadas com sucesso.
       hub:
-        eyebrow: Equipe
-        title: Permissões da equipe
-        description: Controle o que usuários com função membro podem acessar no sistema.
+        eyebrow: Premissões
+        title: Controle de acesso
+        description: Controle o que usuários podem acessar no sistema.
         action: Gerenciar permissões
       groups:
         clients: Clientes

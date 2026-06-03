@@ -3,7 +3,6 @@ class SettingsController < ApplicationController
   before_action :authorize_policy
 
   def show
-    @onboarding_template_count = current_user.account.onboarding_templates.count
   end
 
   private

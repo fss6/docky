@@ -20,5 +20,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_settings_ai_settings_path
     assert_select "a[href=?]", edit_settings_upload_share_path
     assert_select "a[href=?]", edit_settings_onboarding_share_path
+    assert_select "a.app-btn-primary", count: 0
+    assert_select "p", text: /Placeholders:/, count: 0
   end
 end

@@ -9,117 +9,51 @@
 
   <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     <% if policy(:account_permissions).show? %>
-      <article class="app-card p-5">
-        <div class="flex items-start gap-3">
-          <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-            <%= heroicon "shield-check", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-          </div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500"><%= t("settings.permissions.hub.eyebrow") %></p>
-            <h2 class="mt-1 text-lg font-semibold text-zinc-900"><%= t("settings.permissions.hub.title") %></h2>
-          </div>
-        </div>
-        <p class="mt-2 text-sm text-zinc-600"><%= t("settings.permissions.hub.description") %></p>
-        <div class="mt-4">
-          <%= link_to t("settings.permissions.hub.action"), settings_permissions_path, class: "app-btn-primary" %>
-        </div>
-      </article>
+      <%= render "settings/hub_card",
+            path: settings_permissions_path,
+            icon: "shield-check",
+            eyebrow: t("settings.permissions.hub.eyebrow"),
+            title: t("settings.permissions.hub.title"),
+            description: t("settings.permissions.hub.description") %>
     <% end %>
 
-    <article class="app-card p-5">
-      <div class="flex items-start gap-3">
-        <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          <%= heroicon "clipboard-document-list", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Onboarding</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Templates de itens</h2>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-zinc-600">Crie templates personalizados ou edite os padrões usados no onboarding dos clientes.</p>
-      <p class="mt-3 text-xs text-zinc-500"><%= pluralize(@onboarding_template_count, "template") %> configurado(s)</p>
-      <div class="mt-4">
-        <% if policy(OnboardingTemplate).index? %>
-          <%= link_to "Ver templates", settings_onboarding_templates_path, class: "app-btn-primary" %>
-        <% end %>
-      </div>
-    </article>
+    <% if policy(OnboardingTemplate).index? %>
+      <%= render "settings/hub_card",
+            path: settings_onboarding_templates_path,
+            icon: "clipboard-document-list",
+            eyebrow: "Templates",
+            title: "Onboarding de clientes",
+            description: "Crie templates personalizados ou edite os padrões usados no onboarding dos clientes." %>
+    <% end %>
 
-    <article class="app-card p-5">
-      <div class="flex items-start gap-3">
-        <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          <%= heroicon "sparkles", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Inteligência</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Tags automáticas com IA</h2>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-zinc-600">Controle a geração automática de tags para documentos processados.</p>
-      <p class="mt-3 text-xs text-zinc-500">
-        Status: <%= @setting.generate_tags_automatically? ? "ativo" : "inativo" %>
-      </p>
-      <% if policy(@setting).update? %>
-        <div class="mt-4">
-          <%= link_to "Editar IA", edit_settings_ai_settings_path, class: "app-btn-primary" %>
-        </div>
-      <% end %>
-    </article>
+    <% if policy(@setting).update? %>
+      <%= render "settings/hub_card",
+            path: edit_settings_ai_settings_path,
+            icon: "sparkles",
+            eyebrow: "Assistente",
+            title: "Automações com IA",
+            description: "Controle as automações do seu assistente de IA." %>
 
-    <article class="app-card p-5">
-      <div class="flex items-start gap-3">
-        <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          <%= heroicon "bell-alert", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pendências</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Lembretes automáticos</h2>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-zinc-600">Etapas, canais e mensagens para cobrar pendências de documentos.</p>
-      <% if policy(@setting).update? %>
-        <div class="mt-4">
-          <%= link_to "Configurar lembretes", edit_settings_collection_ladder_path, class: "app-btn-primary" %>
-        </div>
-      <% end %>
-    </article>
+      <%= render "settings/hub_card",
+            path: edit_settings_collection_ladder_path,
+            icon: "bell-alert",
+            eyebrow: "Pendências",
+            title: "Lembretes automáticos",
+            description: "Etapas, canais e mensagens para cobrar pendências de documentos." %>
 
-    <article class="app-card p-5">
-      <div class="flex items-start gap-3">
-        <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          <%= heroicon "paper-airplane", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Compartilhamento</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Convite mensal</h2>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-zinc-600">Edite mensagens de WhatsApp e e-mail para coleta mensal.</p>
-      <p class="mt-3 text-xs text-zinc-500">Placeholders: {{nome_cliente}}, {{competencia}}, {{link}}</p>
-      <% if policy(@setting).update? %>
-        <div class="mt-4">
-          <%= link_to "Editar compartilhamento", edit_settings_upload_share_path, class: "app-btn-primary" %>
-        </div>
-      <% end %>
-    </article>
+      <%= render "settings/hub_card",
+            path: edit_settings_upload_share_path,
+            icon: "paper-airplane",
+            eyebrow: "Compartilhamento",
+            title: "Convite mensal",
+            description: "Edite mensagens de WhatsApp e e-mail para coleta mensal." %>
 
-    <article class="app-card p-5">
-      <div class="flex items-start gap-3">
-        <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-          <%= heroicon "chat-bubble-left-right", variant: :outline, options: { class: "h-5 w-5", "aria-hidden": "true" } %>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-zinc-500">Onboarding</p>
-          <h2 class="mt-1 text-lg font-semibold text-zinc-900">Mensagens de onboarding</h2>
-        </div>
-      </div>
-      <p class="mt-2 text-sm text-zinc-600">Configure textos de WhatsApp e e-mail para convite inicial.</p>
-      <p class="mt-3 text-xs text-zinc-500">Placeholders: {{nome_cliente}}, {{progresso}}, {{link}}</p>
-      <% if policy(@setting).update? %>
-        <div class="mt-4">
-          <%= link_to "Editar onboarding", edit_settings_onboarding_share_path, class: "app-btn-primary" %>
-        </div>
-      <% end %>
-    </article>
+      <%= render "settings/hub_card",
+            path: edit_settings_onboarding_share_path,
+            icon: "chat-bubble-left-right",
+            eyebrow: "Onboarding",
+            title: "Mensagens de onboarding",
+            description: "Configure textos de WhatsApp e e-mail para convite inicial." %>
+    <% end %>
   </section>
 </div>
