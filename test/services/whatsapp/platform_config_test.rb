@@ -5,6 +5,7 @@ require "test_helper"
 module Whatsapp
   class PlatformConfigTest < ActiveSupport::TestCase
     setup do
+      PlatformSetting.reset_cache!
       @env_backup = %w[
         WHATSAPP_ACCESS_TOKEN
         WHATSAPP_PHONE_NUMBER_ID
@@ -15,8 +16,9 @@ module Whatsapp
 
     teardown do
       @env_backup&.each { |k, v| v.nil? ? ENV.delete(k) : ENV[k] = v }
-      if Whatsapp::PlatformConfig.instance_variable_defined?(:@credentials_hash)
-        Whatsapp::PlatformConfig.remove_instance_variable(:@credentials_hash)
+      PlatformSetting.reset_cache!
+      if PlatformSettings::WhatsappConfig.instance_variable_defined?(:@credentials_hash)
+        PlatformSettings::WhatsappConfig.remove_instance_variable(:@credentials_hash)
       end
     end
 
@@ -31,6 +33,9 @@ module Whatsapp
     end
 
     test "not configured when missing token" do
+      platform_settings(:default).update!(whatsapp_access_token: nil)
+      PlatformSetting.reset_cache!
+
       ENV.delete("WHATSAPP_ACCESS_TOKEN")
       ENV["WHATSAPP_PHONE_NUMBER_ID"] = "123"
       ENV["WHATSAPP_APP_SECRET"] = "secret"
