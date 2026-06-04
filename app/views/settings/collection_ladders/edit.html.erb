@@ -16,7 +16,10 @@
   <%= form_with model: @collection_setting, url: settings_collection_ladder_path, method: :patch do |form| %>
     <%= hidden_field_tag :section, "behavior" %>
     <section class="app-card space-y-5 p-5 sm:p-6">
-      <h2 class="text-lg font-semibold text-zinc-900">Comportamento</h2>
+      <div>
+        <h2 class="text-lg font-semibold text-zinc-900">Comportamento</h2>
+        <p class="mt-1 text-xs text-zinc-500">Ative os lembretes automáticos e defina a janela de horário em que e-mail e WhatsApp podem ser enviados.</p>
+      </div>
 
       <div class="grid gap-4 sm:grid-cols-2 sm:items-stretch">
         <label class="flex h-full min-h-0 cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3">
@@ -49,7 +52,7 @@
     </section>
   <% end %>
 
-  <div class="space-y-3">
+  <section class="app-card space-y-5 p-5 sm:p-6">
     <div>
       <h2 class="text-lg font-semibold text-zinc-900">Etapas dos lembretes</h2>
       <p class="mt-1 text-xs text-zinc-500">Disparados automaticamente conforme o prazo do checklist.</p>
@@ -79,5 +82,5 @@
         <% end %>
       </div>
     </div>
-  </div>
+  </section>
 </div>
