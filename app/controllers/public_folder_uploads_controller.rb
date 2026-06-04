@@ -47,7 +47,6 @@ class PublicFolderUploadsController < ApplicationController
         document: @document,
         file_io: params.dig(:document, :file)
       )
-      sync_checklist_receipts_if_enabled!
       redirect_to public_folder_upload_path(token: @upload_token),
                   notice: "Arquivo enviado com sucesso.",
                   status: :see_other
@@ -319,15 +318,5 @@ class PublicFolderUploadsController < ApplicationController
 
   def render_expired_link(status:)
     render :expired, status: status
-  end
-
-  def sync_checklist_receipts_if_enabled!
-    return if @period_record.blank?
-
-    account = @period_record.account
-    settings = account.collection_setting
-    return unless settings&.auto_confirm_receipt?
-
-    Checklist::SyncReceiptsForCompetency.new(checklist: @period_record).call
   end
 end

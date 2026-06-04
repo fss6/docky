@@ -121,7 +121,7 @@ module Collection
       end
     end
 
-    test "does not enqueue send job during quiet hours" do
+    test "does not enqueue send job outside sending window" do
       @settings.update!(
         enabled: true,
         timezone: "America/Sao_Paulo",
@@ -145,6 +145,85 @@ module Collection
               assert email
               assert email.status_scheduled?
             end
+          end
+        end
+      end
+    end
+
+    test "enqueues send job when dispatch enters sending window" do
+      @settings.update!(
+        enabled: true,
+        timezone: "America/Sao_Paulo",
+        quiet_hours_start: Time.zone.parse("2000-01-01 08:00:00"),
+        quiet_hours_end: Time.zone.parse("2000-01-01 19:00:00")
+      )
+
+      with_deliverable_email do
+        Whatsapp::PlatformConfig.stub(:configured?, false) do
+          eval_day = Deadline.for(client: @client, period: @period) - 3.days
+          at_night = eval_day.in_time_zone(@settings.timezone).change(hour: 22, min: 0)
+          at_day = eval_day.in_time_zone(@settings.timezone).change(hour: 10, min: 0)
+
+          travel_to at_night do
+            EvaluateClientPeriod.call(
+              client: @client,
+              period_record: @period_record,
+              settings: @settings
+            )
+          end
+
+          travel_to at_day do
+            assert_enqueued_jobs 1, only: Collection::SendDispatchJob do
+              EvaluateClientPeriod.call(
+                client: @client,
+                period_record: @period_record,
+                settings: @settings
+              )
+            end
+          end
+        end
+      end
+    end
+
+    test "does not reenqueue send job when dispatch already sent" do
+      with_deliverable_email do
+        Whatsapp::PlatformConfig.stub(:configured?, false) do
+          travel_to Deadline.for(client: @client, period: @period) do
+            EvaluateClientPeriod.call(
+              client: @client,
+              period_record: @period_record,
+              settings: @settings
+            )
+            dispatch = CollectionDispatch.find_by!(client: @client, period: @period_record, channel: :email)
+            dispatch.mark_sent!
+
+            assert_no_enqueued_jobs only: Collection::SendDispatchJob do
+              EvaluateClientPeriod.call(
+                client: @client,
+                period_record: @period_record,
+                settings: @settings
+              )
+            end
+          end
+        end
+      end
+    end
+
+    test "uses reference_date for step offset" do
+      with_deliverable_email do
+        Whatsapp::PlatformConfig.stub(:configured?, false) do
+          reference = Deadline.for(client: @client, period: @period) - 3.days
+
+          travel_to Time.zone.local(2020, 1, 1, 10, 0, 0) do
+            dispatches = EvaluateClientPeriod.call(
+              client: @client,
+              period_record: @period_record,
+              settings: @settings,
+              reference_date: reference
+            )
+            email = dispatches.find { |d| d.channel_email? }
+            assert email
+            assert_equal(-3, email.collection_step.offset_days)
           end
         end
       end

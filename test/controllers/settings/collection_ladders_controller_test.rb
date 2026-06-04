@@ -32,10 +32,8 @@ class Settings::CollectionLaddersControllerTest < ActionDispatch::IntegrationTes
       section: "behavior",
       collection_setting: {
         enabled: true,
-        auto_confirm_receipt: true,
         quiet_hours_start: "08:00",
         quiet_hours_end: "19:00",
-        max_messages_per_client_per_day: 2,
         timezone: "America/Sao_Paulo"
       }
     }
@@ -44,26 +42,14 @@ class Settings::CollectionLaddersControllerTest < ActionDispatch::IntegrationTes
 
     setting = collection_settings(:one).reload
     assert setting.enabled?
-    assert setting.auto_confirm_receipt?
     assert_equal "08:00", setting.quiet_hours_start.strftime("%H:%M")
     assert_equal "19:00", setting.quiet_hours_end.strftime("%H:%M")
-    assert_equal 2, setting.max_messages_per_client_per_day
   end
 
-  test "update behavior rejects invalid max messages" do
-    patch settings_collection_ladder_path, params: {
-      section: "behavior",
-      collection_setting: {
-        enabled: true,
-        auto_confirm_receipt: true,
-        quiet_hours_start: "08:00",
-        quiet_hours_end: "19:00",
-        max_messages_per_client_per_day: 99,
-        timezone: "America/Sao_Paulo"
-      }
-    }
-    assert_response :unprocessable_entity
-    assert_equal 2, collection_settings(:one).reload.max_messages_per_client_per_day
+  test "edit does not expose max messages per day control" do
+    get edit_settings_collection_ladder_path
+    assert_response :success
+    assert_no_match(/Limite por cliente\/dia/, response.body)
   end
 
   test "update step email only" do
@@ -159,5 +145,70 @@ class Settings::CollectionLaddersControllerTest < ActionDispatch::IntegrationTes
   test "unknown section returns bad request" do
     patch settings_collection_ladder_path, params: { section: "invalid" }
     assert_response :bad_request
+  end
+
+  test "preview email returns turbo frame with rendered subject" do
+    step = ActsAsTenant.with_tenant(accounts(:one)) { collection_steps(:friendly) }
+    client = clients(:alpha)
+
+    post preview_email_settings_collection_ladder_path, params: {
+      step_id: step.id,
+      client_id: client.id,
+      collection_steps: {
+        step.id => {
+          email_subject_template: "Preview {cliente}",
+          email_body_template: "Corpo preview {cliente}"
+        }
+      }
+    }, headers: { "Turbo-Frame" => "email_playground_preview_step_#{step.id}" }
+
+    assert_response :success
+    assert_match(/Corpo preview #{client.name}/, response.body)
+    assert_match(/turbo-frame/, response.body)
+    assert_match(/Enviar documentos/, response.body)
+    assert_no_match(/>\s*Assunto\s*</, response.body)
+    assert_no_match(/>\s*Corpo\s*</, response.body)
+  end
+
+  test "send test email redirects with notice" do
+    step = ActsAsTenant.with_tenant(accounts(:one)) { collection_steps(:friendly) }
+    client = clients(:alpha)
+
+    assert_emails 1 do
+      post send_test_email_settings_collection_ladder_path, params: {
+        step_id: step.id,
+        client_id: client.id,
+        collection_steps: {
+          step.id => {
+            email_subject_template: "Teste {cliente}",
+            email_body_template: "Corpo teste"
+          }
+        }
+      }
+    end
+
+    assert_redirected_to edit_settings_collection_ladder_path(open_email: step.id)
+    assert_match(/E-mail de teste enviado/, flash[:notice])
+  end
+
+  test "send test email fails when smtp not configured" do
+    step = ActsAsTenant.with_tenant(accounts(:one)) { collection_steps(:friendly) }
+    client = clients(:alpha)
+
+    ActionMailerDelivery.stub(:enabled?, false) do
+      post send_test_email_settings_collection_ladder_path, params: {
+        step_id: step.id,
+        client_id: client.id,
+        collection_steps: {
+          step.id => {
+            email_subject_template: step.email_subject_template,
+            email_body_template: step.email_body_template
+          }
+        }
+      }
+    end
+
+    assert_redirected_to edit_settings_collection_ladder_path(open_email: step.id)
+    assert_includes flash[:alert], "SMTP"
   end
 end

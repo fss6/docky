@@ -29,6 +29,18 @@ module PlatformSettings
       end
     end
 
+    test "falls back when platform_settings table is not ready" do
+      PlatformSetting.stub(:table_ready?, false) do
+        PlatformSetting.reset_cache!
+
+        with_env("MAIL_DELIVERY" => "gmail", "SMTP_USERNAME" => "u", "SMTP_PASSWORD" => "p") do
+          assert SmtpConfig.configured?
+          assert_not SmtpConfig.from_database?
+          assert_equal "gmail", SmtpConfig.mode
+        end
+      end
+    end
+
     test "apply_runtime does not recurse when using env fallback" do
       platform_settings(:default).update!(
         mail_delivery: nil,

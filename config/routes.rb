@@ -83,6 +83,9 @@ Rails.application.routes.draw do
   resource :settings, only: :show
   resource :platform_settings, only: %i[show update], path: "sistema/plataforma" do
     post :regenerate_whatsapp_verify_token
+    post :send_test_email
+    get :collection_dispatches, path: "envios", to: "platform_collection_dispatches#index"
+    get "envios/:id", to: "platform_collection_dispatches#show", as: :platform_collection_dispatch
   end
   resource :profile, only: %i[edit update]
   resource :account_profile, only: %i[edit update]
@@ -91,7 +94,10 @@ Rails.application.routes.draw do
     resource :ai_settings, only: %i[edit update]
     resource :upload_share, only: %i[edit update], controller: "upload_shares"
     resource :onboarding_share, only: %i[edit update], controller: "onboarding_shares"
-    resource :collection_ladder, only: %i[edit update], controller: "collection_ladders"
+    resource :collection_ladder, only: %i[edit update], controller: "collection_ladders" do
+      post :preview_email
+      post :send_test_email
+    end
     resources :onboarding_templates, only: %i[index show new create edit update destroy]
   end
 

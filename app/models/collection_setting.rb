@@ -5,7 +5,6 @@
 # Table name: collection_settings
 #
 #  id                              :bigint           not null, primary key
-#  auto_confirm_receipt            :boolean          default(TRUE), not null
 #  enabled                         :boolean          default(FALSE), not null
 #  max_messages_per_client_per_day :integer          default(1), not null
 #  quiet_hours_end                 :time             default(2000-01-01 17:00:00.000000000 -02 -02:00), not null

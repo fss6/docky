@@ -262,8 +262,15 @@ docker compose run web rails whatsapp:test
 
 ### Jobs
 
+Subir **`web` e `worker`** antes de testar lembretes (`docker compose up web worker`). O `web` só enfileira; o `worker` envia e-mail e processa `EvaluateAccountJob`.
+
 - `Collection::DailyTickJob` — cron Sidekiq às 08:00 (`America/Sao_Paulo`)
-- Manual: `docker compose run web rails collection:tick`
+- `Collection::FlushScheduledDispatchesJob` — cron às 08:15; reenfileira dispatches `scheduled` (ex.: criados fora da janela de envio)
+- Avaliação manual (com worker rodando): `docker compose exec web rails collection:tick`
+- Simular outro dia na avaliação de etapas: `DATE=2026-06-03 docker compose exec web rails collection:tick` (a janela de envio ainda usa o relógio real)
+- Reprocessar `scheduled` sem apagar registro: `docker compose exec web rails collection:flush`
+
+Se o e-mail não chegar e `collection_dispatches.status` ficar `scheduled`, confira `docker compose ps worker` e as filas Sidekiq (`default`, `mailers`).
 
 ### Opt-out
 

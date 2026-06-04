@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_02_205834) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_04_094529) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "vector"
@@ -192,7 +192,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_02_205834) do
   create_table "collection_settings", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.boolean "enabled", default: false, null: false
-    t.boolean "auto_confirm_receipt", default: true, null: false
     t.time "quiet_hours_start", default: "2000-01-01 08:00:00", null: false
     t.time "quiet_hours_end", default: "2000-01-01 19:00:00", null: false
     t.integer "max_messages_per_client_per_day", default: 1, null: false

@@ -42,6 +42,7 @@ services:
   #     - minio-data:/data
   #   networks:
   #     - app
+  # Obrigatório para e-mail, WhatsApp e lembretes automáticos (processa filas Sidekiq).
   worker:
     image: docfy-web:latest
     command: bash -c "bundle exec sidekiq -C config/sidekiq.yml"

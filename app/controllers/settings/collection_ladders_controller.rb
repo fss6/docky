@@ -186,7 +186,6 @@ module Settings
     def collection_setting_params
       params.expect(collection_setting: [
         :enabled,
-        :auto_confirm_receipt,
         :quiet_hours_start,
         :quiet_hours_end,
         :timezone

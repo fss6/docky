@@ -53,4 +53,34 @@ class PlatformSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to platform_settings_path
     assert_not_equal old_token, @setting.reload.whatsapp_verify_token
   end
+
+  test "administrator sends test email when smtp configured" do
+    sign_in users(:administrator)
+
+    assert_emails 1 do
+      post send_test_email_platform_settings_path, params: { recipient: "admin@example.com" }
+    end
+
+    assert_redirected_to platform_settings_path
+    assert_equal "E-mail de teste enviado para admin@example.com.", flash[:notice]
+  end
+
+  test "owner cannot send test email" do
+    sign_in users(:owner)
+
+    post send_test_email_platform_settings_path, params: { recipient: "owner@example.com" }
+
+    assert_redirected_to authenticated_root_path
+  end
+
+  test "send test email fails when smtp not configured" do
+    sign_in users(:administrator)
+
+    PlatformSettings::SmtpConfig.stub(:configured?, false) do
+      post send_test_email_platform_settings_path, params: { recipient: "admin@example.com" }
+    end
+
+    assert_redirected_to platform_settings_path
+    assert_includes flash[:alert], "SMTP"
+  end
 end

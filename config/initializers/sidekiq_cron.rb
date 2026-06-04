@@ -14,6 +14,11 @@ if defined?(Sidekiq::Cron) && Sidekiq.server?
       "class" => "Collection::DailyTickJob",
       "cron" => "0 8 * * * America/Sao_Paulo",
       "queue" => "default"
+    },
+    "collection_flush_scheduled" => {
+      "class" => "Collection::FlushScheduledDispatchesJob",
+      "cron" => "15 8 * * * America/Sao_Paulo",
+      "queue" => "default"
     }
   )
 end

@@ -38,6 +38,7 @@ end
 
 module ActiveSupport
   class TestCase
+    include ActionMailer::TestHelper
     include OnboardingTestHelper
     include PermissionTestHelper
     include TestTaxIds
