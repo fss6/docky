@@ -17,12 +17,12 @@ module Settings
         icon_circle: "bg-amber-50 text-amber-800 ring-amber-100",
         badge: "bg-amber-50 text-amber-900 border-amber-200",
         timeline: "bg-amber-50/80 text-amber-950 border-amber-200/80"
-      },
-      internal: {
-        icon_circle: "bg-zinc-100 text-zinc-700 ring-zinc-200",
-        badge: "bg-zinc-100 text-zinc-700 border-zinc-200",
-        timeline: "bg-zinc-50 text-zinc-800 border-zinc-200"
       }
+    }.freeze
+
+    CHANNEL_CARD_STYLES = {
+      email: "border-blue-100 bg-blue-50/50",
+      whatsapp: "border-green-100 bg-green-50/50"
     }.freeze
 
     def collection_step_offset_code(step)
@@ -53,7 +53,7 @@ module Settings
     end
 
     def collection_step_timing_tone(step)
-      return :internal if step.kind_internal_alert?
+      return :after if step.kind_internal_alert?
       return :before if step.offset_days.negative?
       return :due if step.offset_days.zero?
 
@@ -67,6 +67,11 @@ module Settings
 
     def collection_step_timing_aria_label(step)
       "Etapa #{collection_step_timing_phrase(step)}: #{step.name}"
+    end
+
+    def collection_step_channel_card_classes(step:, channel:)
+      tone = channel == :email ? :email : :whatsapp
+      "app-card group #{CHANNEL_CARD_STYLES.fetch(tone)}"
     end
 
     private

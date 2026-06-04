@@ -32,7 +32,18 @@ class Settings::CollectionLaddersHelperTest < ActiveSupport::TestCase
     assert_equal :after, collection_step_timing_tone(late)
 
     assert_equal "building-office", collection_step_timing_icon(collection_steps(:manager_alert))
-    assert_equal :internal, collection_step_timing_tone(collection_steps(:manager_alert))
+    assert_equal :after, collection_step_timing_tone(collection_steps(:manager_alert))
+  end
+
+  test "internal alert email card uses same blue as client reminders" do
+    internal_classes = collection_step_channel_card_classes(step: collection_steps(:manager_alert), channel: :email)
+    client_classes = collection_step_channel_card_classes(step: collection_steps(:friendly), channel: :email)
+    assert_equal client_classes, internal_classes
+  end
+
+  test "internal alert timing badge uses amber after-deadline styling" do
+    badge = collection_step_timing_styles(collection_steps(:manager_alert), variant: :badge)
+    assert_includes badge, "amber"
   end
 
   test "aria label combines phrase and step name" do

@@ -2,7 +2,7 @@
 <% whatsapp_active = step.whatsapp_enabled? %>
 <% accordion_open = @open_whatsapp_step_id == step.id %>
 
-<details class="app-card group"
+<details class="<%= collection_step_channel_card_classes(step: step, channel: :whatsapp) %>"
          data-controller="auto-resize-textarea"
          data-action="toggle->auto-resize-textarea#resizeAll"
          <%= "open" if accordion_open %>>

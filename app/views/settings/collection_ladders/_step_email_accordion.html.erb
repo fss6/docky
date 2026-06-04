@@ -2,7 +2,7 @@
 <% email_active = step.kind_internal_alert? || step.email_enabled? %>
 <% accordion_open = @open_email_step_id == step.id %>
 
-<details class="app-card group"
+<details class="<%= collection_step_channel_card_classes(step: step, channel: :email) %>"
          data-controller="auto-resize-textarea collection-email-playground"
          data-action="toggle->auto-resize-textarea#resizeAll"
          <%= "open" if accordion_open %>>
@@ -12,7 +12,7 @@
     </div>
     <div class="flex shrink-0 items-center gap-2">
       <% if step.kind_internal_alert? %>
-        <span class="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">Interno</span>
+        <span class="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">Interno</span>
       <% elsif email_active %>
         <span class="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">Ativo</span>
       <% else %>
