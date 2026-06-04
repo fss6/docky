@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Extrai texto via OCR, cria chunks e dispara embedding e ingestão wiki.
 class DocumentOcrJob < ApplicationJob
   queue_as :default
 

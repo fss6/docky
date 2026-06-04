@@ -10,19 +10,25 @@ module Collection
         kind: :client_reminder,
         email_enabled: true,
         whatsapp_enabled: false,
-        email_subject_template: "Faltam alguns documentos do seu mês",
+        email_subject_template: "Documentos pendentes para fechamento contábil",
         email_body_template: <<~TEXT.strip,
-          Oi {cliente}!
+          Prezado(a) {cliente},
 
-          Estamos montando a contabilidade do mês e ainda faltam alguns documentos seus:
+          Estamos realizando o fechamento contábil do período e identificamos que ainda precisamos receber alguns documentos para concluir o processo.
+
+          📄 Documentos pendentes
 
           {documentos_faltantes}
 
-          É rapidinho — dá pra enviar tudo por aqui, sem login: {link_upload}
+          ⚠️ Prazo para envio: {prazo}
 
-          Prazo: {prazo}. Qualquer dúvida, é só responder este e-mail.
+          Para enviar os documentos, clique no botão abaixo. O processo é rápido, seguro e não requer login.
 
-          — {escritorio}
+          Caso necessite de ajuda, entre em contato com o escritório responsável.
+
+          Atenciosamente,
+
+          {escritorio}
         TEXT
         whatsapp_body_template: <<~TEXT.strip,
           Oi {cliente}! Estamos montando a contabilidade do mês e ainda faltam:

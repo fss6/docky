@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Periods
+  # Abre o período do mês para clientes ativos que ainda não o possuem.
   class OpenMonthJob < ApplicationJob
     queue_as :default
 

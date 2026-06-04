@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Valida e corrige inconsistências nas páginas wiki de uma conta.
 class WikiLintJob < ApplicationJob
   queue_as :wiki_processing
 

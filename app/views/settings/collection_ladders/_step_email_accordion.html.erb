@@ -3,7 +3,7 @@
 <% accordion_open = @open_email_step_id == step.id %>
 
 <details class="app-card group"
-         data-controller="auto-resize-textarea"
+         data-controller="auto-resize-textarea collection-email-playground"
          data-action="toggle->auto-resize-textarea#resizeAll"
          <%= "open" if accordion_open %>>
   <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left [&::-webkit-details-marker]:hidden">
@@ -43,7 +43,10 @@
 
       <div>
         <%= label_tag "#{step_prefix}[email_subject_template]", "Assunto", class: "app-label" %>
-        <%= text_field_tag "#{step_prefix}[email_subject_template]", step.email_subject_template, class: "app-input mt-1 w-full" %>
+        <%= text_field_tag "#{step_prefix}[email_subject_template]",
+              step.email_subject_template,
+              class: "app-input mt-1 w-full",
+              data: { collection_email_playground_target: "subjectSource" } %>
       </div>
       <div>
         <%= label_tag "#{step_prefix}[email_body_template]", "Corpo da mensagem", class: "app-label" %>
@@ -52,12 +55,69 @@
               rows: 1,
               class: "app-input mt-1 w-full resize-none",
               data: {
+                collection_email_playground_target: "bodySource",
                 auto_resize_textarea_target: "field",
                 action: "input->auto-resize-textarea#resize"
               } %>
       </div>
 
       <%= submit_tag "Salvar e-mail", class: "app-btn-primary" %>
+    <% end %>
+
+    <% if @email_configured %>
+      <div class="mt-6 space-y-3 border-t border-zinc-100 pt-4">
+        <div>
+          <p class="text-sm font-medium text-zinc-800">Playground</p>
+          <p class="mt-0.5 text-xs text-zinc-500">Pré-visualize o e-mail como o cliente receberá (layout e conteúdo da etapa) ou envie um teste para o seu e-mail.</p>
+        </div>
+
+        <% if @sample_clients.any? %>
+          <%= form_with url: preview_email_settings_collection_ladder_path,
+                method: :post,
+                class: "space-y-3",
+                data: {
+                  turbo_frame: "email_playground_preview_step_#{step.id}",
+                  action: "submit->collection-email-playground#sync"
+                } do %>
+            <%= hidden_field_tag :step_id, step.id %>
+            <%= hidden_field_tag "#{step_prefix}[email_subject_template]", step.email_subject_template,
+                  data: { collection_email_playground_target: "subjectField" } %>
+            <%= hidden_field_tag "#{step_prefix}[email_body_template]", step.email_body_template,
+                  data: { collection_email_playground_target: "bodyField" } %>
+
+            <div>
+              <%= label_tag "playground_client_#{step.id}", "Cliente de exemplo", class: "app-label" %>
+              <%= select_tag :client_id,
+                    options_from_collection_for_select(@sample_clients, :id, :name, @sample_clients.first&.id),
+                    class: "app-input mt-1 w-full",
+                    id: "playground_client_#{step.id}" %>
+            </div>
+
+            <div>
+              <%= label_tag "playground_recipient_#{step.id}", "Enviar teste para", class: "app-label" %>
+              <%= email_field_tag :recipient,
+                    current_user.email,
+                    class: "app-input mt-1 w-full bg-zinc-50",
+                    readonly: true,
+                    id: "playground_recipient_#{step.id}" %>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <%= button_tag "Pré-visualizar", type: "submit", class: "app-btn-secondary" %>
+              <%= button_tag "Enviar e-mail de teste",
+                    type: "submit",
+                    class: "app-btn-secondary",
+                    formaction: send_test_email_settings_collection_ladder_path,
+                    formmethod: "post",
+                    data: { turbo_frame: "_top" } %>
+            </div>
+          <% end %>
+
+          <%= turbo_frame_tag "email_playground_preview_step_#{step.id}" %>
+        <% else %>
+          <p class="text-xs text-zinc-500">Cadastre um cliente ativo para testar.</p>
+        <% end %>
+      </div>
     <% end %>
   </div>
 </details>

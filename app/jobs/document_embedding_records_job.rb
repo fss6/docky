@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Gera embeddings dos chunks pendentes de um documento.
 class DocumentEmbeddingRecordsJob < ApplicationJob
   queue_as :default
 

@@ -14,27 +14,27 @@ module PlatformSettings
       end
 
       def access_token
-        record.whatsapp_access_token.presence || env_fetch(:access_token)
+        record&.whatsapp_access_token.presence || env_fetch(:access_token)
       end
 
       def phone_number_id
-        record.whatsapp_phone_number_id.presence || env_fetch(:phone_number_id)
+        record&.whatsapp_phone_number_id.presence || env_fetch(:phone_number_id)
       end
 
       def waba_id
-        record.whatsapp_waba_id.presence || env_fetch(:waba_id)
+        record&.whatsapp_waba_id.presence || env_fetch(:waba_id)
       end
 
       def app_secret
-        record.whatsapp_app_secret.presence || env_fetch(:app_secret)
+        record&.whatsapp_app_secret.presence || env_fetch(:app_secret)
       end
 
       def verify_token
-        record.whatsapp_verify_token.presence || env_fetch(:verify_token)
+        record&.whatsapp_verify_token.presence || env_fetch(:verify_token)
       end
 
       def api_version
-        record.whatsapp_api_version.presence || env_fetch(:api_version).presence || "v21.0"
+        record&.whatsapp_api_version.presence || env_fetch(:api_version).presence || "v21.0"
       end
 
       def graph_base_url
@@ -42,12 +42,14 @@ module PlatformSettings
       end
 
       def from_database?
-        record.whatsapp_configured_in_db?
+        record&.whatsapp_configured_in_db? || false
       end
 
       private
 
       def record
+        return unless PlatformSetting.table_ready?
+
         PlatformSetting.current
       end
 

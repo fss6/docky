@@ -44,6 +44,14 @@ class PlatformSetting < ApplicationRecord
 
   attr_accessor :smtp_password_confirmation, :skip_smtp_password_validation
 
+  def self.table_ready?
+    connection_pool.with_connection do |connection|
+      connection.data_source_exists?(table_name)
+    end
+  rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished
+    false
+  end
+
   def self.current
     Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) do
       find_or_create_by!(singleton_key: "default")

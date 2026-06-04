@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Ingere conteúdo de um documento nas páginas wiki da conta.
 class WikiIngestJob < ApplicationJob
   queue_as :wiki_processing
 

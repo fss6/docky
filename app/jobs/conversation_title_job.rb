@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Gera e atualiza o título de uma conversa via IA.
 class ConversationTitleJob < ApplicationJob
   include ActionView::RecordIdentifier
 

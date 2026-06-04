@@ -8,7 +8,8 @@ module PlatformSettings
       end
 
       def mode
-        return record.mail_delivery if from_database?
+        rec = record
+        return rec.mail_delivery if rec&.smtp_configured_in_db?
 
         ActionMailerDelivery.env_mode
       end
@@ -32,23 +33,25 @@ module PlatformSettings
       end
 
       def smtp_settings
-        if from_database?
-          record_smtp_settings
+        rec = record
+        if rec&.smtp_configured_in_db?
+          record_smtp_settings(rec)
         else
           ActionMailerDelivery.env_smtp_settings
         end
       end
 
       def mailer_from
-        if from_database?
-          record.mailer_from.presence || record.smtp_username
+        rec = record
+        if rec&.smtp_configured_in_db?
+          rec.mailer_from.presence || rec.smtp_username
         else
           ActionMailerDelivery.env_mailer_from
         end
       end
 
       def from_database?
-        record.smtp_configured_in_db?
+        record&.smtp_configured_in_db? || false
       end
 
       def from_env?
@@ -58,30 +61,32 @@ module PlatformSettings
       private
 
       def record
+        return unless PlatformSetting.table_ready?
+
         PlatformSetting.current
       end
 
-      def record_smtp_settings
-        address, domain = smtp_address_and_domain
+      def record_smtp_settings(rec)
+        address, domain = smtp_address_and_domain(rec)
         {
           address: address,
-          port: record.smtp_port.presence || 587,
+          port: rec.smtp_port.presence || 587,
           domain: domain,
-          user_name: record.smtp_username,
-          password: record.smtp_password,
-          authentication: (record.smtp_authentication.presence || "plain").to_sym,
+          user_name: rec.smtp_username,
+          password: rec.smtp_password,
+          authentication: (rec.smtp_authentication.presence || "plain").to_sym,
           enable_starttls_auto: true
         }
       end
 
-      def smtp_address_and_domain
-        case record.mail_delivery
+      def smtp_address_and_domain(rec)
+        case rec.mail_delivery
         when "gmail"
-          ["smtp.gmail.com", record.smtp_domain.presence || "gmail.com"]
+          ["smtp.gmail.com", rec.smtp_domain.presence || "gmail.com"]
         else
           [
-            record.smtp_address.presence || raise(ActionMailerDelivery::ConfigurationError, "smtp_address required"),
-            record.smtp_domain.presence || record.smtp_address
+            rec.smtp_address.presence || raise(ActionMailerDelivery::ConfigurationError, "smtp_address required"),
+            rec.smtp_domain.presence || rec.smtp_address
           ]
         end
       end

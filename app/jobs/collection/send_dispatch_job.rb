@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Collection
+  # Envia um dispatch de cobrança (email ou WhatsApp).
   class SendDispatchJob < ApplicationJob
     queue_as :mailers
 

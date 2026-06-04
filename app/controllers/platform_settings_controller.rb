@@ -2,7 +2,7 @@
 
 class PlatformSettingsController < ApplicationController
   before_action :set_platform_setting
-  before_action :authorize_platform_setting, except: :regenerate_whatsapp_verify_token
+  before_action :authorize_platform_setting, except: %i[regenerate_whatsapp_verify_token send_test_email]
 
   def show
     @smtp_configured = PlatformSettings::SmtpConfig.configured?
@@ -26,6 +26,23 @@ class PlatformSettingsController < ApplicationController
     @platform_setting.update!(whatsapp_verify_token: SecureRandom.hex(16))
     PlatformSettings::Delivery.apply!
     redirect_to platform_settings_path, notice: "Token de verificação do webhook regenerado."
+  end
+
+  def send_test_email
+    authorize @platform_setting, :update?
+
+    recipient = params[:recipient].presence || current_user.email
+    unless recipient.match?(URI::MailTo::EMAIL_REGEXP)
+      redirect_to platform_settings_path, alert: "Informe um e-mail de destino válido."
+      return
+    end
+
+    result = PlatformSettings::SendTestEmail.call(recipient: recipient)
+    if result.success
+      redirect_to platform_settings_path, notice: "E-mail de teste enviado para #{recipient}."
+    else
+      redirect_to platform_settings_path, alert: result.error
+    end
   end
 
   private

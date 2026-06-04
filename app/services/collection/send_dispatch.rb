@@ -16,15 +16,33 @@ module Collection
     def call
       return @dispatch unless @dispatch.status_scheduled?
 
-      PlatformSettings::Delivery.apply!
+      @client.with_lock do
+        @dispatch.reload
+        return @dispatch unless @dispatch.status_scheduled?
 
-      case @dispatch.channel.to_sym
-      when :email
-        send_client_email!
-      when :whatsapp
-        send_whatsapp!
-      when :internal
-        send_internal_email!
+        settings = CollectionSetting.ensure_for!(@account)
+        reason = ChannelEligibility.skip_reason(
+          channel: @dispatch.channel,
+          client: @client,
+          account: @account,
+          step: @step,
+          settings: settings
+        )
+        if reason
+          @dispatch.mark_skipped!(reason: reason)
+          return @dispatch
+        end
+
+        PlatformSettings::Delivery.apply!
+
+        case @dispatch.channel.to_sym
+        when :email
+          send_client_email!
+        when :whatsapp
+          send_whatsapp!
+        when :internal
+          send_internal_email!
+        end
       end
     rescue StandardError => e
       @dispatch.mark_failed!(reason: e.message.to_s.truncate(500))

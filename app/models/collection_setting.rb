@@ -24,6 +24,8 @@
 #  fk_rails_...  (account_id => accounts.id)
 #
 class CollectionSetting < ApplicationRecord
+  MAX_MESSAGES_PER_CLIENT_PER_CHANNEL = 1
+
   acts_as_tenant(:account)
 
   belongs_to :account

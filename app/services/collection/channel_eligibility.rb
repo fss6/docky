@@ -43,9 +43,7 @@ module Collection
     private
 
     def daily_limit_reached?
-      today_range = Time.zone.today.all_day
-      count = CollectionDispatch.status_sent.where(client: @client, sent_at: today_range).count
-      count >= @settings.max_messages_per_client_per_day
+      DailyChannelLimit.reached?(client: @client, channel: @channel)
     end
   end
 end

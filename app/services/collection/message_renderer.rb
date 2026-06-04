@@ -2,7 +2,7 @@
 
 module Collection
   class MessageRenderer
-    PLACEHOLDERS = %w[cliente documentos_faltantes prazo link_upload escritorio].freeze
+    PLACEHOLDERS = TemplateSubstitution::PLACEHOLDERS
 
     Result = Struct.new(:email_subject, :email_body, :whatsapp_body, keyword_init: true)
 
@@ -27,11 +27,7 @@ module Collection
     end
 
     def render_template(template, step:)
-      text = template.to_s
-      PLACEHOLDERS.each do |key|
-        text = text.gsub("{#{key}}", replacements.fetch(key))
-      end
-      text
+      TemplateSubstitution.render_template(template, replacements)
     end
 
     def call
@@ -55,7 +51,7 @@ module Collection
     private
 
     def documents_list
-      names = @pending_items.map { |item| "• #{item.name_snapshot}" }
+      names = @pending_items.map { |item| "- #{item.name_snapshot}" }
       names.presence&.join("\n") || "—"
     end
 

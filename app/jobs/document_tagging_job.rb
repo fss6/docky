@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Gera tags automáticas para um documento processado.
 class DocumentTaggingJob < ApplicationJob
   queue_as :default
 

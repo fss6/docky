@@ -68,6 +68,12 @@ class CollectionDispatch < ApplicationRecord
     status_sent.where(sent_at: start_at..end_at)
   }
 
+  scope :recent, ->(since: 7.days.ago) { where(created_at: since..) }
+
+  scope :stale_scheduled, lambda { |hours: 1|
+    status_scheduled.where(created_at: ...hours.hours.ago)
+  }
+
   def mark_sent!(provider_message_id: nil, at: Time.current)
     update!(
       status: :sent,

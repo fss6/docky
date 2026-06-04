@@ -1,0 +1,119 @@
+<% content_for :title, "Envio ##{@dispatch.id} · Plataforma" %>
+
+<div class="space-y-6">
+  <header>
+    <p class="text-xs font-semibold uppercase tracking-wide text-accent">
+      <%= link_to "Envios de lembretes", collection_dispatches_platform_settings_path, class: "text-accent hover:underline" %>
+      <span class="text-zinc-400">/</span>
+      <span class="text-zinc-600">#<%= @dispatch.id %></span>
+    </p>
+    <h1 class="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
+      <%= @dispatch.collection_step.name %> · <%= platform_dispatch_channel_label(@dispatch.channel) %>
+    </h1>
+    <p class="mt-2 text-sm text-zinc-600">
+      <%= @dispatch.client.name %> · <%= @dispatch.account.name %> · competência <%= @dispatch.period.period.strftime("%Y-%m") %>
+    </p>
+  </header>
+
+  <% if @dispatch.status_scheduled? %>
+    <div class="app-card border-sky-200 bg-sky-50 p-4 text-sm text-sky-900" role="status">
+      <p class="font-semibold">Aguardando envio</p>
+      <p class="mt-1">
+        O envio depende do <strong>worker Sidekiq</strong> e da janela de envio configurada no escritório.
+        Dispatches antigos podem ser reenfileirados com <code class="text-xs">rails collection:flush</code> (cron às 08:15 ou manual).
+      </p>
+      <% if dispatch_stale?(@dispatch) %>
+        <p class="mt-2 font-medium text-amber-900">Criado há mais de 1 hora — verifique se o worker está rodando.</p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <section class="app-card p-5 space-y-4">
+    <h2 class="text-lg font-semibold text-zinc-900">Resumo</h2>
+    <dl class="grid gap-3 sm:grid-cols-2 text-sm">
+      <div>
+        <dt class="text-xs font-medium text-zinc-500">Status</dt>
+        <dd class="mt-0.5">
+          <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold <%= platform_dispatch_status_chip_class(@dispatch) %>">
+            <%= platform_dispatch_status_label(@dispatch.status) %>
+          </span>
+        </dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-zinc-500">Canal</dt>
+        <dd class="mt-0.5 text-zinc-900"><%= platform_dispatch_channel_label(@dispatch.channel) %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-zinc-500">Criado em</dt>
+        <dd class="mt-0.5 tabular-nums text-zinc-900"><%= l(@dispatch.created_at, format: :long) %></dd>
+      </div>
+      <div>
+        <dt class="text-xs font-medium text-zinc-500">Enviado em</dt>
+        <dd class="mt-0.5 tabular-nums text-zinc-900">
+          <%= @dispatch.sent_at ? l(@dispatch.sent_at, format: :long) : "—" %>
+        </dd>
+      </div>
+      <% if @dispatch.skip_reason.present? %>
+        <div class="sm:col-span-2">
+          <dt class="text-xs font-medium text-zinc-500">Motivo</dt>
+          <dd class="mt-0.5 text-zinc-900"><%= platform_dispatch_skip_reason_label(@dispatch.skip_reason) %></dd>
+          <dd class="mt-1 font-mono text-xs text-zinc-500"><%= @dispatch.skip_reason %></dd>
+        </div>
+      <% end %>
+      <% if @dispatch.provider_message_id.present? %>
+        <div class="sm:col-span-2">
+          <dt class="text-xs font-medium text-zinc-500">ID provedor (WhatsApp)</dt>
+          <dd class="mt-0.5 font-mono text-xs text-zinc-700"><%= @dispatch.provider_message_id %></dd>
+        </div>
+      <% end %>
+    </dl>
+
+    <% panel_link = platform_collection_panel_link(@dispatch) %>
+    <% if panel_link %>
+      <p class="pt-2">
+        <%= link_to "Abrir no painel de pendências do escritório", panel_link, class: "text-sm font-semibold text-accent hover:underline" %>
+      </p>
+    <% end %>
+  </section>
+
+  <% if @dispatch.rendered_subject.present? || @dispatch.rendered_body.present? %>
+    <section class="app-card p-5 space-y-3">
+      <h2 class="text-lg font-semibold text-zinc-900">Conteúdo renderizado</h2>
+      <% if @dispatch.rendered_subject.present? %>
+        <div>
+          <p class="text-xs font-medium text-zinc-500">Assunto</p>
+          <p class="mt-1 text-sm text-zinc-900"><%= @dispatch.rendered_subject %></p>
+        </div>
+      <% end %>
+      <% if @dispatch.rendered_body.present? %>
+        <div>
+          <p class="text-xs font-medium text-zinc-500">Corpo</p>
+          <pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-50 p-3 text-xs text-zinc-800"><%= @dispatch.rendered_body %></pre>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="app-card p-5 space-y-3">
+    <h2 class="text-lg font-semibold text-zinc-900">Eventos de entrega</h2>
+    <% if @dispatch.delivery_events.any? %>
+      <ul class="divide-y divide-zinc-100 text-sm">
+        <% @dispatch.delivery_events.order(occurred_at: :desc).each do |event| %>
+          <li class="flex flex-wrap items-baseline justify-between gap-2 py-2">
+            <span class="font-medium text-zinc-900"><%= event.event %></span>
+            <span class="tabular-nums text-zinc-500"><%= l(event.occurred_at, format: :short) %></span>
+            <% if event.reliability_tier_weak? %>
+              <span class="text-xs text-zinc-500">(estimado)</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-zinc-500">Nenhum evento de leitura/abertura registrado ainda.</p>
+    <% end %>
+  </section>
+
+  <div>
+    <%= link_to "← Voltar à lista", collection_dispatches_platform_settings_path, class: "text-sm font-semibold text-accent hover:underline" %>
+  </div>
+</div>

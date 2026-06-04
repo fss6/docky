@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
+  # Envia email de ativação de onboarding ao cliente.
   class DeliverOnboardingActivatedEmailJob < ApplicationJob
     queue_as :mailers
 

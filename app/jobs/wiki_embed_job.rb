@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Gera e persiste o embedding vetorial de uma página wiki.
 class WikiEmbedJob < ApplicationJob
   queue_as :embeddings
 

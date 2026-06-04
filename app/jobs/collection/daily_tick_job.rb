@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Collection
+  # Agenda avaliação de cobrança para cada conta com cobrança ativa.
   class DailyTickJob < ApplicationJob
     queue_as :default
 

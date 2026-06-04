@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Clients
+  # Envia email com link de upload ao cliente.
   class DeliverUploadInviteEmailJob < ApplicationJob
     queue_as :mailers
 

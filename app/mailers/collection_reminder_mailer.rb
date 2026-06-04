@@ -1,21 +1,32 @@
 # frozen_string_literal: true
 
 class CollectionReminderMailer < ApplicationMailer
-  def client_reminder(dispatch:, client:, upload_url:, unsubscribe_token:)
+  def client_reminder(dispatch:, client:, upload_url:, unsubscribe_token:, to: nil, test_mode: false)
     @dispatch = dispatch
     @client = client
     @body = dispatch.rendered_body
     @upload_url = upload_url
-    @unsubscribe_url = collection_unsubscribe_url(token: unsubscribe_token)
+    @unsubscribe_url = if test_mode
+      "#{upload_url}#test-unsubscribe"
+    else
+      collection_unsubscribe_url(token: unsubscribe_token)
+    end
 
-    mail(to: client.email, subject: dispatch.rendered_subject)
+    subject = dispatch.rendered_subject
+    subject = "[TESTE] #{subject}" if to.present?
+
+    mail(to: to || client.email, subject: subject)
   end
 
-  def internal_alert(dispatch:, recipient:)
+  def internal_alert(dispatch:, recipient:, to: nil)
     @dispatch = dispatch
     @client = dispatch.client
     @body = dispatch.rendered_body
 
-    mail(to: recipient, subject: dispatch.rendered_subject)
+    subject = dispatch.rendered_subject
+    destination = to || recipient
+    subject = "[TESTE] #{subject}" if to.present?
+
+    mail(to: destination, subject: subject)
   end
 end

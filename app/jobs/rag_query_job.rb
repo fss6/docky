@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Processa uma pergunta do assistente RAG e transmite a resposta.
 class RagQueryJob < ApplicationJob
   include ActionView::RecordIdentifier
 

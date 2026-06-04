@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "email_playground_preview_step_#{step.id}" do %>
+  <% if error.present? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800" role="alert">
+      <%= error %>
+    </div>
+  <% elsif preview.present? %>
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wide text-zinc-500">Pré-visualização</p>
+      <div class="mt-1 max-h-[32rem] overflow-auto rounded border border-zinc-200 bg-[#f4f4f5]">
+        <%= preview.html.html_safe %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

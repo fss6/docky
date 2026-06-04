@@ -5,11 +5,56 @@ module Settings
     before_action :set_collection_setting
     before_action :load_steps
     before_action :authorize_policy
-    before_action :assign_channel_config, only: %i[edit update]
+    before_action :assign_channel_config, only: %i[edit update preview_email send_test_email]
+    before_action :load_sample_clients, only: %i[edit update preview_email send_test_email]
 
     def edit
       @open_email_step_id = params[:open_email].presence&.to_i
       @open_whatsapp_step_id = params[:open_whatsapp].presence&.to_i
+    end
+
+    def preview_email
+      step, client, templates = playground_context!
+      return if performed?
+
+      @preview = Collection::EmailPlayground.preview(
+        step: step,
+        client: client,
+        account: current_user.account,
+        subject_template: templates[:email_subject_template],
+        body_template: templates[:email_body_template],
+        recipient: current_user.email
+      )
+      render partial: "settings/collection_ladders/email_playground_preview",
+             locals: { preview: @preview, step: step, error: nil },
+             layout: false
+    rescue StandardError => e
+      step ||= @steps.find { |s| s.id == params[:step_id].to_i }
+      render partial: "settings/collection_ladders/email_playground_preview",
+             locals: { preview: nil, step: step, error: e.message },
+             layout: false
+    end
+
+    def send_test_email
+      step, client, templates = playground_context!
+      return if performed?
+
+      result = Collection::EmailPlayground.send_test!(
+        step: step,
+        client: client,
+        account: current_user.account,
+        subject_template: templates[:email_subject_template],
+        body_template: templates[:email_body_template],
+        recipient: current_user.email
+      )
+
+      if result.success
+        redirect_to edit_settings_collection_ladder_path(open_email: step.id),
+                    notice: "E-mail de teste enviado para #{current_user.email}."
+      else
+        redirect_to edit_settings_collection_ladder_path(open_email: step.id),
+                    alert: result.error
+      end
     end
 
     def update
@@ -35,8 +80,32 @@ module Settings
       @steps = current_user.account.collection_steps.ordered
     end
 
+    def load_sample_clients
+      @sample_clients = current_user.account.clients.kept.where(status: :active).order(:name).limit(50)
+    end
+
+    def playground_context!
+      step = find_step_for_update!
+      return [ nil, nil, nil ] if performed?
+
+      client = @sample_clients.find { |c| c.id == params[:client_id].to_i }
+      unless client
+        head :unprocessable_entity
+        return [ nil, nil, nil ]
+      end
+
+      attrs = step_attrs_for(step.id)
+      if attrs.nil?
+        head :bad_request
+        return [ nil, nil, nil ]
+      end
+
+      templates = email_step_params(attrs)
+      [ step, client, templates ]
+    end
+
     def authorize_policy
-      authorize current_user.account.setting || Setting.new(account: current_user.account)
+      authorize(current_user.account.setting || Setting.new(account: current_user.account), :update?)
     end
 
     def assign_channel_config
@@ -120,7 +189,6 @@ module Settings
         :auto_confirm_receipt,
         :quiet_hours_start,
         :quiet_hours_end,
-        :max_messages_per_client_per_day,
         :timezone
       ])
     end
